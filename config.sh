@@ -1,0 +1,35 @@
+#!/bin/bash
+
+PACMAN_PACKAGES_TO_INSTALL=(
+    "wezterm"
+    "7zip"
+    "unzip"
+    "unrar"
+    "vlc"
+    "ksnip"
+    "bitwarden"
+    "discord"
+    "redshift"
+    "thunar"
+    "thunderbird"
+    "bleachbit"
+    "timeshift"
+    "xed"
+    "meld"
+    "maven"
+    "jdk24-openjdk"
+    "postgresql"
+    "mariadb"
+    "docker"
+)
+
+AUR_PACKAGES_TO_INSTALL=(
+    "octopi"
+    "visual-studio-code-bin"
+    "waterfox-bin"
+    "zen-browser-bin"
+    "google-chrome"
+    "betterbird-bin"
+    "downgrade"
+    "ventoy-bin"
+)
