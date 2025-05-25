@@ -3,6 +3,7 @@
 # Kiet's Linux Manager Script
 source ./config.sh
 source ./install_packages.sh
+source ./utils.sh  # Add source to utils.sh
 
 # Enhanced Colors and Styles
 RED='\033[0;31m'
@@ -97,66 +98,35 @@ display_menu() {
     echo
 }
 
-# Function to show loading animation
-show_loading() {
-    local message="$1"
-    local duration="${2:-2}"
+# Function to show loading animation - moved to utils.sh
+# Using the one from utils.sh instead
 
-    echo -e "${LIGHT_YELLOW}${ICON_GEAR} ${message}${NC}"
+# Function to display success message - replaced with utils.sh version
+# Using print_boxed_message from utils.sh instead
 
-    # Spinning wheel animation
-    local spinner=('⠋' '⠙' '⠹' '⠸' '⠼' '⠴' '⠦' '⠧' '⠇' '⠏')
-    local count=0
-    local total_iterations=$((duration * 10))
+# Function to display error message - replaced with utils.sh version
+# Using print_boxed_message from utils.sh instead
 
-    while [ $count -lt $total_iterations ]; do
-        for i in "${spinner[@]}"; do
-            echo -ne "\r${LIGHT_CYAN}${i} ${WHITE}Processing...${NC}"
-            sleep 0.1
-            ((count++))
-            [ $count -ge $total_iterations ] && break
-        done
-    done
-    echo -e "\r${GREEN}${ICON_CHECK} ${WHITE}Ready!${NC}                    "
-    sleep 0.5
-}
+# Function to display info message - replaced with utils.sh version
+# Using print_boxed_message from utils.sh instead
 
-# Function to display success message
-show_success() {
-    echo -e "\n${GREEN}╔═══════════════════════════════════════════════════════════════════════════════╗${NC}"
-    echo -e "${GREEN}║  ${ICON_CHECK} ${WHITE}${BOLD}SUCCESS!${NC} ${GREEN}Operation completed successfully!${NC}                             ${GREEN}║${NC}"
-    echo -e "${GREEN}╚═══════════════════════════════════════════════════════════════════════════════╝${NC}"
-}
-
-# Function to display error message
-show_error() {
-    local error_msg="$1"
-    echo -e "\n${LIGHT_RED}╔═══════════════════════════════════════════════════════════════════════════════╗${NC}"
-    echo -e "${LIGHT_RED}║  ${ICON_CROSS} ${WHITE}${BOLD}ERROR!${NC} ${LIGHT_RED}$error_msg${NC}                                                 ${LIGHT_RED}║${NC}"
-    echo -e "${LIGHT_RED}╚═══════════════════════════════════════════════════════════════════════════════╝${NC}"
-}
-
-# Function to display info message
-show_info() {
-    local info_msg="$1"
-    echo -e "\n${LIGHT_BLUE}╔═══════════════════════════════════════════════════════════════════════════════╗${NC}"
-    echo -e "${LIGHT_BLUE}║  ${ICON_INFO} ${WHITE}${BOLD}INFO:${NC} ${LIGHT_BLUE}$info_msg${NC}                                                  ${LIGHT_BLUE}║${NC}"
-    echo -e "${LIGHT_BLUE}╚═══════════════════════════════════════════════════════════════════════════════╝${NC}"
-}
-
-# Function to get user input with style
+# Function to get user input with style - using read_single_key from utils.sh
 get_user_choice() {
-    echo -e "${LIGHT_CYAN}${ICON_ARROW}  ${WHITE}${BOLD}Enter your choice${NC} ${DARK_GRAY}[${LIGHT_GREEN}1-5${DARK_GRAY}]${NC}: \c"
-    read choice
+    echo -e "${LIGHT_CYAN}${ICON_ARROW} ${WHITE}${BOLD}Enter your choice${NC} ${DARK_GRAY}[${LIGHT_GREEN}1-5${DARK_GRAY}]${NC}: \c"
+
+    # Use read_single_key instead of read to avoid requiring Enter
+    choice=$(read_single_key)
     echo
 }
 
-# Function to wait for user input with style
+# Function to wait for user input with style - enhanced with read_single_key from utils.sh
 wait_for_user() {
     echo -e "\n${DARK_GRAY}┌─────────────────────────────────────────────────────────────────────────────────┐${NC}"
-    echo -e "${DARK_GRAY}│  ${LIGHT_YELLOW}${ICON_INFO} ${WHITE}Press ${LIGHT_GREEN}${BOLD}[ENTER]${NC}${WHITE} to return to the main menu...${NC}                           ${DARK_GRAY}│${NC}"
+    echo -e "${DARK_GRAY}│  ${LIGHT_YELLOW}${ICON_INFO} ${WHITE}Press ${LIGHT_GREEN}${BOLD}any key${NC}${WHITE} to return to the main menu...${NC}                             ${DARK_GRAY}│${NC}"
     echo -e "${DARK_GRAY}└─────────────────────────────────────────────────────────────────────────────────┘${NC}"
-    read
+
+    # Use read_single_key instead of read to avoid requiring Enter
+    read_single_key > /dev/null
 }
 
 # Function to show exit message
@@ -186,23 +156,23 @@ main() {
 
         case $choice in
             1)
-                show_loading "Initializing Package Manager" 1
+                show_spinner "Initializing Package Manager" 1
                 install_packages
-                show_success
+                print_boxed_message "Operation completed successfully!" "success"
                 ;;
             2)
-                show_loading "Loading Configuration Manager" 1
-                show_info "Configuration manager feature coming soon!"
+                show_spinner "Loading Configuration Manager" 1
+                print_boxed_message "Configuration manager feature coming soon!" "info"
                 # install_configurations
                 ;;
             3)
-                show_loading "Setting up PHP Development Environment" 1
-                show_info "PHP/Composer/Laravel manager feature coming soon!"
+                show_spinner "Setting up PHP Development Environment" 1
+                print_boxed_message "PHP/Composer/Laravel manager feature coming soon!" "info"
                 # manage_php_composer_laravel
                 ;;
             4)
-                show_loading "Initializing Node.js Environment" 1
-                show_info "NVM/NodeJS/NPM manager feature coming soon!"
+                show_spinner "Initializing Node.js Environment" 1
+                print_boxed_message "NVM/NodeJS/NPM manager feature coming soon!" "info"
                 # manage_nvm_nodejs_npm
                 ;;
             5)
@@ -210,7 +180,7 @@ main() {
                 exit 0
                 ;;
             *)
-                show_error "Invalid choice. Please select a number between 1-5."
+                print_boxed_message "Invalid choice. Please select a number between 1-5." "error"
                 sleep 2
                 ;;
         esac

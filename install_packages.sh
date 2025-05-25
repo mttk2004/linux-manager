@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Source the utils file
+source ./utils.sh
+
 # Function to check if a package is installed (works for both pacman and AUR packages)
 is_package_installed() {
     # Use pacman -Qi to check if package exists
@@ -11,7 +14,7 @@ is_package_installed() {
     fi
 }
 
-# Enhanced package installation prompt
+# Enhanced package installation prompt using the single keypress function
 ask_install_package() {
     local package="$1"
     local source="$2"
@@ -25,15 +28,11 @@ ask_install_package() {
     echo -e "${LIGHT_BLUE}║                                                                               ║${NC}"
     echo -e "${LIGHT_BLUE}╚═══════════════════════════════════════════════════════════════════════════════╝${NC}"
 
-    echo -e "${LIGHT_CYAN}${ICON_ARROW} ${WHITE}Do you want to install ${BOLD}$package${NC}${WHITE}? ${DARK_GRAY}[${LIGHT_GREEN}Y${DARK_GRAY}/${LIGHT_RED}n${DARK_GRAY}]${NC}: \c"
-    read choice
-    echo
-
-    choice=${choice:-y}
-    if [[ $choice =~ ^[Yy]$ ]]; then
-        return 0
+    # Use the confirm_yn function instead of manual read
+    if confirm_yn "${LIGHT_CYAN}${ICON_ARROW} ${WHITE}Do you want to install ${BOLD}$package${NC}${WHITE}?${NC}" "y"; then
+        return 0 # User selected yes
     else
-        return 1
+        return 1 # User selected no
     fi
 }
 
@@ -99,6 +98,7 @@ install_packages() {
         fi
 
         if ask_install_package "$package" "Official Repository"; then
+            # Show spinner while installing
             echo -e "${LIGHT_YELLOW}${ICON_GEAR} Installing $package...${NC}"
 
             if sudo pacman -S --noconfirm "$package"; then
@@ -151,7 +151,9 @@ install_packages() {
         echo
     done
 
-    # Enhanced Summary of installations
+    # Enhanced Summary of installations using print_boxed_message
+    print_boxed_message "Installation Complete!" "success"
+
     echo -e "\n${LIGHT_BLUE}╔═══════════════════════════════════════════════════════════════════════════════╗${NC}"
     echo -e "${LIGHT_BLUE}║                           ${WHITE}${BOLD}INSTALLATION SUMMARY${NC}${LIGHT_BLUE}                            ║${NC}"
     echo -e "${LIGHT_BLUE}╠═══════════════════════════════════════════════════════════════════════════════╣${NC}"
