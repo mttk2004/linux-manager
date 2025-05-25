@@ -112,10 +112,18 @@ display_menu() {
 
 # Function to get user input with style - using read_single_key from utils.sh
 get_user_choice() {
-    echo -e "${LIGHT_CYAN}${ICON_ARROW} ${WHITE}${BOLD}Enter your choice${NC} ${DARK_GRAY}[${LIGHT_GREEN}1-5${DARK_GRAY}]${NC}: \c"
+    # Display prompt manually
+    echo -e -n "${LIGHT_CYAN}${ICON_ARROW} ${WHITE}${BOLD}Enter your choice${NC} ${DARK_GRAY}[${LIGHT_GREEN}1-5${DARK_GRAY}]${NC}: "
 
-    # Use read_single_key instead of read to avoid requiring Enter
+    # Get ONLY the key without any prompt handling
     choice=$(read_single_key)
+
+    # Echo the character for visual feedback
+    echo "$choice"
+
+    # Debug output to see what character was actually captured
+    echo -e "\n${YELLOW}DEBUG: Captured choice: '$choice' (length: ${#choice}) (ascii codes: $(printf "%s" "$choice" | od -An -td1))${NC}"
+
     echo
 }
 

@@ -1,8 +1,37 @@
 #!/bin/bash
 
 # Function to read a single character without requiring Enter key
-# Usage: read_single_key "prompt message"
+# Usage: key=$(read_single_key)
 read_single_key() {
+    local key
+
+    # Use stty to set terminal to raw mode
+    if command -v stty >/dev/null 2>&1; then
+        # Save current terminal settings
+        local old_stty_cfg
+        old_stty_cfg=$(stty -g)
+
+        # Set terminal to raw mode (no echo, no canonical processing)
+        stty raw -echo
+
+        # Read exactly one character
+        key=$(dd bs=1 count=1 2>/dev/null)
+
+        # Restore terminal settings
+        stty "$old_stty_cfg"
+
+    # Fallback to read -n 1 with timeout
+    else
+        read -n 1 -t 30 key
+    fi
+
+    # Return ONLY the key without any echo
+    printf "%s" "$key"
+}
+
+# Function to read a single character WITH prompt and visual feedback
+# Usage: key=$(read_single_key_with_prompt "Enter choice: ")
+read_single_key_with_prompt() {
     local prompt="$1"
     local key
 
@@ -11,29 +40,14 @@ read_single_key() {
         echo -e -n "$prompt"
     fi
 
-    # Read a single character without requiring Enter
-    if [ -t 0 ]; then  # Check if stdin is a terminal
-        # Save current terminal settings
-        local old_tty_settings
-        old_tty_settings=$(stty -g)
+    # Get the key without any echo - DO NOT capture output from echo
+    key=$(read_single_key)
 
-        # Set terminal to raw mode (-echo: don't echo typed characters, -icanon: disable canonical mode)
-        stty -echo -icanon
+    # Echo the character for visual feedback (but don't capture this output)
+    echo -n "$key"
+    echo  # Add newline
 
-        # Read a single character
-        key=$(dd bs=1 count=1 2>/dev/null)
-
-        # Restore terminal settings
-        stty "$old_tty_settings"
-
-        # Echo the character for user feedback
-        echo -e "$key"
-    else
-        # Fall back to standard read if not on a terminal (e.g. pipe)
-        read -n 1 key
-    fi
-
-    # Return the character
+    # Return ONLY the key, not the prompt or any other output
     echo "$key"
 }
 
@@ -55,9 +69,9 @@ confirm_yn() {
     # Full prompt with message
     local full_prompt="${prompt} ${yn_prompt}: "
 
-    # Get the key press
+    # Get the key press using the new function
     local key
-    key=$(read_single_key "$full_prompt" | tr '[:upper:]' '[:lower:]')
+    key=$(read_single_key_with_prompt "$full_prompt" | tr '[:upper:]' '[:lower:]')
 
     # Default value if nothing is pressed
     if [[ -z "$key" ]]; then
