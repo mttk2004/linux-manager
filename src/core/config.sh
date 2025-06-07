@@ -81,6 +81,7 @@ create_default_package_lists() {
     if [ ! -f "$PACKAGES_DIR/pacman.list" ]; then
         cat > "$PACKAGES_DIR/pacman.list" << EOF
 wezterm
+ghostty
 7zip
 unzip
 unrar
@@ -90,6 +91,7 @@ bitwarden
 discord
 redshift
 thunar
+nemo
 thunderbird
 bleachbit
 timeshift
@@ -146,6 +148,7 @@ gimp
 obs-studio
 kdenlive
 audacity
+audacious
 EOF
     fi
 }
