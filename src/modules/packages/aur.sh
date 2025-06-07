@@ -107,14 +107,15 @@ show_aur_package_status() {
 ask_install_aur_package() {
     local package="$1"
 
-    echo -e "${LIGHT_BLUE}╔═══════════════════════════════════════════════════════════════════════════════╗${NC}"
-    echo -e "${LIGHT_BLUE}║  ${ICON_PACKAGE} ${WHITE}${BOLD}Cài đặt gói AUR${NC}                                                    ${LIGHT_BLUE}║${NC}"
-    echo -e "${LIGHT_BLUE}╠═══════════════════════════════════════════════════════════════════════════════╣${NC}"
-    echo -e "${LIGHT_BLUE}║                                                                               ║${NC}"
-    echo -e "${LIGHT_BLUE}║  ${YELLOW}Gói:${NC} ${WHITE}${BOLD}$package${NC}                                                             ${LIGHT_BLUE}║${NC}"
-    echo -e "${LIGHT_BLUE}║  ${YELLOW}Nguồn:${NC} ${LIGHT_CYAN}Arch User Repository (AUR)${NC}                                       ${LIGHT_BLUE}║${NC}"
-    echo -e "${LIGHT_BLUE}║                                                                               ║${NC}"
-    echo -e "${LIGHT_BLUE}╚═══════════════════════════════════════════════════════════════════════════════╝${NC}"
+    echo -e "${DARK_GRAY}    ──────────────────────────────────────────────────────────────${NC}"
+    echo -e "${WHITE}                    ${ICON_PACKAGE} ${BOLD}CÀI ĐẶT GÓI AUR${NC} ${ICON_PACKAGE}"
+    echo -e "${DARK_GRAY}    ──────────────────────────────────────────────────────────────${NC}"
+    echo
+    echo -e "  ${YELLOW}Gói:${NC} ${WHITE}${BOLD}$package${NC}"
+    echo -e "  ${YELLOW}Nguồn:${NC} ${LIGHT_CYAN}Arch User Repository (AUR)${NC}"
+    echo
+    echo -e "${DARK_GRAY}    ──────────────────────────────────────────────────────────────${NC}"
+    echo
 
     # Sử dụng hàm confirm_yn từ utils.sh
     if confirm_yn "${LIGHT_CYAN}${ICON_ARROW} ${WHITE}Bạn có muốn cài đặt ${BOLD}$package${NC}${WHITE} không?${NC}" "y"; then

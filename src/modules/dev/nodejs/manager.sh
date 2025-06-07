@@ -20,30 +20,36 @@ display_nodejs_menu() {
     echo "    ██║ ╚████║╚██████╔╝██████╔╝███████╗╚█████╔╝███████║    ██║ ╚═╝ ██║██║  ██║██║ ╚████║██║  ██║╚██████╔╝███████╗██║  ██║"
     echo "    ╚═╝  ╚═══╝ ╚═════╝ ╚═════╝ ╚══════╝ ╚════╝ ╚══════╝    ╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝  ╚═╝ ╚═════╝ ╚══════╝╚═╝  ╚═╝"
     echo -e "${NC}"
-    echo -e "${DARK_GRAY}                      ═══════════════════════════════════════════════════════${NC}"
-    echo -e "${WHITE}                              ${ICON_NODE} ${BOLD}NODE.JS/NVM/NPM MANAGER${NC} ${ICON_NODE}"
-    echo -e "${DARK_GRAY}                      ═══════════════════════════════════════════════════════${NC}"
+
+    echo -e "${DARK_GRAY}    ──────────────────────────────────────────────────────────────${NC}"
+    echo -e "${WHITE}                    ${ICON_NODE} ${BOLD}NODE.JS/NVM/NPM MANAGER${NC} ${ICON_NODE}"
+    echo -e "${DARK_GRAY}    ──────────────────────────────────────────────────────────────${NC}"
     echo
 
-    echo -e "${LIGHT_BLUE}╔════════════════════════════════════════════════════════════════════════════════╗${NC}"
-    echo -e "${LIGHT_BLUE}║                             ${WHITE}${BOLD}NODE.JS MENU${NC}${LIGHT_BLUE}                                     ║${NC}"
-    echo -e "${LIGHT_BLUE}╠════════════════════════════════════════════════════════════════════════════════╣${NC}"
-    echo -e "${LIGHT_BLUE}║                                                                                ║${NC}"
-    echo -e "${LIGHT_BLUE}║  ${ICON_PACKAGE} ${GREEN}${BOLD}[1]${NC} ${WHITE}Cài đặt NVM${NC}                          ${GRAY}${DIM}Node Version Manager${NC}  ${LIGHT_BLUE}║${NC}"
-    echo -e "${LIGHT_BLUE}║                                                                                ║${NC}"
-    echo -e "${LIGHT_BLUE}║  ${ICON_CONFIG} ${GREEN}${BOLD}[2]${NC} ${WHITE}Cài đặt Node.js${NC}                            ${GRAY}${DIM}Thông qua NVM${NC}  ${LIGHT_BLUE}║${NC}"
-    echo -e "${LIGHT_BLUE}║                                                                                ║${NC}"
-    echo -e "${LIGHT_BLUE}║  ${ICON_NODE} ${GREEN}${BOLD}[3]${NC} ${WHITE}Quản lý phiên bản Node.js${NC}                ${GRAY}${DIM}Cài đặt/chuyển đổi${NC}  ${LIGHT_BLUE}║${NC}"
-    echo -e "${LIGHT_BLUE}║                                                                                ║${NC}"
-    echo -e "${LIGHT_BLUE}║  ${ICON_CONFIG} ${GREEN}${BOLD}[4]${NC} ${WHITE}Cài đặt gói NPM toàn cục${NC}                ${GRAY}${DIM}Các công cụ phổ biến${NC}  ${LIGHT_BLUE}║${NC}"
-    echo -e "${LIGHT_BLUE}║                                                                                ║${NC}"
-    echo -e "${LIGHT_BLUE}║  ${ICON_EXIT} ${LIGHT_RED}${BOLD}[5]${NC} ${WHITE}Quay lại menu chính${NC}                                    ${GRAY}${DIM}Quay lại${NC}  ${LIGHT_BLUE}║${NC}"
-    echo -e "${LIGHT_BLUE}║                                                                                ║${NC}"
-    echo -e "${LIGHT_BLUE}╚════════════════════════════════════════════════════════════════════════════════╝${NC}"
+    # Menu items với style đơn giản và hiện đại
+    echo -e "  ${ICON_PACKAGE} ${GREEN}${BOLD}[1]${NC}  ${WHITE}Cài đặt NVM${NC}"
+    echo -e "      ${GRAY}${DIM}Node Version Manager${NC}"
     echo
-    echo -e "${DARK_GRAY}               ┌──────────────────────────────────────────────────┐${NC}"
-    echo -e "${DARK_GRAY}               │  ${LIGHT_CYAN}${ICON_INFO} ${WHITE}Chọn một tùy chọn và nhấn Enter để tiếp tục${NC}${DARK_GRAY}  │${NC}"
-    echo -e "${DARK_GRAY}               └──────────────────────────────────────────────────┘${NC}"
+
+    echo -e "  ${ICON_CONFIG} ${GREEN}${BOLD}[2]${NC}  ${WHITE}Cài đặt Node.js${NC}"
+    echo -e "      ${GRAY}${DIM}Thông qua NVM${NC}"
+    echo
+
+    echo -e "  ${ICON_NODE} ${GREEN}${BOLD}[3]${NC}  ${WHITE}Quản lý phiên bản Node.js${NC}"
+    echo -e "      ${GRAY}${DIM}Cài đặt/chuyển đổi phiên bản${NC}"
+    echo
+
+    echo -e "  ${ICON_CONFIG} ${GREEN}${BOLD}[4]${NC}  ${WHITE}Cài đặt gói NPM toàn cục${NC}"
+    echo -e "      ${GRAY}${DIM}Các công cụ phổ biến${NC}"
+    echo
+
+    echo -e "  ${ICON_EXIT} ${LIGHT_RED}${BOLD}[5]${NC}  ${WHITE}Quay lại menu chính${NC}"
+    echo -e "      ${GRAY}${DIM}Trở về menu chính${NC}"
+    echo
+
+    echo -e "${DARK_GRAY}    ──────────────────────────────────────────────────────────────${NC}"
+    echo -e "    ${LIGHT_CYAN}${ICON_INFO} ${WHITE}Chọn một tùy chọn từ ${LIGHT_GREEN}${BOLD}1-5${NC}${WHITE} và nhấn Enter${NC}"
+    echo -e "${DARK_GRAY}    ──────────────────────────────────────────────────────────────${NC}"
     echo
 }
 

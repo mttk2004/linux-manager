@@ -13,32 +13,40 @@ display_system_menu() {
     echo "    ███████║   ██║   ███████║   ██║   ███████╗██║ ╚═╝ ██║"
     echo "    ╚══════╝   ╚═╝   ╚══════╝   ╚═╝   ╚══════╝╚═╝     ╚═╝"
     echo -e "${NC}"
-    echo -e "${DARK_GRAY}                      ═══════════════════════════════════════════════════════${NC}"
-    echo -e "${WHITE}                              ${ICON_CONFIG} ${BOLD}QUẢN LÝ CẤU HÌNH HỆ THỐNG${NC} ${ICON_CONFIG}"
-    echo -e "${DARK_GRAY}                      ═══════════════════════════════════════════════════════${NC}"
+
+    echo -e "${DARK_GRAY}    ──────────────────────────────────────────────────────────────${NC}"
+    echo -e "${WHITE}                    ${ICON_CONFIG} ${BOLD}QUẢN LÝ CẤU HÌNH HỆ THỐNG${NC} ${ICON_CONFIG}"
+    echo -e "${DARK_GRAY}    ──────────────────────────────────────────────────────────────${NC}"
     echo
 
-    echo -e "${LIGHT_BLUE}╔════════════════════════════════════════════════════════════════════════════════╗${NC}"
-    echo -e "${LIGHT_BLUE}║                           ${WHITE}${BOLD}MENU CẤU HÌNH HỆ THỐNG${NC}${LIGHT_BLUE}                              ║${NC}"
-    echo -e "${LIGHT_BLUE}╠════════════════════════════════════════════════════════════════════════════════╣${NC}"
-    echo -e "${LIGHT_BLUE}║                                                                                ║${NC}"
-    echo -e "${LIGHT_BLUE}║  ${ICON_CONFIG} ${GREEN}${BOLD}[1]${NC} ${WHITE}Cấu hình shell${NC}                             ${GRAY}${DIM}Bash, Zsh, Fish${NC}  ${LIGHT_BLUE}║${NC}"
-    echo -e "${LIGHT_BLUE}║                                                                                ║${NC}"
-    echo -e "${LIGHT_BLUE}║  ${ICON_CONFIG} ${GREEN}${BOLD}[2]${NC} ${WHITE}Cấu hình trình soạn thảo${NC}                 ${GRAY}${DIM}Vim, Neovim, Emacs${NC}  ${LIGHT_BLUE}║${NC}"
-    echo -e "${LIGHT_BLUE}║                                                                                ║${NC}"
-    echo -e "${LIGHT_BLUE}║  ${ICON_CONFIG} ${GREEN}${BOLD}[3]${NC} ${WHITE}Cấu hình mạng${NC}                             ${GRAY}${DIM}NetworkManager${NC}  ${LIGHT_BLUE}║${NC}"
-    echo -e "${LIGHT_BLUE}║                                                                                ║${NC}"
-    echo -e "${LIGHT_BLUE}║  ${ICON_CONFIG} ${GREEN}${BOLD}[4]${NC} ${WHITE}Cấu hình dịch vụ${NC}                             ${GRAY}${DIM}Systemd${NC}  ${LIGHT_BLUE}║${NC}"
-    echo -e "${LIGHT_BLUE}║                                                                                ║${NC}"
-    echo -e "${LIGHT_BLUE}║  ${ICON_CONFIG} ${GREEN}${BOLD}[5]${NC} ${WHITE}Tạo bản sao lưu${NC}                            ${GRAY}${DIM}Timeshift${NC}  ${LIGHT_BLUE}║${NC}"
-    echo -e "${LIGHT_BLUE}║                                                                                ║${NC}"
-    echo -e "${LIGHT_BLUE}║  ${ICON_EXIT} ${LIGHT_RED}${BOLD}[6]${NC} ${WHITE}Quay lại menu chính${NC}                                    ${GRAY}${DIM}Quay lại${NC}  ${LIGHT_BLUE}║${NC}"
-    echo -e "${LIGHT_BLUE}║                                                                                ║${NC}"
-    echo -e "${LIGHT_BLUE}╚════════════════════════════════════════════════════════════════════════════════╝${NC}"
+    # Menu items với style đơn giản và hiện đại
+    echo -e "  ${ICON_CONFIG} ${GREEN}${BOLD}[1]${NC}  ${WHITE}Cấu hình shell${NC}"
+    echo -e "      ${GRAY}${DIM}Bash, Zsh, Fish${NC}"
     echo
-    echo -e "${DARK_GRAY}               ┌──────────────────────────────────────────────────┐${NC}"
-    echo -e "${DARK_GRAY}               │  ${LIGHT_CYAN}${ICON_INFO} ${WHITE}Chọn một tùy chọn và nhấn Enter để tiếp tục${NC}${DARK_GRAY}  │${NC}"
-    echo -e "${DARK_GRAY}               └──────────────────────────────────────────────────┘${NC}"
+
+    echo -e "  ${ICON_CONFIG} ${GREEN}${BOLD}[2]${NC}  ${WHITE}Cấu hình trình soạn thảo${NC}"
+    echo -e "      ${GRAY}${DIM}Vim, Neovim, Emacs${NC}"
+    echo
+
+    echo -e "  ${ICON_CONFIG} ${GREEN}${BOLD}[3]${NC}  ${WHITE}Cấu hình mạng${NC}"
+    echo -e "      ${GRAY}${DIM}NetworkManager${NC}"
+    echo
+
+    echo -e "  ${ICON_CONFIG} ${GREEN}${BOLD}[4]${NC}  ${WHITE}Cấu hình dịch vụ${NC}"
+    echo -e "      ${GRAY}${DIM}Systemd${NC}"
+    echo
+
+    echo -e "  ${ICON_CONFIG} ${GREEN}${BOLD}[5]${NC}  ${WHITE}Tạo bản sao lưu${NC}"
+    echo -e "      ${GRAY}${DIM}Timeshift${NC}"
+    echo
+
+    echo -e "  ${ICON_EXIT} ${LIGHT_RED}${BOLD}[6]${NC}  ${WHITE}Quay lại menu chính${NC}"
+    echo -e "      ${GRAY}${DIM}Trở về menu chính${NC}"
+    echo
+
+    echo -e "${DARK_GRAY}    ──────────────────────────────────────────────────────────────${NC}"
+    echo -e "    ${LIGHT_CYAN}${ICON_INFO} ${WHITE}Chọn một tùy chọn từ ${LIGHT_GREEN}${BOLD}1-6${NC}${WHITE} và nhấn Enter${NC}"
+    echo -e "${DARK_GRAY}    ──────────────────────────────────────────────────────────────${NC}"
     echo
 }
 

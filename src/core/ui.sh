@@ -73,25 +73,35 @@ print_fancy_header() {
 display_menu() {
     print_fancy_header
 
-    echo -e "${LIGHT_BLUE}╔════════════════════════════════════════════════════════════════════════════════╗${NC}"
-    echo -e "${LIGHT_BLUE}║                                  ${WHITE}${BOLD}MENU CHÍNH${NC}${LIGHT_BLUE}                                    ║${NC}"
-    echo -e "${LIGHT_BLUE}╠════════════════════════════════════════════════════════════════════════════════╣${NC}"
-    echo -e "${LIGHT_BLUE}║                                                                                ║${NC}"
-    echo -e "${LIGHT_BLUE}║  ${ICON_PACKAGE} ${GREEN}${BOLD}[1]${NC} ${WHITE}Cài đặt gói phần mềm thiết yếu${NC}                ${GRAY}${DIM}Gói hệ thống & AUR${NC}  ${LIGHT_BLUE}║${NC}"
-    echo -e "${LIGHT_BLUE}║                                                                                ║${NC}"
-    echo -e "${LIGHT_BLUE}║  ${ICON_CONFIG} ${GREEN}${BOLD}[2]${NC} ${WHITE}Cài đặt cấu hình${NC}                               ${GRAY}${DIM}Thiết lập hệ thống${NC}  ${LIGHT_BLUE}║${NC}"
-    echo -e "${LIGHT_BLUE}║                                                                                ║${NC}"
-    echo -e "${LIGHT_BLUE}║  ${ICON_PHP} ${GREEN}${BOLD}[3]${NC} ${WHITE}Quản lý PHP/Composer/Laravel${NC}                     ${GRAY}${DIM}Môi trường web${NC}  ${LIGHT_BLUE}║${NC}"
-    echo -e "${LIGHT_BLUE}║                                                                                ║${NC}"
-    echo -e "${LIGHT_BLUE}║  ${ICON_NODE} ${GREEN}${BOLD}[4]${NC} ${WHITE}Quản lý NVM/NodeJS/NPM${NC}                          ${GRAY}${DIM}JavaScript runtime${NC}  ${LIGHT_BLUE}║${NC}"
-    echo -e "${LIGHT_BLUE}║                                                                                ║${NC}"
-    echo -e "${LIGHT_BLUE}║  ${ICON_EXIT} ${LIGHT_RED}${BOLD}[5]${NC} ${WHITE}Thoát ứng dụng${NC}                                             ${GRAY}${DIM}Tạm biệt!${NC}  ${LIGHT_BLUE}║${NC}"
-    echo -e "${LIGHT_BLUE}║                                                                                ║${NC}"
-    echo -e "${LIGHT_BLUE}╚════════════════════════════════════════════════════════════════════════════════╝${NC}"
+    echo -e "${DARK_GRAY}    ──────────────────────────────────────────────────────────────${NC}"
+    echo -e "${WHITE}                    ${ICON_ROCKET} ${BOLD}MENU CHÍNH${NC} ${ICON_ROCKET}"
+    echo -e "${DARK_GRAY}    ──────────────────────────────────────────────────────────────${NC}"
     echo
-    echo -e "${DARK_GRAY}               ┌──────────────────────────────────────────────────┐${NC}"
-    echo -e "${DARK_GRAY}               │  ${LIGHT_CYAN}${ICON_INFO} ${WHITE}Chọn một tùy chọn và nhấn Enter để tiếp tục${NC}${DARK_GRAY}  │${NC}"
-    echo -e "${DARK_GRAY}               └──────────────────────────────────────────────────┘${NC}"
+
+    # Menu items với style đơn giản và hiện đại
+    echo -e "  ${ICON_PACKAGE} ${GREEN}${BOLD}[1]${NC}  ${WHITE}Cài đặt gói phần mềm thiết yếu${NC}"
+    echo -e "      ${GRAY}${DIM}Gói hệ thống & AUR${NC}"
+    echo
+
+    echo -e "  ${ICON_CONFIG} ${GREEN}${BOLD}[2]${NC}  ${WHITE}Cài đặt cấu hình${NC}"
+    echo -e "      ${GRAY}${DIM}Thiết lập hệ thống${NC}"
+    echo
+
+    echo -e "  ${ICON_PHP} ${GREEN}${BOLD}[3]${NC}  ${WHITE}Quản lý PHP/Composer/Laravel${NC}"
+    echo -e "      ${GRAY}${DIM}Môi trường web development${NC}"
+    echo
+
+    echo -e "  ${ICON_NODE} ${GREEN}${BOLD}[4]${NC}  ${WHITE}Quản lý NVM/NodeJS/NPM${NC}"
+    echo -e "      ${GRAY}${DIM}JavaScript runtime environment${NC}"
+    echo
+
+    echo -e "  ${ICON_EXIT} ${LIGHT_RED}${BOLD}[5]${NC}  ${WHITE}Thoát ứng dụng${NC}"
+    echo -e "      ${GRAY}${DIM}Tạm biệt!${NC}"
+    echo
+
+    echo -e "${DARK_GRAY}    ──────────────────────────────────────────────────────────────${NC}"
+    echo -e "    ${LIGHT_CYAN}${ICON_INFO} ${WHITE}Chọn một tùy chọn từ ${LIGHT_GREEN}${BOLD}1-5${NC}${WHITE} và nhấn Enter${NC}"
+    echo -e "${DARK_GRAY}    ──────────────────────────────────────────────────────────────${NC}"
     echo
 }
 

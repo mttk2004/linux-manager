@@ -27,32 +27,40 @@ display_package_menu() {
     echo "    ██║     ██║  ██║╚██████╗██║  ██╗██║  ██║╚██████╔╝███████╗"
     echo "    ╚═╝     ╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝ ╚══════╝"
     echo -e "${NC}"
-    echo -e "${DARK_GRAY}                      ═══════════════════════════════════════════════════════${NC}"
-    echo -e "${WHITE}                              ${ICON_PACKAGE} ${BOLD}QUẢN LÝ GÓI PHẦN MỀM${NC} ${ICON_PACKAGE}"
-    echo -e "${DARK_GRAY}                      ═══════════════════════════════════════════════════════${NC}"
+
+    echo -e "${DARK_GRAY}    ──────────────────────────────────────────────────────────────${NC}"
+    echo -e "${WHITE}                    ${ICON_PACKAGE} ${BOLD}QUẢN LÝ GÓI PHẦN MỀM${NC} ${ICON_PACKAGE}"
+    echo -e "${DARK_GRAY}    ──────────────────────────────────────────────────────────────${NC}"
     echo
 
-    echo -e "${LIGHT_BLUE}╔════════════════════════════════════════════════════════════════════════════════╗${NC}"
-    echo -e "${LIGHT_BLUE}║                            ${WHITE}${BOLD}MENU QUẢN LÝ GÓI${NC}${LIGHT_BLUE}                                  ║${NC}"
-    echo -e "${LIGHT_BLUE}╠════════════════════════════════════════════════════════════════════════════════╣${NC}"
-    echo -e "${LIGHT_BLUE}║                                                                                ║${NC}"
-    echo -e "${LIGHT_BLUE}║  ${ICON_PACKAGE} ${GREEN}${BOLD}[1]${NC} ${WHITE}Cài đặt gói Pacman${NC}                      ${GRAY}${DIM}Cài đặt từ kho chính thức${NC}  ${LIGHT_BLUE}║${NC}"
-    echo -e "${LIGHT_BLUE}║                                                                                ║${NC}"
-    echo -e "${LIGHT_BLUE}║  ${ICON_PACKAGE} ${GREEN}${BOLD}[2]${NC} ${WHITE}Cài đặt gói AUR${NC}                         ${GRAY}${DIM}Cài đặt từ AUR${NC}  ${LIGHT_BLUE}║${NC}"
-    echo -e "${LIGHT_BLUE}║                                                                                ║${NC}"
-    echo -e "${LIGHT_BLUE}║  ${ICON_PACKAGE} ${GREEN}${BOLD}[3]${NC} ${WHITE}Cài đặt ứng dụng Flatpak${NC}                ${GRAY}${DIM}Cài đặt từ Flathub${NC}  ${LIGHT_BLUE}║${NC}"
-    echo -e "${LIGHT_BLUE}║                                                                                ║${NC}"
-    echo -e "${LIGHT_BLUE}║  ${ICON_CONFIG} ${GREEN}${BOLD}[4]${NC} ${WHITE}Cập nhật tất cả gói${NC}                      ${GRAY}${DIM}Pacman + AUR + Flatpak${NC}  ${LIGHT_BLUE}║${NC}"
-    echo -e "${LIGHT_BLUE}║                                                                                ║${NC}"
-    echo -e "${LIGHT_BLUE}║  ${ICON_CONFIG} ${GREEN}${BOLD}[5]${NC} ${WHITE}Tìm kiếm gói${NC}                             ${GRAY}${DIM}Tìm kiếm gói phần mềm${NC}  ${LIGHT_BLUE}║${NC}"
-    echo -e "${LIGHT_BLUE}║                                                                                ║${NC}"
-    echo -e "${LIGHT_BLUE}║  ${ICON_EXIT} ${LIGHT_RED}${BOLD}[6]${NC} ${WHITE}Quay lại menu chính${NC}                                    ${GRAY}${DIM}Quay lại${NC}  ${LIGHT_BLUE}║${NC}"
-    echo -e "${LIGHT_BLUE}║                                                                                ║${NC}"
-    echo -e "${LIGHT_BLUE}╚════════════════════════════════════════════════════════════════════════════════╝${NC}"
+    # Menu items với style đơn giản và hiện đại
+    echo -e "  ${ICON_PACKAGE} ${GREEN}${BOLD}[1]${NC}  ${WHITE}Cài đặt gói Pacman${NC}"
+    echo -e "      ${GRAY}${DIM}Cài đặt từ kho chính thức Arch Linux${NC}"
     echo
-    echo -e "${DARK_GRAY}               ┌──────────────────────────────────────────────────┐${NC}"
-    echo -e "${DARK_GRAY}               │  ${LIGHT_CYAN}${ICON_INFO} ${WHITE}Chọn một tùy chọn và nhấn Enter để tiếp tục${NC}${DARK_GRAY}  │${NC}"
-    echo -e "${DARK_GRAY}               └──────────────────────────────────────────────────┘${NC}"
+
+    echo -e "  ${ICON_PACKAGE} ${GREEN}${BOLD}[2]${NC}  ${WHITE}Cài đặt gói AUR${NC}"
+    echo -e "      ${GRAY}${DIM}Cài đặt từ Arch User Repository${NC}"
+    echo
+
+    echo -e "  ${ICON_PACKAGE} ${GREEN}${BOLD}[3]${NC}  ${WHITE}Cài đặt ứng dụng Flatpak${NC}"
+    echo -e "      ${GRAY}${DIM}Cài đặt từ Flathub universal packages${NC}"
+    echo
+
+    echo -e "  ${ICON_CONFIG} ${GREEN}${BOLD}[4]${NC}  ${WHITE}Cập nhật tất cả gói${NC}"
+    echo -e "      ${GRAY}${DIM}Pacman + AUR + Flatpak${NC}"
+    echo
+
+    echo -e "  ${ICON_CONFIG} ${GREEN}${BOLD}[5]${NC}  ${WHITE}Tìm kiếm gói${NC}"
+    echo -e "      ${GRAY}${DIM}Tìm kiếm trong tất cả kho phần mềm${NC}"
+    echo
+
+    echo -e "  ${ICON_EXIT} ${LIGHT_RED}${BOLD}[6]${NC}  ${WHITE}Quay lại menu chính${NC}"
+    echo -e "      ${GRAY}${DIM}Trở về menu chính của ứng dụng${NC}"
+    echo
+
+    echo -e "${DARK_GRAY}    ──────────────────────────────────────────────────────────────${NC}"
+    echo -e "    ${LIGHT_CYAN}${ICON_INFO} ${WHITE}Chọn một tùy chọn từ ${LIGHT_GREEN}${BOLD}1-6${NC}${WHITE} và nhấn Enter${NC}"
+    echo -e "${DARK_GRAY}    ──────────────────────────────────────────────────────────────${NC}"
     echo
 }
 
@@ -67,30 +75,36 @@ display_pacman_package_menu() {
     echo "    ██║     ██║  ██║╚██████╗██║ ╚═╝ ██║██║  ██║██║ ╚████║"
     echo "    ╚═╝     ╚═╝  ╚═╝ ╚═════╝╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝"
     echo -e "${NC}"
-    echo -e "${DARK_GRAY}                      ═══════════════════════════════════════════════════════${NC}"
-    echo -e "${WHITE}                              ${ICON_PACKAGE} ${BOLD}CÀI ĐẶT GÓI PACMAN${NC} ${ICON_PACKAGE}"
-    echo -e "${DARK_GRAY}                      ═══════════════════════════════════════════════════════${NC}"
+
+    echo -e "${DARK_GRAY}    ──────────────────────────────────────────────────────────────${NC}"
+    echo -e "${WHITE}                     ${ICON_PACKAGE} ${BOLD}CÀI ĐẶT GÓI PACMAN${NC} ${ICON_PACKAGE}"
+    echo -e "${DARK_GRAY}    ──────────────────────────────────────────────────────────────${NC}"
     echo
 
-    echo -e "${LIGHT_BLUE}╔════════════════════════════════════════════════════════════════════════════════╗${NC}"
-    echo -e "${LIGHT_BLUE}║                            ${WHITE}${BOLD}DANH MỤC GÓI${NC}${LIGHT_BLUE}                                      ║${NC}"
-    echo -e "${LIGHT_BLUE}╠════════════════════════════════════════════════════════════════════════════════╣${NC}"
-    echo -e "${LIGHT_BLUE}║                                                                                ║${NC}"
-    echo -e "${LIGHT_BLUE}║  ${ICON_PACKAGE} ${GREEN}${BOLD}[1]${NC} ${WHITE}Cài đặt gói thiết yếu${NC}                     ${GRAY}${DIM}Gói cơ bản cần thiết${NC}  ${LIGHT_BLUE}║${NC}"
-    echo -e "${LIGHT_BLUE}║                                                                                ║${NC}"
-    echo -e "${LIGHT_BLUE}║  ${ICON_PACKAGE} ${GREEN}${BOLD}[2]${NC} ${WHITE}Cài đặt gói phát triển${NC}                    ${GRAY}${DIM}Công cụ lập trình${NC}  ${LIGHT_BLUE}║${NC}"
-    echo -e "${LIGHT_BLUE}║                                                                                ║${NC}"
-    echo -e "${LIGHT_BLUE}║  ${ICON_PACKAGE} ${GREEN}${BOLD}[3]${NC} ${WHITE}Cài đặt gói đa phương tiện${NC}               ${GRAY}${DIM}Nhạc, phim, hình ảnh${NC}  ${LIGHT_BLUE}║${NC}"
-    echo -e "${LIGHT_BLUE}║                                                                                ║${NC}"
-    echo -e "${LIGHT_BLUE}║  ${ICON_CONFIG} ${GREEN}${BOLD}[4]${NC} ${WHITE}Cài đặt gói tùy chỉnh${NC}                         ${GRAY}${DIM}Nhập tên gói${NC}  ${LIGHT_BLUE}║${NC}"
-    echo -e "${LIGHT_BLUE}║                                                                                ║${NC}"
-    echo -e "${LIGHT_BLUE}║  ${ICON_EXIT} ${LIGHT_RED}${BOLD}[5]${NC} ${WHITE}Quay lại${NC}                                           ${GRAY}${DIM}Menu trước${NC}  ${LIGHT_BLUE}║${NC}"
-    echo -e "${LIGHT_BLUE}║                                                                                ║${NC}"
-    echo -e "${LIGHT_BLUE}╚════════════════════════════════════════════════════════════════════════════════╝${NC}"
+    # Menu items với style đơn giản và hiện đại
+    echo -e "  ${ICON_PACKAGE} ${GREEN}${BOLD}[1]${NC}  ${WHITE}Cài đặt gói thiết yếu${NC}"
+    echo -e "      ${GRAY}${DIM}Các gói cơ bản cần thiết cho hệ thống${NC}"
     echo
-    echo -e "${DARK_GRAY}               ┌──────────────────────────────────────────────────┐${NC}"
-    echo -e "${DARK_GRAY}               │  ${LIGHT_CYAN}${ICON_INFO} ${WHITE}Chọn một tùy chọn và nhấn Enter để tiếp tục${NC}${DARK_GRAY}  │${NC}"
-    echo -e "${DARK_GRAY}               └──────────────────────────────────────────────────┘${NC}"
+
+    echo -e "  ${ICON_PACKAGE} ${GREEN}${BOLD}[2]${NC}  ${WHITE}Cài đặt gói phát triển${NC}"
+    echo -e "      ${GRAY}${DIM}Công cụ lập trình và development${NC}"
+    echo
+
+    echo -e "  ${ICON_PACKAGE} ${GREEN}${BOLD}[3]${NC}  ${WHITE}Cài đặt gói đa phương tiện${NC}"
+    echo -e "      ${GRAY}${DIM}Âm thanh, video và hình ảnh${NC}"
+    echo
+
+    echo -e "  ${ICON_CONFIG} ${GREEN}${BOLD}[4]${NC}  ${WHITE}Cài đặt gói tùy chỉnh${NC}"
+    echo -e "      ${GRAY}${DIM}Nhập tên gói muốn cài đặt${NC}"
+    echo
+
+    echo -e "  ${ICON_EXIT} ${LIGHT_RED}${BOLD}[5]${NC}  ${WHITE}Quay lại${NC}"
+    echo -e "      ${GRAY}${DIM}Trở về menu quản lý gói${NC}"
+    echo
+
+    echo -e "${DARK_GRAY}    ──────────────────────────────────────────────────────────────${NC}"
+    echo -e "    ${LIGHT_CYAN}${ICON_INFO} ${WHITE}Chọn một tùy chọn từ ${LIGHT_GREEN}${BOLD}1-5${NC}${WHITE} và nhấn Enter${NC}"
+    echo -e "${DARK_GRAY}    ──────────────────────────────────────────────────────────────${NC}"
     echo
 }
 
