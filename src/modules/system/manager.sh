@@ -2,6 +2,10 @@
 
 # Module quản lý cấu hình hệ thống
 
+# Tải các module chức năng
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "${SCRIPT_DIR}/terminal/manager.sh"
+
 # Hiển thị menu cấu hình hệ thống
 display_system_menu() {
     clear
@@ -44,12 +48,16 @@ display_system_menu() {
     echo -e "      ${GRAY}${DIM}Qtile, Xmonad${NC}"
     echo
 
-    echo -e "  ${ICON_EXIT} ${LIGHT_RED}${BOLD}[7]${NC}  ${WHITE}Quay lại menu chính${NC}"
+    echo -e "  ${ICON_CONFIG} ${GREEN}${BOLD}[7]${NC}  ${WHITE}Cấu hình Terminal Emulator${NC}"
+    echo -e "      ${GRAY}${DIM}WezTerm, Ghostty, Alacritty${NC}"
+    echo
+
+    echo -e "  ${ICON_EXIT} ${LIGHT_RED}${BOLD}[8]${NC}  ${WHITE}Quay lại menu chính${NC}"
     echo -e "      ${GRAY}${DIM}Trở về menu chính${NC}"
     echo
 
     echo -e "${DARK_GRAY}    ──────────────────────────────────────────────────────────────${NC}"
-    echo -e "    ${LIGHT_CYAN}${ICON_INFO} ${WHITE}Chọn một tùy chọn từ ${LIGHT_GREEN}${BOLD}1-7${NC}${WHITE} và nhấn Enter${NC}"
+    echo -e "    ${LIGHT_CYAN}${ICON_INFO} ${WHITE}Chọn một tùy chọn từ ${LIGHT_GREEN}${BOLD}1-8${NC}${WHITE} và nhấn Enter${NC}"
     echo -e "${DARK_GRAY}    ──────────────────────────────────────────────────────────────${NC}"
     echo
 }
@@ -351,7 +359,7 @@ manage_system_configurations() {
 
     while true; do
         display_system_menu
-        echo -e -n "${LIGHT_CYAN}${ICON_ARROW} ${WHITE}${BOLD}Nhập lựa chọn của bạn${NC} ${DARK_GRAY}[${LIGHT_GREEN}1-7${DARK_GRAY}]${NC}: "
+        echo -e -n "${LIGHT_CYAN}${ICON_ARROW} ${WHITE}${BOLD}Nhập lựa chọn của bạn${NC} ${DARK_GRAY}[${LIGHT_GREEN}1-8${DARK_GRAY}]${NC}: "
         read -n 1 choice
         echo
 
@@ -375,11 +383,14 @@ manage_system_configurations() {
                 configure_window_manager
                 ;;
             7)
+                configure_terminal
+                ;;
+            8)
                 # Quay lại menu chính
                 return 0
                 ;;
             *)
-                print_boxed_message "Lựa chọn không hợp lệ. Vui lòng chọn số từ 1-7." "error"
+                print_boxed_message "Lựa chọn không hợp lệ. Vui lòng chọn số từ 1-8." "error"
                 ;;
         esac
 
