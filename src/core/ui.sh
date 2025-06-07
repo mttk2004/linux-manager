@@ -1,9 +1,6 @@
 #!/bin/bash
 
-# Kiet's Linux Manager Script
-source ./config.sh
-source ./install_packages.sh
-source ./utils.sh  # Add source to utils.sh
+# UI Core Module - Chứa các thành phần giao diện người dùng
 
 # Enhanced Colors and Styles
 RED='\033[0;31m'
@@ -67,7 +64,7 @@ print_fancy_header() {
     echo -e "${NC}"
     echo -e "${DARK_GRAY}                           ═══════════════════════════════════════════════════════${NC}"
     echo -e "${WHITE}                                    ${ICON_ROCKET} ${BOLD}PROFESSIONAL SYSTEM MANAGER${NC} ${ICON_ROCKET}"
-    echo -e "${LIGHT_MAGENTA}                                           ${BOLD}Version 2.0 Pro${NC}"
+    echo -e "${LIGHT_MAGENTA}                                           ${BOLD}Version 2.1 Pro${NC}"
     echo -e "${DARK_GRAY}                           ═══════════════════════════════════════════════════════${NC}"
     echo
 }
@@ -77,60 +74,46 @@ display_menu() {
     print_fancy_header
 
     echo -e "${LIGHT_BLUE}╔════════════════════════════════════════════════════════════════════════════════╗${NC}"
-    echo -e "${LIGHT_BLUE}║                                  ${WHITE}${BOLD}MAIN MENU${NC}${LIGHT_BLUE}                                     ║${NC}"
+    echo -e "${LIGHT_BLUE}║                                  ${WHITE}${BOLD}MENU CHÍNH${NC}${LIGHT_BLUE}                                    ║${NC}"
     echo -e "${LIGHT_BLUE}╠════════════════════════════════════════════════════════════════════════════════╣${NC}"
     echo -e "${LIGHT_BLUE}║                                                                                ║${NC}"
-    echo -e "${LIGHT_BLUE}║  ${ICON_PACKAGE} ${GREEN}${BOLD}[1]${NC} ${WHITE}Install Essential Packages${NC}                ${GRAY}${DIM}System packages & AUR tools${NC}  ${LIGHT_BLUE}║${NC}"
+    echo -e "${LIGHT_BLUE}║  ${ICON_PACKAGE} ${GREEN}${BOLD}[1]${NC} ${WHITE}Cài đặt gói phần mềm thiết yếu${NC}                ${GRAY}${DIM}Gói hệ thống & AUR${NC}  ${LIGHT_BLUE}║${NC}"
     echo -e "${LIGHT_BLUE}║                                                                                ║${NC}"
-    echo -e "${LIGHT_BLUE}║  ${ICON_CONFIG} ${GREEN}${BOLD}[2]${NC} ${WHITE}Install Configurations${NC}                           ${GRAY}${DIM}Setup system configs${NC}  ${LIGHT_BLUE}║${NC}"
+    echo -e "${LIGHT_BLUE}║  ${ICON_CONFIG} ${GREEN}${BOLD}[2]${NC} ${WHITE}Cài đặt cấu hình${NC}                               ${GRAY}${DIM}Thiết lập hệ thống${NC}  ${LIGHT_BLUE}║${NC}"
     echo -e "${LIGHT_BLUE}║                                                                                ║${NC}"
-    echo -e "${LIGHT_BLUE}║  ${ICON_PHP} ${GREEN}${BOLD}[3]${NC} ${WHITE}Manage PHP/Composer/Laravel${NC}                     ${GRAY}${DIM}Web development stack${NC}  ${LIGHT_BLUE}║${NC}"
+    echo -e "${LIGHT_BLUE}║  ${ICON_PHP} ${GREEN}${BOLD}[3]${NC} ${WHITE}Quản lý PHP/Composer/Laravel${NC}                     ${GRAY}${DIM}Môi trường web${NC}  ${LIGHT_BLUE}║${NC}"
     echo -e "${LIGHT_BLUE}║                                                                                ║${NC}"
-    echo -e "${LIGHT_BLUE}║  ${ICON_NODE} ${GREEN}${BOLD}[4]${NC} ${WHITE}Manage NVM/NodeJS/NPM${NC}                          ${GRAY}${DIM}JavaScript runtime env${NC}  ${LIGHT_BLUE}║${NC}"
+    echo -e "${LIGHT_BLUE}║  ${ICON_NODE} ${GREEN}${BOLD}[4]${NC} ${WHITE}Quản lý NVM/NodeJS/NPM${NC}                          ${GRAY}${DIM}JavaScript runtime${NC}  ${LIGHT_BLUE}║${NC}"
     echo -e "${LIGHT_BLUE}║                                                                                ║${NC}"
-    echo -e "${LIGHT_BLUE}║  ${ICON_EXIT} ${LIGHT_RED}${BOLD}[5]${NC} ${WHITE}Exit Application${NC}                                             ${GRAY}${DIM}Goodbye!${NC}  ${LIGHT_BLUE}║${NC}"
+    echo -e "${LIGHT_BLUE}║  ${ICON_EXIT} ${LIGHT_RED}${BOLD}[5]${NC} ${WHITE}Thoát ứng dụng${NC}                                             ${GRAY}${DIM}Tạm biệt!${NC}  ${LIGHT_BLUE}║${NC}"
     echo -e "${LIGHT_BLUE}║                                                                                ║${NC}"
     echo -e "${LIGHT_BLUE}╚════════════════════════════════════════════════════════════════════════════════╝${NC}"
     echo
     echo -e "${DARK_GRAY}               ┌──────────────────────────────────────────────────┐${NC}"
-    echo -e "${DARK_GRAY}               │  ${LIGHT_CYAN}${ICON_INFO} ${WHITE}Choose an option and press Enter to continue${NC}${DARK_GRAY}  │${NC}"
+    echo -e "${DARK_GRAY}               │  ${LIGHT_CYAN}${ICON_INFO} ${WHITE}Chọn một tùy chọn và nhấn Enter để tiếp tục${NC}${DARK_GRAY}  │${NC}"
     echo -e "${DARK_GRAY}               └──────────────────────────────────────────────────┘${NC}"
     echo
 }
 
-# Function to show loading animation - moved to utils.sh
-# Using the one from utils.sh instead
-
-# Function to display success message - replaced with utils.sh version
-# Using print_boxed_message from utils.sh instead
-
-# Function to display error message - replaced with utils.sh version
-# Using print_boxed_message from utils.sh instead
-
-# Function to display info message - replaced with utils.sh version
-# Using print_boxed_message from utils.sh instead
-
 # Function to get user input with style - using read_single_key from utils.sh
 get_user_choice() {
     # Display prompt manually
-    echo -e -n "${LIGHT_CYAN}${ICON_ARROW} ${WHITE}${BOLD}Enter your choice${NC} ${DARK_GRAY}[${LIGHT_GREEN}1-5${DARK_GRAY}]${NC}: "
+    echo -e -n "${LIGHT_CYAN}${ICON_ARROW} ${WHITE}${BOLD}Nhập lựa chọn của bạn${NC} ${DARK_GRAY}[${LIGHT_GREEN}1-5${DARK_GRAY}]${NC}: "
 
     # Get ONLY the key without any prompt handling
     choice=$(read_single_key)
 
     # Echo the character for visual feedback
     echo "$choice"
-
-    # Debug output to see what character was actually captured
-    echo -e "\n${YELLOW}DEBUG: Captured choice: '$choice' (length: ${#choice}) (ascii codes: $(printf "%s" "$choice" | od -An -td1))${NC}"
-
     echo
+
+    return 0
 }
 
-# Function to wait for user input with style - enhanced with read_single_key from utils.sh
+# Function to wait for user input with style
 wait_for_user() {
     echo -e "\n${DARK_GRAY}┌─────────────────────────────────────────────────────────────────────────────────┐${NC}"
-    echo -e "${DARK_GRAY}│  ${LIGHT_YELLOW}${ICON_INFO} ${WHITE}Press ${LIGHT_GREEN}${BOLD}any key${NC}${WHITE} to return to the main menu...${NC}                             ${DARK_GRAY}│${NC}"
+    echo -e "${DARK_GRAY}│  ${LIGHT_YELLOW}${ICON_INFO} ${WHITE}Nhấn ${LIGHT_GREEN}${BOLD}phím bất kỳ${NC}${WHITE} để quay lại menu chính...${NC}                             ${DARK_GRAY}│${NC}"
     echo -e "${DARK_GRAY}└─────────────────────────────────────────────────────────────────────────────────┘${NC}"
 
     # Use read_single_key instead of read to avoid requiring Enter
@@ -149,53 +132,9 @@ show_exit_message() {
     echo "       ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝  ╚═╝       ╚═╝    ╚═════╝  ╚═════╝ ╚═╝"
     echo -e "${NC}"
     echo -e "${LIGHT_BLUE}                          ═══════════════════════════════════════════════════════${NC}"
-    echo -e "${WHITE}                               ${ICON_STAR} ${BOLD}Thank you for using Kiet's Linux Manager!${NC} ${ICON_STAR}"
-    echo -e "${LIGHT_GREEN}                                    ${BOLD}Have a great day! 🌟${NC}"
+    echo -e "${WHITE}                               ${ICON_STAR} ${BOLD}Cảm ơn bạn đã sử dụng Kiet's Linux Manager!${NC} ${ICON_STAR}"
+    echo -e "${LIGHT_GREEN}                                    ${BOLD}Chúc một ngày tốt lành! 🌟${NC}"
     echo -e "${LIGHT_BLUE}                          ═══════════════════════════════════════════════════════${NC}"
     echo
     sleep 2
 }
-
-# Main function
-main() {
-    while true; do
-        display_menu
-        get_user_choice
-
-        case $choice in
-            1)
-                show_spinner "Initializing Package Manager" 1
-                install_packages
-                print_boxed_message "Operation completed successfully!" "success"
-                ;;
-            2)
-                show_spinner "Loading Configuration Manager" 1
-                print_boxed_message "Configuration manager feature coming soon!" "info"
-                # install_configurations
-                ;;
-            3)
-                show_spinner "Setting up PHP Development Environment" 1
-                print_boxed_message "PHP/Composer/Laravel manager feature coming soon!" "info"
-                # manage_php_composer_laravel
-                ;;
-            4)
-                show_spinner "Initializing Node.js Environment" 1
-                print_boxed_message "NVM/NodeJS/NPM manager feature coming soon!" "info"
-                # manage_nvm_nodejs_npm
-                ;;
-            5)
-                show_exit_message
-                exit 0
-                ;;
-            *)
-                print_boxed_message "Invalid choice. Please select a number between 1-5." "error"
-                sleep 2
-                ;;
-        esac
-
-        wait_for_user
-    done
-}
-
-# Run the main function
-main

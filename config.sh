@@ -2,6 +2,7 @@
 
 PACMAN_PACKAGES_TO_INSTALL=(
     "wezterm"
+    "ghostty"
     "7zip"
     "unzip"
     "unrar"
@@ -11,6 +12,7 @@ PACMAN_PACKAGES_TO_INSTALL=(
     "discord"
     "redshift"
     "thunar"
+    "nemo"
     "thunderbird"
     "bleachbit"
     "timeshift"
