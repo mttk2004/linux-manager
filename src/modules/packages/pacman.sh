@@ -15,6 +15,62 @@ is_pacman_package_installed() {
     fi
 }
 
+# Yêu cầu xác nhận cài đặt gói
+ask_install_pacman() {
+    local package="$1"
+    local description="$2"
+
+    # Nếu không có mô tả, sử dụng tên gói
+    if [ -z "$description" ]; then
+        description="$package"
+    fi
+
+    # Hiển thị header với style tối giản
+    display_section_header "CÀI ĐẶT GÓI PACMAN" "${ICON_PACKAGE}"
+
+    # Hiển thị thông tin gói
+    echo -e "  ${YELLOW}Gói:${NC} ${WHITE}${BOLD}$package${NC}"
+    echo -e "  ${YELLOW}Mô tả:${NC} ${LIGHT_CYAN}$description${NC}"
+    echo -e "  ${YELLOW}Nguồn:${NC} ${LIGHT_CYAN}Arch Linux Repository${NC}"
+    echo
+
+    # Sử dụng hàm confirm_yn từ utils.sh với style mới
+    if confirm_yn "Bạn có muốn cài đặt ${BOLD}$package${NC}${WHITE} không?" "y"; then
+        return 0 # Người dùng chọn có
+    else
+        return 1 # Người dùng chọn không
+    fi
+}
+
+# Hiển thị trạng thái cài đặt gói
+show_package_status() {
+    local package="$1"
+    local status="$2"
+    local color=""
+    local icon=""
+
+    case $status in
+        "installed")
+            icon="${ICON_CHECK}"
+            color="${GREEN}"
+            ;;
+        "skipped")
+            icon="${ICON_WARNING}"
+            color="${YELLOW}"
+            ;;
+        "already")
+            icon="${ICON_INFO}"
+            color="${BLUE}"
+            ;;
+        "failed")
+            icon="${ICON_CROSS}"
+            color="${LIGHT_RED}"
+            ;;
+    esac
+
+    echo -e "  ${color}${icon} ${WHITE}${package}${NC} ${GRAY}${DIM}(${color}${status}${GRAY})${NC}"
+}
+
 # Hiển thị trạng thái cài đặt gói
 show_pacman_package_status() {
     local package="$1"
@@ -47,28 +103,6 @@ show_pacman_package_status() {
     log_info "Gói Pacman: $package - Trạng thái: $status"
 }
 
-# Yêu cầu xác nhận cài đặt gói
-ask_install_pacman_package() {
-    local package="$1"
-
-    echo -e "${DARK_GRAY}    ──────────────────────────────────────────────────────────────${NC}"
-    echo -e "${WHITE}                    ${ICON_PACKAGE} ${BOLD}CÀI ĐẶT GÓI PACMAN${NC} ${ICON_PACKAGE}"
-    echo -e "${DARK_GRAY}    ──────────────────────────────────────────────────────────────${NC}"
-    echo
-    echo -e "  ${YELLOW}Gói:${NC} ${WHITE}${BOLD}$package${NC}"
-    echo -e "  ${YELLOW}Nguồn:${NC} ${LIGHT_CYAN}Kho chính thức Arch Linux${NC}"
-    echo
-    echo -e "${DARK_GRAY}    ──────────────────────────────────────────────────────────────${NC}"
-    echo
-
-    # Sử dụng hàm confirm_yn từ utils.sh
-    if confirm_yn "${LIGHT_CYAN}${ICON_ARROW} ${WHITE}Bạn có muốn cài đặt ${BOLD}$package${NC}${WHITE} không?${NC}" "y"; then
-        return 0 # Người dùng chọn có
-    else
-        return 1 # Người dùng chọn không
-    fi
-}
-
 # Cài đặt một gói Pacman cụ thể
 install_pacman_package() {
     local package="$1"
@@ -84,7 +118,7 @@ install_pacman_package() {
     fi
 
     # Yêu cầu xác nhận cài đặt
-    if ask_install_pacman_package "$package"; then
+    if ask_install_pacman "$package"; then
         # Hiển thị spinner khi đang cài đặt
         echo -e "${LIGHT_YELLOW}${ICON_GEAR} Đang cài đặt $package...${NC}"
 
@@ -128,7 +162,7 @@ install_pacman_packages() {
         fi
 
         # Yêu cầu xác nhận cài đặt
-        if ask_install_pacman_package "$package"; then
+        if ask_install_pacman "$package"; then
             # Hiển thị spinner khi đang cài đặt
             echo -e "${LIGHT_YELLOW}${ICON_GEAR} Đang cài đặt $package...${NC}"
 

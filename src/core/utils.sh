@@ -59,31 +59,32 @@ confirm_yn() {
     local default="${2:-y}"
     local yn_prompt
 
-    # Create prompt with proper highlight for default option
+    # Tạo prompt với highlight cho option mặc định
     if [[ "$default" = "y" ]]; then
-        yn_prompt="${DARK_GRAY}[${LIGHT_GREEN}Y${DARK_GRAY}/${LIGHT_RED}n${DARK_GRAY}]${NC}"
+        yn_prompt="${LIGHT_GREEN}${BOLD}[Y]${NC}es/${LIGHT_RED}[n]${NC}o"
     else
-        yn_prompt="${DARK_GRAY}[${LIGHT_GREEN}y${DARK_GRAY}/${LIGHT_RED}N${DARK_GRAY}]${NC}"
+        yn_prompt="${LIGHT_GREEN}[y]${NC}es/${LIGHT_RED}${BOLD}[N]${NC}o"
     fi
 
-    # Full prompt with message
-    local full_prompt="${prompt} ${yn_prompt}: "
+    # Hiển thị prompt với style tối giản
+    echo -e "${DARK_GRAY}    ──────────────────────────────────────────────────────────────${NC}"
+    echo -e "    ${LIGHT_CYAN}${ICON_ARROW} ${WHITE}${prompt}${NC}"
+    echo -e "    ${DARK_GRAY}│${NC}  ${yn_prompt}"
+    echo -e "${DARK_GRAY}    ──────────────────────────────────────────────────────────────${NC}"
 
-    # Get the key press using the new function
+    # Lấy phím bấm và chuyển sang chữ thường
     local key
-    key=$(read_single_key_with_prompt "$full_prompt" | tr '[:upper:]' '[:lower:]')
+    key=$(read_single_key | tr '[:upper:]' '[:lower:]')
 
-    # Default value if nothing is pressed
+    # Giá trị mặc định nếu không có phím nào được bấm
     if [[ -z "$key" ]]; then
         key="$default"
     fi
 
-    # Return result (0=success/yes, 1=failure/no)
+    # Trả về kết quả (0=yes, 1=no)
     if [[ "$key" = "y" ]]; then
-        echo -e "\n"
         return 0
     else
-        echo -e "\n"
         return 1
     fi
 }
@@ -105,7 +106,7 @@ show_spinner() {
     local message="$1"
     local duration="${2:-2}"
 
-    # Spinner characters
+    # Spinner characters with minimalist style
     local spinner=('⠋' '⠙' '⠹' '⠸' '⠼' '⠴' '⠦' '⠧' '⠇' '⠏')
     local count=0
     local total_iterations=$((duration * 10))
@@ -114,13 +115,14 @@ show_spinner() {
 
     while [ $count -lt $total_iterations ]; do
         for i in "${spinner[@]}"; do
-            echo -ne "\r${LIGHT_CYAN}${i} ${WHITE}Processing...${NC}"
+            echo -ne "\r${LIGHT_CYAN}  ${i} ${WHITE}${DIM}Đang xử lý...${NC}"
             sleep 0.1
             ((count++))
             [ $count -ge $total_iterations ] && break
         done
     done
-    echo -e "\r${GREEN}${ICON_CHECK} ${WHITE}Ready!${NC}                    "
+
+    echo -e "\r${GREEN}  ${ICON_CHECK} ${WHITE}Hoàn tất!${NC}                    "
     sleep 0.5
 }
 
@@ -135,26 +137,22 @@ print_boxed_message() {
         "success")
             color="${GREEN}"
             icon="${ICON_CHECK}"
-            title="SUCCESS"
             ;;
         "error")
             color="${LIGHT_RED}"
             icon="${ICON_CROSS}"
-            title="ERROR"
             ;;
         "warning")
             color="${YELLOW}"
             icon="${ICON_WARNING}"
-            title="WARNING"
             ;;
         *)  # default is info
-            color="${LIGHT_BLUE}"
+            color="${LIGHT_CYAN}"
             icon="${ICON_INFO}"
-            title="INFO"
             ;;
     esac
 
-    echo -e "\n${DARK_GRAY}    ──────────────────────────────────────────────────────────────${NC}"
-    echo -e "${color}    ${icon} ${WHITE}${BOLD}${title}:${NC} ${color}${message}${NC}"
+    echo -e "${DARK_GRAY}    ──────────────────────────────────────────────────────────────${NC}"
+    echo -e "    ${color}${icon} ${WHITE}${message}${NC}"
     echo -e "${DARK_GRAY}    ──────────────────────────────────────────────────────────────${NC}"
 }

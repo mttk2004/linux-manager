@@ -120,17 +120,30 @@ manage_nodejs_versions() {
     # Tải NVM nếu chưa được tải
     source "$HOME/.nvm/nvm.sh" &>/dev/null
 
-    # Hiển thị các phiên bản Node.js phổ biến
-    echo -e "\n${LIGHT_BLUE}╔════════════════════════════════════════════════════════════════════════════════╗${NC}"
-    echo -e "${LIGHT_BLUE}║                       ${WHITE}${BOLD}QUẢN LÝ PHIÊN BẢN NODE.JS${NC}${LIGHT_BLUE}                             ║${NC}"
-    echo -e "${LIGHT_BLUE}╠════════════════════════════════════════════════════════════════════════════════╣${NC}"
-    echo -e "${LIGHT_BLUE}║                                                                                ║${NC}"
-    echo -e "${LIGHT_BLUE}║  ${GREEN}${BOLD}[1]${NC} ${WHITE}Node.js 20 LTS${NC} ${LIGHT_GREEN}(Khuyến nghị)${NC}                                         ${LIGHT_BLUE}║${NC}"
-    echo -e "${LIGHT_BLUE}║  ${GREEN}${BOLD}[2]${NC} ${WHITE}Node.js 18 LTS${NC}                                                       ${LIGHT_BLUE}║${NC}"
-    echo -e "${LIGHT_BLUE}║  ${GREEN}${BOLD}[3]${NC} ${WHITE}Node.js 16 LTS${NC} ${YELLOW}(Legacy)${NC}                                           ${LIGHT_BLUE}║${NC}"
-    echo -e "${LIGHT_BLUE}║  ${GREEN}${BOLD}[4]${NC} ${WHITE}Node.js 21${NC} ${MAGENTA}(Latest)${NC}                                               ${LIGHT_BLUE}║${NC}"
-    echo -e "${LIGHT_BLUE}║                                                                                ║${NC}"
-    echo -e "${LIGHT_BLUE}╚════════════════════════════════════════════════════════════════════════════════╝${NC}"
+    echo -e "${DARK_GRAY}    ──────────────────────────────────────────────────────────────${NC}"
+    echo -e "${WHITE}                    ${ICON_NODE} ${BOLD}QUẢN LÝ PHIÊN BẢN NODE.JS${NC} ${ICON_NODE}"
+    echo -e "${DARK_GRAY}    ──────────────────────────────────────────────────────────────${NC}"
+    echo
+
+    # Menu items với style đơn giản và hiện đại
+    echo -e "  ${ICON_NODE} ${GREEN}${BOLD}[1]${NC}  ${WHITE}Node.js 20 LTS${NC} ${LIGHT_GREEN}(Khuyến nghị)${NC}"
+    echo -e "      ${GRAY}${DIM}Phiên bản LTS mới nhất${NC}"
+    echo
+
+    echo -e "  ${ICON_NODE} ${GREEN}${BOLD}[2]${NC}  ${WHITE}Node.js 18 LTS${NC}"
+    echo -e "      ${GRAY}${DIM}Phiên bản LTS ổn định${NC}"
+    echo
+
+    echo -e "  ${ICON_NODE} ${GREEN}${BOLD}[3]${NC}  ${WHITE}Node.js 16 LTS${NC} ${YELLOW}(Legacy)${NC}"
+    echo -e "      ${GRAY}${DIM}Phiên bản cũ hơn${NC}"
+    echo
+
+    echo -e "  ${ICON_NODE} ${GREEN}${BOLD}[4]${NC}  ${WHITE}Node.js 21${NC} ${MAGENTA}(Latest)${NC}"
+    echo -e "      ${GRAY}${DIM}Phiên bản mới nhất${NC}"
+    echo
+
+    echo -e "${DARK_GRAY}    ──────────────────────────────────────────────────────────────${NC}"
+    echo
 
     # Yêu cầu người dùng chọn phiên bản
     echo -e -n "${LIGHT_CYAN}${ICON_ARROW} ${WHITE}${BOLD}Chọn phiên bản Node.js${NC} ${DARK_GRAY}[${LIGHT_GREEN}1-4${DARK_GRAY}]${NC}: "
@@ -171,23 +184,11 @@ manage_nodejs_versions() {
 
 # Cài đặt các gói NPM toàn cục
 install_global_npm_packages() {
-    echo -e "${LIGHT_YELLOW}${ICON_GEAR} Cài đặt gói NPM toàn cục...${NC}"
-
-    # Kiểm tra xem Node.js và NPM đã được cài đặt chưa
-    if ! command -v npm &>/dev/null; then
-        print_boxed_message "NPM chưa được cài đặt. Vui lòng cài đặt Node.js trước." "error"
-        return 1
-    fi
-
     # Danh sách các gói NPM phổ biến
     local npm_packages=(
         "typescript"
-        "ts-node"
         "nodemon"
         "pm2"
-        "yarn"
-        "pnpm"
-        "http-server"
         "eslint"
         "prettier"
         "create-react-app"
@@ -197,20 +198,18 @@ install_global_npm_packages() {
     )
 
     # Hiển thị danh sách các gói NPM
-    echo -e "\n${LIGHT_BLUE}╔════════════════════════════════════════════════════════════════════════════════╗${NC}"
-    echo -e "${LIGHT_BLUE}║                       ${WHITE}${BOLD}CÁC GÓI NPM TOÀN CỤC${NC}${LIGHT_BLUE}                                 ║${NC}"
-    echo -e "${LIGHT_BLUE}╠════════════════════════════════════════════════════════════════════════════════╣${NC}"
-    echo -e "${LIGHT_BLUE}║                                                                                ║${NC}"
+    display_section_header "CÁC GÓI NPM TOÀN CỤC" "${ICON_NODE}"
+    echo -e "  ${YELLOW}Tổng số:${NC} ${WHITE}${BOLD}${#npm_packages[@]}${NC} ${GRAY}${DIM}gói${NC}"
+    echo
 
     for i in "${!npm_packages[@]}"; do
         local package="${npm_packages[$i]}"
         local number=$((i + 1))
-        echo -e "${LIGHT_BLUE}║  ${GREEN}${BOLD}[$number]${NC} ${WHITE}$package${NC}${LIGHT_BLUE}                                                            ║${NC}"
+        echo -e "  ${GREEN}${BOLD}[$number]${NC} ${WHITE}$package${NC}"
     done
 
-    echo -e "${LIGHT_BLUE}║  ${GREEN}${BOLD}[0]${NC} ${WHITE}Cài đặt tất cả${NC}                                                     ${LIGHT_BLUE}║${NC}"
-    echo -e "${LIGHT_BLUE}║                                                                                ║${NC}"
-    echo -e "${LIGHT_BLUE}╚════════════════════════════════════════════════════════════════════════════════╝${NC}"
+    echo -e "\n  ${GREEN}${BOLD}[0]${NC} ${WHITE}Cài đặt tất cả${NC}"
+    echo
 
     # Yêu cầu người dùng chọn gói
     echo -e -n "${LIGHT_CYAN}${ICON_ARROW} ${WHITE}${BOLD}Chọn gói NPM để cài đặt${NC} ${DARK_GRAY}[${LIGHT_GREEN}0-${#npm_packages[@]}${DARK_GRAY}]${NC}: "
@@ -238,6 +237,8 @@ install_global_npm_packages() {
         print_boxed_message "Lựa chọn không hợp lệ" "error"
         return 1
     fi
+
+    return 0
 }
 
 # Hàm chính để quản lý môi trường Node.js

@@ -71,12 +71,39 @@ is_aur_package_installed() {
     fi
 }
 
-# Hiển thị trạng thái cài đặt gói
-show_aur_package_status() {
+# Yêu cầu xác nhận cài đặt gói AUR
+ask_install_aur() {
+    local package="$1"
+    local description="$2"
+
+    # Nếu không có mô tả, sử dụng tên gói
+    if [ -z "$description" ]; then
+        description="$package"
+    fi
+
+    # Hiển thị header với style tối giản
+    display_section_header "CÀI ĐẶT GÓI AUR" "${ICON_PACKAGE}"
+
+    # Hiển thị thông tin gói
+    echo -e "  ${YELLOW}Gói:${NC} ${WHITE}${BOLD}$package${NC}"
+    echo -e "  ${YELLOW}Mô tả:${NC} ${LIGHT_CYAN}$description${NC}"
+    echo -e "  ${YELLOW}Nguồn:${NC} ${LIGHT_CYAN}Arch User Repository${NC}"
+    echo
+
+    # Sử dụng hàm confirm_yn từ utils.sh với style mới
+    if confirm_yn "Bạn có muốn cài đặt ${BOLD}$package${NC}${WHITE} không?" "y"; then
+        return 0 # Người dùng chọn có
+    else
+        return 1 # Người dùng chọn không
+    fi
+}
+
+# Hiển thị trạng thái cài đặt gói AUR
+show_aur_status() {
     local package="$1"
     local status="$2"
-    local icon=""
     local color=""
+    local icon=""
 
     case $status in
         "installed")
@@ -84,7 +111,7 @@ show_aur_package_status() {
             color="${GREEN}"
             ;;
         "skipped")
-            icon="${ICON_CROSS}"
+            icon="${ICON_WARNING}"
             color="${YELLOW}"
             ;;
         "already")
@@ -97,32 +124,69 @@ show_aur_package_status() {
             ;;
     esac
 
-    echo -e "${color}  ${icon} ${WHITE}${package}${NC} ${color}${status}${NC}"
+    echo -e "  ${color}${icon} ${WHITE}${package}${NC} ${GRAY}${DIM}(${color}${status}${GRAY})${NC}"
 
     # Ghi nhật ký
-    log_info "Gói AUR: $package - Trạng thái: $status"
+    log_info "AUR: $package - Status: $status"
 }
 
-# Yêu cầu xác nhận cài đặt gói
-ask_install_aur_package() {
+# Kiểm tra và cài đặt trình trợ giúp AUR
+check_install_aur_helper() {
+    local helper_installed=false
+
+    # Hiển thị header
+    display_section_header "KIỂM TRA TRÌNH TRỢ GIÚP AUR" "${ICON_GEAR}"
+
+    # Kiểm tra từng trình trợ giúp
+    if command -v yay &>/dev/null; then
+        echo -e "  ${GREEN}${ICON_CHECK} ${WHITE}Đã cài đặt${NC} ${LIGHT_CYAN}yay${NC}"
+        AUR_HELPER="yay"
+        helper_installed=true
+    elif command -v paru &>/dev/null; then
+        echo -e "  ${GREEN}${ICON_CHECK} ${WHITE}Đã cài đặt${NC} ${LIGHT_CYAN}paru${NC}"
+        AUR_HELPER="paru"
+        helper_installed=true
+    fi
+
+    if ! $helper_installed; then
+        echo -e "  ${YELLOW}${ICON_WARNING} ${WHITE}Chưa cài đặt trình trợ giúp AUR${NC}"
+        echo
+
+        # Yêu cầu cài đặt trình trợ giúp
+        if confirm_yn "Bạn có muốn cài đặt trình trợ giúp AUR (yay) không?" "y"; then
+            install_aur_helper
+            return $?
+        else
+            print_boxed_message "Không thể tiếp tục mà không có trình trợ giúp AUR" "error"
+            return 1
+        fi
+    fi
+
+    return 0
+}
+
+# Hiển thị thông tin chi tiết về gói AUR
+show_aur_package_info() {
     local package="$1"
 
-    echo -e "${DARK_GRAY}    ──────────────────────────────────────────────────────────────${NC}"
-    echo -e "${WHITE}                    ${ICON_PACKAGE} ${BOLD}CÀI ĐẶT GÓI AUR${NC} ${ICON_PACKAGE}"
-    echo -e "${DARK_GRAY}    ──────────────────────────────────────────────────────────────${NC}"
-    echo
-    echo -e "  ${YELLOW}Gói:${NC} ${WHITE}${BOLD}$package${NC}"
-    echo -e "  ${YELLOW}Nguồn:${NC} ${LIGHT_CYAN}Arch User Repository (AUR)${NC}"
-    echo
-    echo -e "${DARK_GRAY}    ──────────────────────────────────────────────────────────────${NC}"
-    echo
+    echo -e "${LIGHT_YELLOW}${ICON_GEAR} Đang lấy thông tin gói AUR $package...${NC}"
 
-    # Sử dụng hàm confirm_yn từ utils.sh
-    if confirm_yn "${LIGHT_CYAN}${ICON_ARROW} ${WHITE}Bạn có muốn cài đặt ${BOLD}$package${NC}${WHITE} không?${NC}" "y"; then
-        return 0 # Người dùng chọn có
-    else
-        return 1 # Người dùng chọn không
+    # Kiểm tra xem trình trợ giúp AUR đã được cài đặt chưa
+    if ! check_aur_helper; then
+        print_boxed_message "Không tìm thấy trình trợ giúp AUR" "error"
+        return 1
     fi
+
+    # Lấy thông tin gói
+    if ! $AUR_HELPER -Si "$package" >/dev/null 2>&1; then
+        print_boxed_message "Không thể tìm thấy gói AUR $package" "error"
+        return 1
+    fi
+
+    # Hiển thị thông tin gói
+    $AUR_HELPER -Si "$package" | awk -F ': ' '/^Name/{printf "\033[1;37m%-20s\033[0m: ", $2} /^Version/{printf "\033[1;32m%s\033[0m\n", $2} /^Description/{printf "\033[1;36m%s\033[0m\n", $2} /^URL/{printf "\033[1;34m%s\033[0m\n", $2} /^Maintainer/{printf "\033[1;35m%s\033[0m\n", $2} /^Last Updated/{printf "\033[1;33m%s\033[0m\n", $2}'
+
+    return 0
 }
 
 # Cài đặt một gói AUR cụ thể
@@ -156,7 +220,7 @@ install_aur_package() {
     fi
 
     # Yêu cầu xác nhận cài đặt
-    if ask_install_aur_package "$package"; then
+    if ask_install_aur "$package"; then
         # Hiển thị spinner khi đang cài đặt
         echo -e "${LIGHT_YELLOW}${ICON_GEAR} Đang cài đặt $package từ AUR...${NC}"
 
@@ -216,7 +280,7 @@ install_aur_packages() {
         fi
 
         # Yêu cầu xác nhận cài đặt
-        if ask_install_aur_package "$package"; then
+        if ask_install_aur "$package"; then
             # Hiển thị spinner khi đang cài đặt
             echo -e "${LIGHT_YELLOW}${ICON_GEAR} Đang cài đặt $package từ AUR...${NC}"
 

@@ -77,6 +77,8 @@ configure_shell() {
     echo
 
     echo -e "${DARK_GRAY}    ──────────────────────────────────────────────────────────────${NC}"
+    echo -e "    ${LIGHT_CYAN}${ICON_INFO} ${WHITE}Chọn một tùy chọn từ ${LIGHT_GREEN}${BOLD}1-4${NC}${WHITE} và nhấn Enter${NC}"
+    echo -e "${DARK_GRAY}    ──────────────────────────────────────────────────────────────${NC}"
     echo
 
     # Lấy lựa chọn từ người dùng

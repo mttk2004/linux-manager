@@ -39,19 +39,19 @@ display_package_menu() {
     echo
 
     echo -e "  ${ICON_PACKAGE} ${GREEN}${BOLD}[2]${NC}  ${WHITE}Cài đặt gói AUR${NC}"
-    echo -e "      ${GRAY}${DIM}Cài đặt từ Arch User Repository${NC}"
+    echo -e "      ${GRAY}${DIM}Cài đặt từ AUR (Arch User Repository)${NC}"
     echo
 
     echo -e "  ${ICON_PACKAGE} ${GREEN}${BOLD}[3]${NC}  ${WHITE}Cài đặt ứng dụng Flatpak${NC}"
-    echo -e "      ${GRAY}${DIM}Cài đặt từ Flathub universal packages${NC}"
+    echo -e "      ${GRAY}${DIM}Cài đặt từ Flathub${NC}"
     echo
 
-    echo -e "  ${ICON_CONFIG} ${GREEN}${BOLD}[4]${NC}  ${WHITE}Cập nhật tất cả gói${NC}"
-    echo -e "      ${GRAY}${DIM}Pacman + AUR + Flatpak${NC}"
+    echo -e "  ${ICON_PACKAGE} ${GREEN}${BOLD}[4]${NC}  ${WHITE}Cập nhật hệ thống${NC}"
+    echo -e "      ${GRAY}${DIM}Cập nhật tất cả các gói${NC}"
     echo
 
-    echo -e "  ${ICON_CONFIG} ${GREEN}${BOLD}[5]${NC}  ${WHITE}Tìm kiếm gói${NC}"
-    echo -e "      ${GRAY}${DIM}Tìm kiếm trong tất cả kho phần mềm${NC}"
+    echo -e "  ${ICON_CONFIG} ${GREEN}${BOLD}[5]${NC}  ${WHITE}Gỡ cài đặt gói${NC}"
+    echo -e "      ${GRAY}${DIM}Gỡ bỏ gói đã cài đặt${NC}"
     echo
 
     echo -e "  ${ICON_EXIT} ${LIGHT_RED}${BOLD}[6]${NC}  ${WHITE}Quay lại menu chính${NC}"
@@ -108,6 +108,78 @@ display_pacman_package_menu() {
     echo
 }
 
+# Hiển thị menu cài đặt gói AUR
+display_aur_package_menu() {
+    clear
+    echo -e "${LIGHT_CYAN}"
+    echo "     █████╗ ██╗   ██╗██████╗     ███╗   ███╗███████╗███╗   ██╗██╗   ██╗"
+    echo "    ██╔══██╗██║   ██║██╔══██╗    ████╗ ████║██╔════╝████╗  ██║██║   ██║"
+    echo "    ███████║██║   ██║██████╔╝    ██╔████╔██║█████╗  ██╔██╗ ██║██║   ██║"
+    echo "    ██╔══██║██║   ██║██╔══██╗    ██║╚██╔╝██║██╔══╝  ██║╚██╗██║██║   ██║"
+    echo "    ██║  ██║╚██████╔╝██║  ██║    ██║ ╚═╝ ██║███████╗██║ ╚████║╚██████╔╝"
+    echo "    ╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═╝    ╚═╝     ╚═╝╚══════╝╚═╝  ╚═══╝ ╚═════╝ "
+    echo -e "${NC}"
+
+    echo -e "${DARK_GRAY}    ──────────────────────────────────────────────────────────────${NC}"
+    echo -e "${WHITE}                    ${ICON_PACKAGE} ${BOLD}CÀI ĐẶT GÓI AUR${NC} ${ICON_PACKAGE}"
+    echo -e "${DARK_GRAY}    ──────────────────────────────────────────────────────────────${NC}"
+    echo
+
+    # Menu items với style đơn giản và hiện đại
+    echo -e "  ${ICON_PACKAGE} ${GREEN}${BOLD}[1]${NC}  ${WHITE}Cài đặt gói AUR thiết yếu${NC}"
+    echo -e "      ${GRAY}${DIM}Các gói phổ biến từ AUR${NC}"
+    echo
+
+    echo -e "  ${ICON_CONFIG} ${GREEN}${BOLD}[2]${NC}  ${WHITE}Cài đặt gói AUR tùy chỉnh${NC}"
+    echo -e "      ${GRAY}${DIM}Nhập tên gói AUR muốn cài đặt${NC}"
+    echo
+
+    echo -e "  ${ICON_EXIT} ${LIGHT_RED}${BOLD}[3]${NC}  ${WHITE}Quay lại${NC}"
+    echo -e "      ${GRAY}${DIM}Trở về menu quản lý gói${NC}"
+    echo
+
+    echo -e "${DARK_GRAY}    ──────────────────────────────────────────────────────────────${NC}"
+    echo -e "    ${LIGHT_CYAN}${ICON_INFO} ${WHITE}Chọn một tùy chọn từ ${LIGHT_GREEN}${BOLD}1-3${NC}${WHITE} và nhấn Enter${NC}"
+    echo -e "${DARK_GRAY}    ──────────────────────────────────────────────────────────────${NC}"
+    echo
+}
+
+# Hiển thị menu cài đặt ứng dụng Flatpak
+display_flatpak_package_menu() {
+    clear
+    echo -e "${LIGHT_CYAN}"
+    echo "    ███████╗██╗      █████╗ ████████╗██████╗  █████╗ ██╗  ██╗"
+    echo "    ██╔════╝██║     ██╔══██╗╚══██╔══╝██╔══██╗██╔══██╗██║ ██╔╝"
+    echo "    █████╗  ██║     ███████║   ██║   ██████╔╝███████║█████╔╝ "
+    echo "    ██╔══╝  ██║     ██╔══██║   ██║   ██╔═══╝ ██╔══██║██╔═██╗ "
+    echo "    ██║     ███████╗██║  ██║   ██║   ██║     ██║  ██║██║  ██╗"
+    echo "    ╚═╝     ╚══════╝╚═╝  ╚═╝   ╚═╝   ╚═╝     ╚═╝  ╚═╝╚═╝  ╚═╝"
+    echo -e "${NC}"
+
+    echo -e "${DARK_GRAY}    ──────────────────────────────────────────────────────────────${NC}"
+    echo -e "${WHITE}                    ${ICON_PACKAGE} ${BOLD}CÀI ĐẶT ỨNG DỤNG FLATPAK${NC} ${ICON_PACKAGE}"
+    echo -e "${DARK_GRAY}    ──────────────────────────────────────────────────────────────${NC}"
+    echo
+
+    # Menu items với style đơn giản và hiện đại
+    echo -e "  ${ICON_PACKAGE} ${GREEN}${BOLD}[1]${NC}  ${WHITE}Cài đặt ứng dụng phổ biến${NC}"
+    echo -e "      ${GRAY}${DIM}Các ứng dụng nổi tiếng từ Flathub${NC}"
+    echo
+
+    echo -e "  ${ICON_CONFIG} ${GREEN}${BOLD}[2]${NC}  ${WHITE}Cài đặt ứng dụng tùy chỉnh${NC}"
+    echo -e "      ${GRAY}${DIM}Nhập ID ứng dụng muốn cài đặt${NC}"
+    echo
+
+    echo -e "  ${ICON_EXIT} ${LIGHT_RED}${BOLD}[3]${NC}  ${WHITE}Quay lại${NC}"
+    echo -e "      ${GRAY}${DIM}Trở về menu quản lý gói${NC}"
+    echo
+
+    echo -e "${DARK_GRAY}    ──────────────────────────────────────────────────────────────${NC}"
+    echo -e "    ${LIGHT_CYAN}${ICON_INFO} ${WHITE}Chọn một tùy chọn từ ${LIGHT_GREEN}${BOLD}1-3${NC}${WHITE} và nhấn Enter${NC}"
+    echo -e "${DARK_GRAY}    ──────────────────────────────────────────────────────────────${NC}"
+    echo
+}
+
 # Hàm cài đặt gói tùy chỉnh Pacman
 install_custom_pacman_package() {
     echo -e "${LIGHT_YELLOW}${ICON_GEAR} Cài đặt gói tùy chỉnh${NC}"
@@ -142,34 +214,25 @@ search_package() {
         return 0
     fi
 
-    # Tìm kiếm trong cả ba nguồn
-    echo -e "${LIGHT_BLUE}╔════════════════════════════════════════════════════════════════════════════════╗${NC}"
-    echo -e "${LIGHT_BLUE}║                            ${WHITE}${BOLD}KẾT QUẢ TÌM KIẾM${NC}${LIGHT_BLUE}                                  ║${NC}"
-    echo -e "${LIGHT_BLUE}╠════════════════════════════════════════════════════════════════════════════════╣${NC}"
-    echo -e "${LIGHT_BLUE}║                                                                                ║${NC}"
-    echo -e "${LIGHT_BLUE}║  ${YELLOW}Từ khóa:${NC} ${WHITE}${BOLD}$keyword${NC}                                                           ${LIGHT_BLUE}║${NC}"
-    echo -e "${LIGHT_BLUE}║                                                                                ║${NC}"
-    echo -e "${LIGHT_BLUE}╚════════════════════════════════════════════════════════════════════════════════╝${NC}"
+    # Hiển thị header kết quả tìm kiếm
+    display_section_header "KẾT QUẢ TÌM KIẾM" "${ICON_SEARCH}"
+    echo -e "  ${YELLOW}Từ khóa:${NC} ${WHITE}${BOLD}$keyword${NC}"
+    echo
 
     # Tìm kiếm trong Pacman
-    echo -e "\n${LIGHT_CYAN}${BOLD}=== Kết quả từ kho chính thức (Pacman) ===${NC}"
+    echo -e "  ${LIGHT_CYAN}${BOLD}=== Kết quả từ kho chính thức (Pacman) ===${NC}"
     search_pacman_package "$keyword"
 
     # Tìm kiếm trong AUR
-    echo -e "\n${LIGHT_CYAN}${BOLD}=== Kết quả từ AUR ===${NC}"
+    echo -e "\n  ${LIGHT_CYAN}${BOLD}=== Kết quả từ AUR ===${NC}"
     search_aur_package "$keyword"
 
     # Tìm kiếm trong Flatpak
-    echo -e "\n${LIGHT_CYAN}${BOLD}=== Kết quả từ Flathub (Flatpak) ===${NC}"
+    echo -e "\n  ${LIGHT_CYAN}${BOLD}=== Kết quả từ Flathub (Flatpak) ===${NC}"
     search_flatpak_app "$keyword"
 
     # Đợi người dùng nhấn phím để tiếp tục
-    echo
-    echo -e "${DARK_GRAY}               ┌──────────────────────────────────────────────────┐${NC}"
-    echo -e "${DARK_GRAY}               │  ${LIGHT_CYAN}${ICON_INFO} ${WHITE}Nhấn phím bất kỳ để tiếp tục...${NC}${DARK_GRAY}             │${NC}"
-    echo -e "${DARK_GRAY}               └──────────────────────────────────────────────────┘${NC}"
-    read -n 1 -s
-
+    wait_for_user
     return 0
 }
 

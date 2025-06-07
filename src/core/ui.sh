@@ -107,26 +107,35 @@ display_menu() {
 
 # Function to get user input with style - using read_single_key from utils.sh
 get_user_choice() {
-    # Display prompt manually
-    echo -e -n "${LIGHT_CYAN}${ICON_ARROW} ${WHITE}${BOLD}Nhập lựa chọn của bạn${NC} ${DARK_GRAY}[${LIGHT_GREEN}1-5${DARK_GRAY}]${NC}: "
+    local min="$1"
+    local max="$2"
+    local prompt="${3:-Nhập lựa chọn của bạn}"
 
-    # Get ONLY the key without any prompt handling
+    # Display prompt with range
+    echo -e -n "    ${LIGHT_CYAN}${ICON_ARROW} ${WHITE}${BOLD}${prompt}${NC} ${DARK_GRAY}[${LIGHT_GREEN}${min}-${max}${DARK_GRAY}]${NC}: "
+
+    # Get user input
+    local choice
     choice=$(read_single_key)
-
-    # Echo the character for visual feedback
-    echo "$choice"
-    echo
+    echo "$choice" # Echo for visual feedback
+    echo # New line
 
     return 0
 }
 
 # Function to wait for user input with style
 wait_for_user() {
-    echo -e "\n${DARK_GRAY}┌─────────────────────────────────────────────────────────────────────────────────┐${NC}"
-    echo -e "${DARK_GRAY}│  ${LIGHT_YELLOW}${ICON_INFO} ${WHITE}Nhấn ${LIGHT_GREEN}${BOLD}phím bất kỳ${NC}${WHITE} để quay lại menu chính...${NC}                             ${DARK_GRAY}│${NC}"
-    echo -e "${DARK_GRAY}└─────────────────────────────────────────────────────────────────────────────────┘${NC}"
+    echo -e "\n${DARK_GRAY}    ──────────────────────────────────────────────────────────────${NC}"
+    echo -e "    ${LIGHT_YELLOW}${ICON_INFO} ${WHITE}Nhấn ${LIGHT_GREEN}${BOLD}phím bất kỳ${NC}${WHITE} để tiếp tục...${NC}"
+    echo -e "${DARK_GRAY}    ──────────────────────────────────────────────────────────────${NC}"
+    read_single_key > /dev/null
+}
 
-    # Use read_single_key instead of read to avoid requiring Enter
+# Function to wait for return to main menu
+wait_return_to_main() {
+    echo -e "\n${DARK_GRAY}    ──────────────────────────────────────────────────────────────${NC}"
+    echo -e "    ${LIGHT_YELLOW}${ICON_INFO} ${WHITE}Nhấn ${LIGHT_GREEN}${BOLD}phím bất kỳ${NC}${WHITE} để quay lại menu chính...${NC}"
+    echo -e "${DARK_GRAY}    ──────────────────────────────────────────────────────────────${NC}"
     read_single_key > /dev/null
 }
 
@@ -147,4 +156,16 @@ show_exit_message() {
     echo -e "${LIGHT_BLUE}                          ═══════════════════════════════════════════════════════${NC}"
     echo
     sleep 2
+}
+
+# Function to display section header
+display_section_header() {
+    local title="$1"
+    local icon="${2:-$ICON_GEAR}"
+
+    echo
+    echo -e "${DARK_GRAY}    ──────────────────────────────────────────────────────────────${NC}"
+    echo -e "${WHITE}                    ${icon} ${BOLD}${title}${NC} ${icon}"
+    echo -e "${DARK_GRAY}    ──────────────────────────────────────────────────────────────${NC}"
+    echo
 }
