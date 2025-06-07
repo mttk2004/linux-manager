@@ -269,7 +269,6 @@ manage_nodejs_environment() {
                 ;;
             *)
                 print_boxed_message "Lựa chọn không hợp lệ. Vui lòng chọn số từ 1-5." "error"
-                sleep 2
                 ;;
         esac
 

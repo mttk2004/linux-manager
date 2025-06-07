@@ -306,7 +306,6 @@ manage_packages() {
                             ;;
                         *)
                             print_boxed_message "Lựa chọn không hợp lệ. Vui lòng chọn số từ 1-5." "error"
-                            sleep 2
                             ;;
                     esac
 
@@ -345,7 +344,6 @@ manage_packages() {
                 ;;
             *)
                 print_boxed_message "Lựa chọn không hợp lệ. Vui lòng chọn số từ 1-6." "error"
-                sleep 2
                 ;;
         esac
 

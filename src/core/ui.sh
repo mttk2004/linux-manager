@@ -151,7 +151,6 @@ show_exit_message() {
     echo -e "${LIGHT_GREEN}                                    ${BOLD}Chúc một ngày tốt lành! 🌟${NC}"
     echo -e "${LIGHT_BLUE}                          ═══════════════════════════════════════════════════════${NC}"
     echo
-    sleep 2
 }
 
 # Function to display section header

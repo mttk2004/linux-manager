@@ -264,7 +264,6 @@ manage_system_configurations() {
                 ;;
             *)
                 print_boxed_message "Lựa chọn không hợp lệ. Vui lòng chọn số từ 1-6." "error"
-                sleep 2
                 ;;
         esac
 

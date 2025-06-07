@@ -97,7 +97,6 @@ main() {
             *)
                 print_boxed_message "Lựa chọn không hợp lệ. Vui lòng chọn số từ 1-5." "error"
                 log_warning "Lựa chọn không hợp lệ: $choice"
-                sleep 2
                 ;;
         esac
 
