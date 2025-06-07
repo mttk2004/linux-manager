@@ -311,9 +311,7 @@ manage_packages() {
                     esac
 
                     # Đợi người dùng nhấn phím bất kỳ để tiếp tục
-                    echo -e "\n${DARK_GRAY}┌─────────────────────────────────────────────────────────────────────────────────┐${NC}"
-                    echo -e "${DARK_GRAY}│  ${LIGHT_YELLOW}${ICON_INFO} ${WHITE}Nhấn ${LIGHT_GREEN}${BOLD}phím bất kỳ${NC}${WHITE} để tiếp tục...${NC}                                     ${DARK_GRAY}│${NC}"
-                    echo -e "${DARK_GRAY}└─────────────────────────────────────────────────────────────────────────────────┘${NC}"
+                    echo -e "${LIGHT_YELLOW}${ICON_INFO} ${WHITE}Nhấn ${LIGHT_GREEN}${BOLD}phím bất kỳ${NC}${WHITE} để tiếp tục..."
                     read -n 1 -s
                 done
                 ;;
@@ -352,9 +350,7 @@ manage_packages() {
         esac
 
         # Đợi người dùng nhấn phím bất kỳ để tiếp tục
-        echo -e "\n${DARK_GRAY}┌─────────────────────────────────────────────────────────────────────────────────┐${NC}"
-        echo -e "${DARK_GRAY}│  ${LIGHT_YELLOW}${ICON_INFO} ${WHITE}Nhấn ${LIGHT_GREEN}${BOLD}phím bất kỳ${NC}${WHITE} để quay lại menu quản lý gói...${NC}                     ${DARK_GRAY}│${NC}"
-        echo -e "${DARK_GRAY}└─────────────────────────────────────────────────────────────────────────────────┘${NC}"
+        echo -e "${LIGHT_YELLOW}${ICON_INFO} ${WHITE}Nhấn ${LIGHT_GREEN}${BOLD}phím bất kỳ${NC}${WHITE} để quay lại menu quản lý gói..."
         read -n 1 -s
     done
 }

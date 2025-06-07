@@ -152,7 +152,5 @@ print_boxed_message() {
             ;;
     esac
 
-    echo -e "${DARK_GRAY}    ──────────────────────────────────────────────────────────────${NC}"
-    echo -e "    ${color}${icon} ${WHITE}${message}${NC}"
-    echo -e "${DARK_GRAY}    ──────────────────────────────────────────────────────────────${NC}"
+    echo -e "${color}${icon} ${WHITE}${message}${NC}"
 }

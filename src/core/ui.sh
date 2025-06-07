@@ -125,17 +125,13 @@ get_user_choice() {
 
 # Function to wait for user input with style
 wait_for_user() {
-    echo -e "\n${DARK_GRAY}    ──────────────────────────────────────────────────────────────${NC}"
-    echo -e "    ${LIGHT_YELLOW}${ICON_INFO} ${WHITE}Nhấn ${LIGHT_GREEN}${BOLD}phím bất kỳ${NC}${WHITE} để tiếp tục...${NC}"
-    echo -e "${DARK_GRAY}    ──────────────────────────────────────────────────────────────${NC}"
+    echo -e "${LIGHT_YELLOW}${ICON_INFO} ${WHITE}Nhấn ${LIGHT_GREEN}${BOLD}phím bất kỳ${NC}${WHITE} để tiếp tục...${NC}"
     read_single_key > /dev/null
 }
 
 # Function to wait for return to main menu
 wait_return_to_main() {
-    echo -e "\n${DARK_GRAY}    ──────────────────────────────────────────────────────────────${NC}"
-    echo -e "    ${LIGHT_YELLOW}${ICON_INFO} ${WHITE}Nhấn ${LIGHT_GREEN}${BOLD}phím bất kỳ${NC}${WHITE} để quay lại menu chính...${NC}"
-    echo -e "${DARK_GRAY}    ──────────────────────────────────────────────────────────────${NC}"
+    echo -e "${LIGHT_YELLOW}${ICON_INFO} ${WHITE}Nhấn ${LIGHT_GREEN}${BOLD}phím bất kỳ${NC}${WHITE} để quay lại menu chính...${NC}"
     read_single_key > /dev/null
 }
 
