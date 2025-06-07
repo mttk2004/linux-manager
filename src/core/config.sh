@@ -17,6 +17,11 @@ MODULES_DIR="$BASE_DIR/src/modules"
 PACKAGES_DIR="$DATA_DIR/packages"
 CONFIGS_DIR="$DATA_DIR/configs"
 
+# Đảm bảo các thư mục tồn tại
+mkdir -p "$LOGS_DIR"
+mkdir -p "$PACKAGES_DIR"
+mkdir -p "$CONFIGS_DIR"
+
 # Tên tập tin nhật ký
 LOG_FILE="$LOGS_DIR/manager_$(date +%Y%m%d).log"
 
@@ -28,6 +33,13 @@ load_package_list() {
         return 0
     else
         echo "Lỗi: Không tìm thấy tập tin danh sách $list_file" >&2
+        # Tự động tạo file nếu chưa tồn tại
+        create_default_package_lists
+        # Thử lại sau khi tạo file mặc định
+        if [ -f "$list_file" ]; then
+            mapfile -t PACKAGES < "$list_file"
+            return 0
+        fi
         return 1
     fi
 }

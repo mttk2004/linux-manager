@@ -16,6 +16,10 @@ LOGS_DIR="$ROOT_DIR/logs"
 # Tạo thư mục logs nếu chưa tồn tại
 mkdir -p "$LOGS_DIR"
 
+# Đảm bảo thư mục data tồn tại
+mkdir -p "$DATA_DIR/packages"
+mkdir -p "$DATA_DIR/configs"
+
 # Load các tập tin core
 source "$CORE_DIR/config.sh"
 source "$CORE_DIR/utils.sh"

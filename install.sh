@@ -138,7 +138,6 @@ main() {
     echo "Cài đặt Linux Manager với cấu trúc thư mục mới..."
 
     create_directory_structure
-    migrate_existing_files
     update_core_config
     create_readme
 
