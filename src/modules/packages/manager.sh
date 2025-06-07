@@ -7,6 +7,11 @@ source "$(dirname "$0")/pacman.sh"
 source "$(dirname "$0")/aur.sh"
 source "$(dirname "$0")/flatpak.sh"
 
+# Tải các module core cần thiết
+source "$(dirname "$(dirname "$0")")/core/ui.sh"
+source "$(dirname "$(dirname "$0")")/core/utils.sh"
+source "$(dirname "$(dirname "$0")")/core/config.sh"
+
 # Hiển thị menu quản lý gói
 display_package_menu() {
     clear
