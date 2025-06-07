@@ -30,20 +30,16 @@ linux-manager/
 │       ├── packages/    # Quản lý cài đặt gói
 │       └── system/      # Quản lý cấu hình hệ thống
 ├── config.sh            # Cấu hình chung (danh sách gói cài đặt)
-├── install.sh           # Script cài đặt ứng dụng
-├── setup.sh             # Script thiết lập cấu trúc thư mục
-└── uninstall.sh         # Script gỡ cài đặt ứng dụng
+├── install.sh           # Script cài đặt (tùy chọn)
+├── setup.sh             # Script thiết lập cấu trúc thư mục (tùy chọn)
+└── uninstall.sh         # Script gỡ cài đặt (tùy chọn)
 ```
 
 ## Luồng hoạt động của ứng dụng
 
 ```mermaid
 graph TB
-    A[Người dùng] -->|Chạy| B[install.sh]
-    B -->|Tạo cấu trúc thư mục| C[setup.sh]
-    C -->|Tạo cấu hình core| D[src/core/config.sh]
-
-    A -->|Sử dụng| E[bin/linux-manager]
+    A[Người dùng] -->|Chạy trực tiếp| E[bin/linux-manager]
     E -->|Hiển thị menu| F[Menu chính]
 
     F -->|Chọn| G1[Cài đặt gói]
@@ -61,12 +57,9 @@ graph TB
     G3 -->|Cài đặt/Cấu hình| I3[PHP/Composer/Laravel]
     G4 -->|Cài đặt/Cấu hình| I4[NVM/NodeJS/NPM]
     G5 -->|Cài đặt/Cấu hình| I5[Docker/Docker Compose]
-
-    A -->|Gỡ cài đặt| J[uninstall.sh]
-    J -->|Xóa thư mục| K[Xóa dữ liệu]
 ```
 
-## Hướng dẫn cài đặt
+## Hướng dẫn sử dụng
 
 ### Yêu cầu hệ thống
 
@@ -74,7 +67,7 @@ graph TB
 - Bash shell
 - Quyền sudo
 
-### Các bước cài đặt
+### Cách 1: Sử dụng trực tiếp (Khuyên dùng)
 
 1. Tải về mã nguồn:
 
@@ -83,41 +76,35 @@ git clone https://github.com/mttk2004/linux-manager.git
 cd linux-manager
 ```
 
-2. Cấp quyền thực thi cho script cài đặt:
+2. Cấp quyền thực thi cho script:
 
 ```bash
-chmod +x install.sh
+chmod +x bin/linux-manager
 ```
 
-3. Chạy script cài đặt:
-
-```bash
-./install.sh
-```
-
-Script sẽ tự động tạo cấu trúc thư mục cần thiết và chuẩn bị các tập tin cấu hình.
-
-## Cách sử dụng
-
-Sau khi cài đặt, bạn có thể chạy Linux Manager bằng lệnh:
+3. Chạy ứng dụng:
 
 ```bash
 ./bin/linux-manager
 ```
 
-Hoặc tạo liên kết tượng trưng để chạy từ bất kỳ đâu:
+### Cách 2: Sử dụng script cài đặt
+
+Nếu bạn muốn sử dụng script cài đặt để tạo cấu trúc thư mục mới:
+
+```bash
+chmod +x install.sh
+./install.sh
+./bin/linux-manager
+```
+
+### Tạo liên kết tượng trưng (tùy chọn)
+
+Để có thể chạy Linux Manager từ bất kỳ đâu:
 
 ```bash
 sudo ln -s /path/to/linux-manager/bin/linux-manager /usr/local/bin/linux-manager
 ```
-
-Khi chạy, chương trình sẽ hiển thị menu chính với các tùy chọn:
-
-1. **Cài đặt gói phần mềm** - Cài đặt các gói từ kho Pacman và AUR
-2. **Cấu hình hệ thống** - Thiết lập cấu hình cho shell, terminal, và các ứng dụng
-3. **Quản lý PHP/Composer/Laravel** - Cài đặt và cấu hình môi trường PHP
-4. **Quản lý NVM/NodeJS/NPM** - Cài đặt và cấu hình môi trường NodeJS
-5. **Quản lý Docker** - Cài đặt và cấu hình Docker và Docker Compose
 
 ## Tùy chỉnh
 
@@ -126,8 +113,8 @@ Khi chạy, chương trình sẽ hiển thị menu chính với các tùy chọn
 Bạn có thể chỉnh sửa danh sách gói trong các tập tin:
 - `src/data/packages/pacman.list` - Gói từ kho chính thức
 - `src/data/packages/aur.list` - Gói từ AUR
-
-Hoặc chỉnh sửa trực tiếp trong `config.sh`
+- `src/data/packages/dev.list` - Gói phát triển
+- `src/data/packages/multimedia.list` - Gói đa phương tiện
 
 ### Thêm cấu hình riêng
 
@@ -148,8 +135,6 @@ Bạn có thể thêm cấu hình shell, terminal hoặc trình soạn thảo v�
 ```bash
 ./uninstall.sh
 ```
-
-Script sẽ xóa tất cả dữ liệu liên quan đến Linux Manager nhưng vẫn giữ lại các tập tin gốc để bạn có thể cài đặt lại sau này.
 
 ## Đóng góp
 
