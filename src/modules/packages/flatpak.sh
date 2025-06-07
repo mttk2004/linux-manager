@@ -87,15 +87,16 @@ ask_install_flatpak() {
         app_name="$app_id"
     fi
 
-    echo -e "${LIGHT_BLUE}╔═══════════════════════════════════════════════════════════════════════════════╗${NC}"
-    echo -e "${LIGHT_BLUE}║  ${ICON_PACKAGE} ${WHITE}${BOLD}Cài đặt ứng dụng Flatpak${NC}                                              ${LIGHT_BLUE}║${NC}"
-    echo -e "${LIGHT_BLUE}╠═══════════════════════════════════════════════════════════════════════════════╣${NC}"
-    echo -e "${LIGHT_BLUE}║                                                                               ║${NC}"
-    echo -e "${LIGHT_BLUE}║  ${YELLOW}Ứng dụng:${NC} ${WHITE}${BOLD}$app_name${NC}                                                        ${LIGHT_BLUE}║${NC}"
-    echo -e "${LIGHT_BLUE}║  ${YELLOW}ID:${NC} ${LIGHT_CYAN}$app_id${NC}                                                            ${LIGHT_BLUE}║${NC}"
-    echo -e "${LIGHT_BLUE}║  ${YELLOW}Nguồn:${NC} ${LIGHT_CYAN}Flathub${NC}                                                         ${LIGHT_BLUE}║${NC}"
-    echo -e "${LIGHT_BLUE}║                                                                               ║${NC}"
-    echo -e "${LIGHT_BLUE}╚═══════════════════════════════════════════════════════════════════════════════╝${NC}"
+    echo -e "${DARK_GRAY}    ──────────────────────────────────────────────────────────────${NC}"
+    echo -e "${WHITE}                    ${ICON_PACKAGE} ${BOLD}CÀI ĐẶT ỨNG DỤNG FLATPAK${NC} ${ICON_PACKAGE}"
+    echo -e "${DARK_GRAY}    ──────────────────────────────────────────────────────────────${NC}"
+    echo
+    echo -e "  ${YELLOW}Ứng dụng:${NC} ${WHITE}${BOLD}$app_name${NC}"
+    echo -e "  ${YELLOW}ID:${NC} ${LIGHT_CYAN}$app_id${NC}"
+    echo -e "  ${YELLOW}Nguồn:${NC} ${LIGHT_CYAN}Flathub${NC}"
+    echo
+    echo -e "${DARK_GRAY}    ──────────────────────────────────────────────────────────────${NC}"
+    echo
 
     # Sử dụng hàm confirm_yn từ utils.sh
     if confirm_yn "${LIGHT_CYAN}${ICON_ARROW} ${WHITE}Bạn có muốn cài đặt ${BOLD}$app_name${NC}${WHITE} không?${NC}" "y"; then

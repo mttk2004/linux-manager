@@ -54,17 +54,30 @@ display_system_menu() {
 configure_shell() {
     echo -e "${LIGHT_YELLOW}${ICON_GEAR} Cấu hình shell...${NC}"
 
-    # Hiển thị menu các shell có sẵn
-    echo -e "${LIGHT_BLUE}╔════════════════════════════════════════════════════════════════════════════════╗${NC}"
-    echo -e "${LIGHT_BLUE}║                               ${WHITE}${BOLD}LỰA CHỌN SHELL${NC}${LIGHT_BLUE}                                  ║${NC}"
-    echo -e "${LIGHT_BLUE}╠════════════════════════════════════════════════════════════════════════════════╣${NC}"
-    echo -e "${LIGHT_BLUE}║                                                                                ║${NC}"
-    echo -e "${LIGHT_BLUE}║  ${ICON_CONFIG} ${GREEN}${BOLD}[1]${NC} ${WHITE}Bash${NC}                                   ${GRAY}${DIM}Shell mặc định${NC}  ${LIGHT_BLUE}║${NC}"
-    echo -e "${LIGHT_BLUE}║  ${ICON_CONFIG} ${GREEN}${BOLD}[2]${NC} ${WHITE}Zsh${NC}                                ${GRAY}${DIM}Với Oh My Zsh${NC}  ${LIGHT_BLUE}║${NC}"
-    echo -e "${LIGHT_BLUE}║  ${ICON_CONFIG} ${GREEN}${BOLD}[3]${NC} ${WHITE}Fish${NC}                                    ${GRAY}${DIM}User-friendly${NC}  ${LIGHT_BLUE}║${NC}"
-    echo -e "${LIGHT_BLUE}║  ${ICON_EXIT} ${LIGHT_RED}${BOLD}[4]${NC} ${WHITE}Quay lại${NC}                                           ${GRAY}${DIM}Menu trước${NC}  ${LIGHT_BLUE}║${NC}"
-    echo -e "${LIGHT_BLUE}║                                                                                ║${NC}"
-    echo -e "${LIGHT_BLUE}╚════════════════════════════════════════════════════════════════════════════════╝${NC}"
+    echo -e "${DARK_GRAY}    ──────────────────────────────────────────────────────────────${NC}"
+    echo -e "${WHITE}                    ${ICON_CONFIG} ${BOLD}LỰA CHỌN SHELL${NC} ${ICON_CONFIG}"
+    echo -e "${DARK_GRAY}    ──────────────────────────────────────────────────────────────${NC}"
+    echo
+
+    # Menu items với style đơn giản và hiện đại
+    echo -e "  ${ICON_CONFIG} ${GREEN}${BOLD}[1]${NC}  ${WHITE}Bash${NC}"
+    echo -e "      ${GRAY}${DIM}Shell mặc định${NC}"
+    echo
+
+    echo -e "  ${ICON_CONFIG} ${GREEN}${BOLD}[2]${NC}  ${WHITE}Zsh${NC}"
+    echo -e "      ${GRAY}${DIM}Với Oh My Zsh${NC}"
+    echo
+
+    echo -e "  ${ICON_CONFIG} ${GREEN}${BOLD}[3]${NC}  ${WHITE}Fish${NC}"
+    echo -e "      ${GRAY}${DIM}User-friendly${NC}"
+    echo
+
+    echo -e "  ${ICON_EXIT} ${LIGHT_RED}${BOLD}[4]${NC}  ${WHITE}Quay lại${NC}"
+    echo -e "      ${GRAY}${DIM}Menu trước${NC}"
+    echo
+
+    echo -e "${DARK_GRAY}    ──────────────────────────────────────────────────────────────${NC}"
+    echo
 
     # Lấy lựa chọn từ người dùng
     echo -e -n "${LIGHT_CYAN}${ICON_ARROW} ${WHITE}${BOLD}Nhập lựa chọn của bạn${NC} ${DARK_GRAY}[${LIGHT_GREEN}1-4${DARK_GRAY}]${NC}: "
@@ -106,17 +119,30 @@ configure_shell() {
 configure_editor() {
     echo -e "${LIGHT_YELLOW}${ICON_GEAR} Cấu hình trình soạn thảo...${NC}"
 
-    # Hiển thị menu các trình soạn thảo có sẵn
-    echo -e "${LIGHT_BLUE}╔════════════════════════════════════════════════════════════════════════════════╗${NC}"
-    echo -e "${LIGHT_BLUE}║                          ${WHITE}${BOLD}LỰA CHỌN TRÌNH SOẠN THẢO${NC}${LIGHT_BLUE}                            ║${NC}"
-    echo -e "${LIGHT_BLUE}╠════════════════════════════════════════════════════════════════════════════════╣${NC}"
-    echo -e "${LIGHT_BLUE}║                                                                                ║${NC}"
-    echo -e "${LIGHT_BLUE}║  ${ICON_CONFIG} ${GREEN}${BOLD}[1]${NC} ${WHITE}Vim${NC}                                     ${GRAY}${DIM}Trình soạn thảo cơ bản${NC}  ${LIGHT_BLUE}║${NC}"
-    echo -e "${LIGHT_BLUE}║  ${ICON_CONFIG} ${GREEN}${BOLD}[2]${NC} ${WHITE}Neovim${NC}                         ${GRAY}${DIM}Phiên bản hiện đại của Vim${NC}  ${LIGHT_BLUE}║${NC}"
-    echo -e "${LIGHT_BLUE}║  ${ICON_CONFIG} ${GREEN}${BOLD}[3]${NC} ${WHITE}VS Code${NC}                        ${GRAY}${DIM}Trình soạn thảo đồ họa hiện đại${NC}  ${LIGHT_BLUE}║${NC}"
-    echo -e "${LIGHT_BLUE}║  ${ICON_EXIT} ${LIGHT_RED}${BOLD}[4]${NC} ${WHITE}Quay lại${NC}                                           ${GRAY}${DIM}Menu trước${NC}  ${LIGHT_BLUE}║${NC}"
-    echo -e "${LIGHT_BLUE}║                                                                                ║${NC}"
-    echo -e "${LIGHT_BLUE}╚════════════════════════════════════════════════════════════════════════════════╝${NC}"
+    echo -e "${DARK_GRAY}    ──────────────────────────────────────────────────────────────${NC}"
+    echo -e "${WHITE}                    ${ICON_CONFIG} ${BOLD}LỰA CHỌN TRÌNH SOẠN THẢO${NC} ${ICON_CONFIG}"
+    echo -e "${DARK_GRAY}    ──────────────────────────────────────────────────────────────${NC}"
+    echo
+
+    # Menu items với style đơn giản và hiện đại
+    echo -e "  ${ICON_CONFIG} ${GREEN}${BOLD}[1]${NC}  ${WHITE}Vim${NC}"
+    echo -e "      ${GRAY}${DIM}Trình soạn thảo cơ bản${NC}"
+    echo
+
+    echo -e "  ${ICON_CONFIG} ${GREEN}${BOLD}[2]${NC}  ${WHITE}Neovim${NC}"
+    echo -e "      ${GRAY}${DIM}Phiên bản hiện đại của Vim${NC}"
+    echo
+
+    echo -e "  ${ICON_CONFIG} ${GREEN}${BOLD}[3]${NC}  ${WHITE}VS Code${NC}"
+    echo -e "      ${GRAY}${DIM}Trình soạn thảo đồ họa hiện đại${NC}"
+    echo
+
+    echo -e "  ${ICON_EXIT} ${LIGHT_RED}${BOLD}[4]${NC}  ${WHITE}Quay lại${NC}"
+    echo -e "      ${GRAY}${DIM}Menu trước${NC}"
+    echo
+
+    echo -e "${DARK_GRAY}    ──────────────────────────────────────────────────────────────${NC}"
+    echo
 
     # Lấy lựa chọn từ người dùng
     echo -e -n "${LIGHT_CYAN}${ICON_ARROW} ${WHITE}${BOLD}Nhập lựa chọn của bạn${NC} ${DARK_GRAY}[${LIGHT_GREEN}1-4${DARK_GRAY}]${NC}: "

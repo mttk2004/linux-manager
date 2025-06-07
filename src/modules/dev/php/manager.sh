@@ -122,17 +122,30 @@ install_laravel() {
 manage_php_versions() {
     echo -e "${LIGHT_YELLOW}${ICON_GEAR} Quản lý phiên bản PHP...${NC}"
 
-    # Hiển thị các phiên bản PHP có sẵn
-    echo -e "\n${LIGHT_BLUE}╔════════════════════════════════════════════════════════════════════════════════╗${NC}"
-    echo -e "${LIGHT_BLUE}║                          ${WHITE}${BOLD}QUẢN LÝ PHIÊN BẢN PHP${NC}${LIGHT_BLUE}                              ║${NC}"
-    echo -e "${LIGHT_BLUE}╠════════════════════════════════════════════════════════════════════════════════╣${NC}"
-    echo -e "${LIGHT_BLUE}║                                                                                ║${NC}"
-    echo -e "${LIGHT_BLUE}║  ${GREEN}${BOLD}[1]${NC} ${WHITE}PHP 8.2${NC} ${LIGHT_GREEN}(Khuyến nghị)${NC}                                                ${LIGHT_BLUE}║${NC}"
-    echo -e "${LIGHT_BLUE}║  ${GREEN}${BOLD}[2]${NC} ${WHITE}PHP 8.1${NC}                                                                ${LIGHT_BLUE}║${NC}"
-    echo -e "${LIGHT_BLUE}║  ${GREEN}${BOLD}[3]${NC} ${WHITE}PHP 7.4${NC} ${YELLOW}(Legacy)${NC}                                                  ${LIGHT_BLUE}║${NC}"
-    echo -e "${LIGHT_BLUE}║  ${GREEN}${BOLD}[4]${NC} ${WHITE}PHP 8.3${NC} ${MAGENTA}(Beta)${NC}                                                   ${LIGHT_BLUE}║${NC}"
-    echo -e "${LIGHT_BLUE}║                                                                                ║${NC}"
-    echo -e "${LIGHT_BLUE}╚════════════════════════════════════════════════════════════════════════════════╝${NC}"
+    echo -e "${DARK_GRAY}    ──────────────────────────────────────────────────────────────${NC}"
+    echo -e "${WHITE}                    ${ICON_PHP} ${BOLD}QUẢN LÝ PHIÊN BẢN PHP${NC} ${ICON_PHP}"
+    echo -e "${DARK_GRAY}    ──────────────────────────────────────────────────────────────${NC}"
+    echo
+
+    # Menu items với style đơn giản và hiện đại
+    echo -e "  ${ICON_PHP} ${GREEN}${BOLD}[1]${NC}  ${WHITE}PHP 8.2${NC} ${LIGHT_GREEN}(Khuyến nghị)${NC}"
+    echo -e "      ${GRAY}${DIM}Phiên bản ổn định mới nhất${NC}"
+    echo
+
+    echo -e "  ${ICON_PHP} ${GREEN}${BOLD}[2]${NC}  ${WHITE}PHP 8.1${NC}"
+    echo -e "      ${GRAY}${DIM}Phiên bản LTS${NC}"
+    echo
+
+    echo -e "  ${ICON_PHP} ${GREEN}${BOLD}[3]${NC}  ${WHITE}PHP 7.4${NC} ${YELLOW}(Legacy)${NC}"
+    echo -e "      ${GRAY}${DIM}Phiên bản cũ hơn${NC}"
+    echo
+
+    echo -e "  ${ICON_PHP} ${GREEN}${BOLD}[4]${NC}  ${WHITE}PHP 8.3${NC} ${MAGENTA}(Beta)${NC}"
+    echo -e "      ${GRAY}${DIM}Phiên bản thử nghiệm${NC}"
+    echo
+
+    echo -e "${DARK_GRAY}    ──────────────────────────────────────────────────────────────${NC}"
+    echo
 
     # Yêu cầu người dùng chọn phiên bản
     echo -e -n "${LIGHT_CYAN}${ICON_ARROW} ${WHITE}${BOLD}Chọn phiên bản PHP${NC} ${DARK_GRAY}[${LIGHT_GREEN}1-4${DARK_GRAY}]${NC}: "

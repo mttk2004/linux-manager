@@ -8,6 +8,9 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 LIGHT_CYAN='\033[1;36m'
+DARK_GRAY='\033[1;30m'
+WHITE='\033[1;37m'
+BOLD='\033[1m'
 NC='\033[0m' # No Color
 
 # Biểu tượng
@@ -50,7 +53,9 @@ print_message() {
             ;;
     esac
 
-    echo -e "${color}${icon} ${message}${NC}"
+    echo -e "${DARK_GRAY}    ──────────────────────────────────────────────────────────────${NC}"
+    echo -e "${color}    ${icon} ${WHITE}${BOLD}${message}${NC}"
+    echo -e "${DARK_GRAY}    ──────────────────────────────────────────────────────────────${NC}"
 }
 
 # Hiển thị tiêu đề
