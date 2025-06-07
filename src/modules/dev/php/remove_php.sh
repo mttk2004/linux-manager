@@ -1,18 +1,18 @@
 #!/bin/bash
 
-# Chức năng chuyển phiên bản PHP
+# Chức năng xóa phiên bản PHP
 # Tải utils từ core
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CORE_DIR="$(cd "${SCRIPT_DIR}/../../../core" && pwd)"
 source "${CORE_DIR}/utils.sh"
 source "${CORE_DIR}/ui.sh"
 
-# Chuyển phiên bản PHP
-switch_php_version() {
-    echo -e "${LIGHT_YELLOW}${ICON_GEAR} Chuyển phiên bản PHP...${NC}"
+# Xóa phiên bản PHP
+remove_php_version() {
+    echo -e "${LIGHT_YELLOW}${ICON_GEAR} Xóa phiên bản PHP...${NC}"
 
     echo -e "${DARK_GRAY}    ──────────────────────────────────────────────────────────────${NC}"
-    echo -e "${WHITE}                ${ICON_SWITCH} ${BOLD}CHUYỂN PHIÊN BẢN PHP${NC} ${ICON_SWITCH}"
+    echo -e "${WHITE}                ${ICON_TRASH} ${BOLD}XÓA PHIÊN BẢN PHP${NC} ${ICON_TRASH}"
     echo -e "${DARK_GRAY}    ──────────────────────────────────────────────────────────────${NC}"
     echo
 
@@ -67,7 +67,7 @@ switch_php_version() {
     echo -e "${DARK_GRAY}    ──────────────────────────────────────────────────────────────${NC}"
     echo
 
-    echo -e -n "${LIGHT_CYAN}${ICON_ARROW} ${WHITE}${BOLD}Chọn phiên bản PHP muốn sử dụng${NC} ${DARK_GRAY}[${LIGHT_GREEN}1-${#php_versions[@]}${DARK_GRAY} hoặc ${LIGHT_RED}x${DARK_GRAY}]${NC}: "
+    echo -e -n "${LIGHT_CYAN}${ICON_ARROW} ${WHITE}${BOLD}Chọn phiên bản PHP muốn xóa${NC} ${DARK_GRAY}[${LIGHT_GREEN}1-${#php_versions[@]}${DARK_GRAY} hoặc ${LIGHT_RED}x${DARK_GRAY}]${NC}: "
     read php_choice
     echo
 
@@ -86,68 +86,63 @@ switch_php_version() {
     # Lấy phiên bản đã chọn
     local selected_version=${php_versions[$php_choice-1]}
 
-    # Nếu đã là phiên bản hiện tại
+    # Nếu là phiên bản hiện tại
     if [ "$selected_version" = "$current_version" ]; then
-        print_boxed_message "PHP $selected_version đã là phiên bản đang sử dụng" "info"
+        print_boxed_message "Bạn không thể xóa phiên bản PHP đang sử dụng. Vui lòng chuyển sang phiên bản khác trước." "error"
+
+        # Hỏi người dùng có muốn chuyển phiên bản không
+        echo -e -n "${LIGHT_CYAN}${ICON_ARROW} ${WHITE}${BOLD}Bạn có muốn chuyển phiên bản PHP ngay bây giờ?${NC} ${DARK_GRAY}[${LIGHT_GREEN}y${DARK_GRAY}/${LIGHT_RED}n${DARK_GRAY}]${NC}: "
+        read -n 1 switch_version
+        echo
+
+        if [[ "$switch_version" =~ ^[yY]$ ]]; then
+            switch_php_version
+            # Sau khi chuyển phiên bản, kiểm tra lại phiên bản hiện tại
+            if [ -L "$HOME/.php/current" ]; then
+                current_version=$(readlink -f "$HOME/.php/current" | sed 's|.*/php-||')
+            fi
+
+            # Nếu vẫn là phiên bản người dùng muốn xóa, thoát
+            if [ "$selected_version" = "$current_version" ]; then
+                print_boxed_message "Bạn vẫn đang sử dụng phiên bản muốn xóa. Hủy thao tác xóa." "error"
+                return 1
+            fi
+        else
+            print_boxed_message "Đã hủy thao tác xóa PHP $selected_version" "info"
+            return 0
+        fi
+    fi
+
+    # Xác nhận từ người dùng
+    echo -e -n "${LIGHT_CYAN}${ICON_ARROW} ${WHITE}${BOLD}Bạn có chắc chắn muốn xóa PHP $selected_version?${NC} ${DARK_GRAY}[${LIGHT_GREEN}y${DARK_GRAY}/${LIGHT_RED}n${DARK_GRAY}]${NC}: "
+    read -n 1 confirm
+    echo
+
+    if [[ ! "$confirm" =~ ^[yY]$ ]]; then
+        print_boxed_message "Đã hủy thao tác xóa PHP $selected_version" "info"
         return 0
     fi
 
-    # Thực hiện chuyển đổi phiên bản
-    print_boxed_message "Đang chuyển sang PHP $selected_version" "info"
+    # Thực hiện xóa
+    print_boxed_message "Đang xóa PHP $selected_version" "info"
 
-    # Di chuyển vào thư mục PHP
-    cd "$HOME/.php" || {
-        print_boxed_message "Không thể truy cập thư mục $HOME/.php" "error"
-        return 1
-    }
-
-    # Cập nhật symlink
-    echo -e "${WHITE}Cập nhật symlink: $HOME/.php/current -> $HOME/.php/php-$selected_version${NC}"
-    ln -sfn "php-$selected_version" current || {
-        print_boxed_message "Không thể cập nhật symlink" "error"
+    # Xóa thư mục
+    rm -rf "$HOME/.php/php-$selected_version" || {
+        print_boxed_message "Không thể xóa thư mục PHP $selected_version" "error"
         return 1
     }
 
     # Hiển thị thông báo thành công
-    print_boxed_message "Đã chuyển sang PHP $selected_version thành công" "success"
-    echo -e "${WHITE}PHP $selected_version đã được kích hoạt tại: ${LIGHT_GREEN}$HOME/.php/current${NC}"
+    print_boxed_message "Đã xóa PHP $selected_version thành công" "success"
 
-    # Kiểm tra phiên bản PHP
-    if [ -x "$HOME/.php/current/bin/php" ]; then
-        local new_version=$("$HOME/.php/current/bin/php" -r "echo PHP_VERSION;" 2>/dev/null)
-        echo -e "${WHITE}Phiên bản PHP hiện tại: ${LIGHT_GREEN}$new_version${NC}"
-    fi
-    echo
+    # Hiển thị các phiên bản còn lại
+    local remaining_count=$(find "$HOME/.php" -maxdepth 1 -type d -name "php-*" | wc -l)
+    echo -e "${WHITE}Số phiên bản PHP còn lại: ${LIGHT_GREEN}$remaining_count${NC}"
 
-    # Kiểm tra và cập nhật PATH nếu cần
-    if ! grep -q "$HOME/.php/current/bin" "$HOME/.config/fish/config.fish" 2>/dev/null; then
-        echo -e "${YELLOW}${ICON_WARNING} ${WHITE}Đường dẫn PHP chưa được thêm vào PATH${NC}"
-        echo -e "${WHITE}Thêm dòng sau vào file ~/.config/fish/config.fish:${NC}"
-        echo -e "${LIGHT_GREEN}set -gx PATH $HOME/.php/current/bin \$PATH${NC}"
-
-        # Hỏi người dùng có muốn thêm vào không
-        echo -e -n "${LIGHT_CYAN}${ICON_ARROW} ${WHITE}${BOLD}Thêm vào PATH ngay bây giờ?${NC} ${DARK_GRAY}[${LIGHT_GREEN}y${DARK_GRAY}/${LIGHT_RED}n${DARK_GRAY}]${NC}: "
-        read -n 1 add_path
-        echo
-
-        if [[ "$add_path" =~ ^[yY]$ ]]; then
-            # Đảm bảo thư mục cấu hình tồn tại
-            mkdir -p "$HOME/.config/fish"
-
-            # Thêm vào file cấu hình
-            echo "" >> "$HOME/.config/fish/config.fish"
-            echo "# PHP từ source" >> "$HOME/.config/fish/config.fish"
-            echo "set -gx PATH $HOME/.php/current/bin \$PATH" >> "$HOME/.config/fish/config.fish"
-
-            print_boxed_message "Đã thêm PHP vào PATH thành công" "success"
-        fi
+    # Nhắc nhở người dùng nếu không còn phiên bản nào
+    if [ "$remaining_count" -eq 0 ]; then
+        print_boxed_message "Bạn đã xóa tất cả các phiên bản PHP. Vui lòng build lại PHP nếu cần." "warning"
     fi
 
-    # Nhắc nhở người dùng khởi động lại shell nếu cần
-    echo -e "${LIGHT_YELLOW}${ICON_INFO} ${WHITE}Để áp dụng thay đổi ngay lập tức, hãy chạy:${NC}"
-    echo -e "${LIGHT_GREEN}source ~/.config/fish/config.fish${NC}"
     echo
-
-    # Trở lại thư mục ban đầu
-    cd - > /dev/null
 }
