@@ -2,15 +2,19 @@
 
 # Module quản lý gói chính - Tích hợp tất cả các trình quản lý gói
 
-# Tải các module quản lý gói
-source "$(dirname "$0")/pacman.sh"
-source "$(dirname "$0")/aur.sh"
-source "$(dirname "$0")/flatpak.sh"
+# Lấy đường dẫn hiện tại của script
+CURRENT_DIR="$(dirname "${BASH_SOURCE[0]}")"
+CORE_DIR="$CURRENT_DIR/../../../src/core"
 
-# Tải các module core cần thiết
-source "$(dirname "$(dirname "$0")")/core/ui.sh"
-source "$(dirname "$(dirname "$0")")/core/utils.sh"
-source "$(dirname "$(dirname "$0")")/core/config.sh"
+# Tải các module core cần thiết trước
+source "$CORE_DIR/config.sh"
+source "$CORE_DIR/ui.sh"
+source "$CORE_DIR/utils.sh"
+
+# Tải các module quản lý gói sau khi đã có config
+source "$CURRENT_DIR/pacman.sh"
+source "$CURRENT_DIR/aur.sh"
+source "$CURRENT_DIR/flatpak.sh"
 
 # Hiển thị menu quản lý gói
 display_package_menu() {
