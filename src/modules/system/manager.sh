@@ -40,12 +40,16 @@ display_system_menu() {
     echo -e "      ${GRAY}${DIM}Timeshift${NC}"
     echo
 
-    echo -e "  ${ICON_EXIT} ${LIGHT_RED}${BOLD}[6]${NC}  ${WHITE}Quay lại menu chính${NC}"
+    echo -e "  ${ICON_CONFIG} ${GREEN}${BOLD}[6]${NC}  ${WHITE}Cấu hình Window Manager${NC}"
+    echo -e "      ${GRAY}${DIM}Qtile, Xmonad${NC}"
+    echo
+
+    echo -e "  ${ICON_EXIT} ${LIGHT_RED}${BOLD}[7]${NC}  ${WHITE}Quay lại menu chính${NC}"
     echo -e "      ${GRAY}${DIM}Trở về menu chính${NC}"
     echo
 
     echo -e "${DARK_GRAY}    ──────────────────────────────────────────────────────────────${NC}"
-    echo -e "    ${LIGHT_CYAN}${ICON_INFO} ${WHITE}Chọn một tùy chọn từ ${LIGHT_GREEN}${BOLD}1-6${NC}${WHITE} và nhấn Enter${NC}"
+    echo -e "    ${LIGHT_CYAN}${ICON_INFO} ${WHITE}Chọn một tùy chọn từ ${LIGHT_GREEN}${BOLD}1-7${NC}${WHITE} và nhấn Enter${NC}"
     echo -e "${DARK_GRAY}    ──────────────────────────────────────────────────────────────${NC}"
     echo
 }
@@ -232,13 +236,122 @@ create_backup() {
     return 0
 }
 
+# Cấu hình Window Manager
+configure_window_manager() {
+    echo -e "${LIGHT_YELLOW}${ICON_GEAR} Cấu hình Window Manager...${NC}"
+
+    echo -e "${DARK_GRAY}    ──────────────────────────────────────────────────────────────${NC}"
+    echo -e "${WHITE}                    ${ICON_CONFIG} ${BOLD}LỰA CHỌN WINDOW MANAGER${NC} ${ICON_CONFIG}"
+    echo -e "${DARK_GRAY}    ──────────────────────────────────────────────────────────────${NC}"
+    echo
+
+    # Menu items với style đơn giản và hiện đại
+    echo -e "  ${ICON_CONFIG} ${GREEN}${BOLD}[1]${NC}  ${WHITE}Qtile${NC}"
+    echo -e "      ${GRAY}${DIM}Window Manager dựa trên Python${NC}"
+    echo
+
+    echo -e "  ${ICON_CONFIG} ${GREEN}${BOLD}[2]${NC}  ${WHITE}Xmonad${NC}"
+    echo -e "      ${GRAY}${DIM}Window Manager dựa trên Haskell${NC}"
+    echo
+
+    echo -e "  ${ICON_EXIT} ${LIGHT_RED}${BOLD}[3]${NC}  ${WHITE}Quay lại${NC}"
+    echo -e "      ${GRAY}${DIM}Menu trước${NC}"
+    echo
+
+    echo -e "${DARK_GRAY}    ──────────────────────────────────────────────────────────────${NC}"
+    echo -e "    ${LIGHT_CYAN}${ICON_INFO} ${WHITE}Chọn một tùy chọn từ ${LIGHT_GREEN}${BOLD}1-3${NC}${WHITE} và nhấn Enter${NC}"
+    echo -e "${DARK_GRAY}    ──────────────────────────────────────────────────────────────${NC}"
+    echo
+
+    # Lấy lựa chọn từ người dùng
+    echo -e -n "${LIGHT_CYAN}${ICON_ARROW} ${WHITE}${BOLD}Nhập lựa chọn của bạn${NC} ${DARK_GRAY}[${LIGHT_GREEN}1-3${DARK_GRAY}]${NC}: "
+    read -n 1 wm_choice
+    echo
+
+    case $wm_choice in
+        1)
+            # Cấu hình Qtile
+            configure_qtile
+            ;;
+        2)
+            # Cấu hình Xmonad
+            print_boxed_message "Đang cấu hình Xmonad..." "info"
+            show_spinner "Cài đặt cấu hình Xmonad" 2
+            print_boxed_message "Tính năng cấu hình Xmonad sẽ sớm được phát triển!" "info"
+            ;;
+        3)
+            # Quay lại
+            return 0
+            ;;
+        *)
+            print_boxed_message "Lựa chọn không hợp lệ" "error"
+            ;;
+    esac
+
+    return 0
+}
+
+# Cấu hình Qtile
+configure_qtile() {
+    echo -e "${LIGHT_YELLOW}${ICON_GEAR} Cấu hình Qtile...${NC}"
+
+    # Kiểm tra xem Qtile đã được cài đặt chưa
+    if ! command -v qtile &>/dev/null; then
+        print_boxed_message "Qtile chưa được cài đặt" "info"
+
+        # Yêu cầu cài đặt Qtile
+        if confirm_yn "${LIGHT_CYAN}${ICON_ARROW} ${WHITE}Bạn có muốn cài đặt Qtile không?${NC}" "y"; then
+            if ! sudo pacman -S --noconfirm qtile; then
+                print_boxed_message "Không thể cài đặt Qtile. Không thể tiếp tục." "error"
+                return 1
+            fi
+        else
+            print_boxed_message "Qtile không được cài đặt. Không thể tiếp tục." "error"
+            return 1
+        fi
+    fi
+
+    # Tạo thư mục config nếu chưa tồn tại
+    mkdir -p "$HOME/.config"
+
+    # Tải cấu hình Qtile từ GitHub
+    print_boxed_message "Đang tải cấu hình Qtile từ GitHub..." "info"
+
+    # Tạo thư mục tạm để tải xuống
+    temp_dir=$(mktemp -d)
+
+    # Tải file cấu hình
+    if wget -q https://github.com/mttk2004/qtile/archive/refs/heads/main.zip -O "$temp_dir/qtile.zip"; then
+        print_boxed_message "Đã tải xuống cấu hình Qtile thành công" "success"
+
+        # Giải nén vào thư mục ~/.config
+        if unzip -q -o "$temp_dir/qtile.zip" -d "$temp_dir"; then
+            # Di chuyển nội dung vào thư mục ~/.config/qtile
+            mkdir -p "$HOME/.config/qtile"
+            cp -r "$temp_dir/qtile-main/"* "$HOME/.config/qtile/"
+            print_boxed_message "Đã cài đặt cấu hình Qtile thành công" "success"
+        else
+            print_boxed_message "Không thể giải nén file cấu hình Qtile" "error"
+        fi
+
+        # Dọn dẹp file tạm
+        rm -rf "$temp_dir"
+    else
+        print_boxed_message "Không thể tải xuống cấu hình Qtile từ GitHub" "error"
+        rm -rf "$temp_dir"
+        return 1
+    fi
+
+    return 0
+}
+
 # Hàm chính để quản lý cấu hình hệ thống
 manage_system_configurations() {
     local choice
 
     while true; do
         display_system_menu
-        echo -e -n "${LIGHT_CYAN}${ICON_ARROW} ${WHITE}${BOLD}Nhập lựa chọn của bạn${NC} ${DARK_GRAY}[${LIGHT_GREEN}1-6${DARK_GRAY}]${NC}: "
+        echo -e -n "${LIGHT_CYAN}${ICON_ARROW} ${WHITE}${BOLD}Nhập lựa chọn của bạn${NC} ${DARK_GRAY}[${LIGHT_GREEN}1-7${DARK_GRAY}]${NC}: "
         read -n 1 choice
         echo
 
@@ -259,11 +372,14 @@ manage_system_configurations() {
                 create_backup
                 ;;
             6)
+                configure_window_manager
+                ;;
+            7)
                 # Quay lại menu chính
                 return 0
                 ;;
             *)
-                print_boxed_message "Lựa chọn không hợp lệ. Vui lòng chọn số từ 1-6." "error"
+                print_boxed_message "Lựa chọn không hợp lệ. Vui lòng chọn số từ 1-7." "error"
                 ;;
         esac
 
