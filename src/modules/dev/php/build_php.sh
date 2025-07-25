@@ -7,6 +7,68 @@ CORE_DIR="$(cd "${SCRIPT_DIR}/../../../core" && pwd)"
 source "${CORE_DIR}/utils.sh"
 source "${CORE_DIR}/ui.sh"
 
+# Kiểm tra và cài đặt dependencies cho Arch Linux
+check_and_install_dependencies() {
+    local required_packages=(
+        "base-devel"
+        "libxml2"
+        "openssl"
+        "curl"
+        "libpng"
+        "libjpeg-turbo"
+        "freetype2"
+        "libwebp"
+        "libxpm"
+        "openldap"
+        "readline"
+        "libzip"
+        "oniguruma"
+        "sqlite"
+        "icu"
+        "bzip2"
+        "zlib"
+    )
+
+    echo -e "${WHITE}Kiểm tra các gói phụ thuộc cần thiết...${NC}"
+
+    local missing_packages=()
+    for package in "${required_packages[@]}"; do
+        if ! pacman -Qi "$package" >/dev/null 2>&1; then
+            missing_packages+=("$package")
+        fi
+    done
+
+    if [ ${#missing_packages[@]} -gt 0 ]; then
+        echo -e "${YELLOW}${ICON_WARNING} ${WHITE}Các gói sau chưa được cài đặt:${NC}"
+        printf "${LIGHT_RED}  - %s${NC}\n" "${missing_packages[@]}"
+        echo
+
+        echo -e -n "${LIGHT_CYAN}${ICON_ARROW} ${WHITE}${BOLD}Bạn có muốn cài đặt các gói này không?${NC} ${DARK_GRAY}[${LIGHT_GREEN}y${DARK_GRAY}/${LIGHT_RED}n${DARK_GRAY}]${NC}: "
+        read -n 1 install_deps
+        echo
+
+        if [[ "$install_deps" =~ ^[yY]$ ]]; then
+            echo -e "${WHITE}Đang cài đặt các gói phụ thuộc...${NC}"
+            sudo pacman -S --needed "${missing_packages[@]}" || {
+                print_boxed_message "Không thể cài đặt các gói phụ thuộc. Vui lòng cài đặt thủ công." "error"
+                echo -e "${YELLOW}${ICON_INFO} ${WHITE}Chạy lệnh sau để cài đặt:${NC}"
+                echo -e "${LIGHT_GREEN}sudo pacman -S --needed ${missing_packages[*]}${NC}"
+                return 1
+            }
+            echo -e "${WHITE}✓ Đã cài đặt thành công các gói phụ thuộc${NC}"
+        else
+            print_boxed_message "Không thể tiếp tục mà không có các gói phụ thuộc cần thiết" "error"
+            echo -e "${YELLOW}${ICON_INFO} ${WHITE}Chạy lệnh sau để cài đặt:${NC}"
+            echo -e "${LIGHT_GREEN}sudo pacman -S --needed ${missing_packages[*]}${NC}"
+            return 1
+        fi
+    else
+        echo -e "${WHITE}✓ Tất cả các gói phụ thuộc đã được cài đặt${NC}"
+    fi
+
+    return 0
+}
+
 # Build PHP từ source
 build_php_from_source() {
     echo -e "${LIGHT_YELLOW}${ICON_GEAR} Build PHP từ mã nguồn...${NC}"
@@ -15,6 +77,11 @@ build_php_from_source() {
     echo -e "${WHITE}                ${ICON_SOURCE} ${BOLD}BUILD PHP TỪ MÃ NGUỒN${NC} ${ICON_SOURCE}"
     echo -e "${DARK_GRAY}    ──────────────────────────────────────────────────────────────${NC}"
     echo
+
+    # Kiểm tra hệ điều hành
+    if ! command -v pacman >/dev/null 2>&1; then
+        print_boxed_message "Script này được tối ưu cho Arch Linux. Trên hệ điều hành khác có thể cần điều chỉnh tên gói dependencies." "warning"
+    fi
 
     # Yêu cầu người dùng nhập phiên bản PHP
     echo -e -n "${LIGHT_CYAN}${ICON_ARROW} ${WHITE}${BOLD}Nhập phiên bản PHP muốn build${NC} ${DARK_GRAY}(ví dụ: 8.4.4)${DARK_GRAY}: ${NC}"
@@ -102,12 +169,16 @@ build_php_from_source() {
         return 1
     }
 
-    # 2. Cấu hình trước khi biên dịch
-    print_boxed_message "2. Cấu hình PHP $php_version" "info"
-    echo -e "${WHITE}Đang chạy lệnh configure với các tùy chọn...${NC}"
+    # 2. Kiểm tra và cài đặt các gói phụ thuộc cần thiết
+    print_boxed_message "2. Kiểm tra và cài đặt dependencies" "info"
 
-    # Kiểm tra các gói phụ thuộc cần thiết
-    echo -e "${WHITE}Kiểm tra các gói phụ thuộc...${NC}"
+    if ! check_and_install_dependencies; then
+        return 1
+    fi
+
+    # 3. Cấu hình trước khi biên dịch
+    print_boxed_message "3. Cấu hình PHP $php_version" "info"
+    echo -e "${WHITE}Đang chạy lệnh configure với các tùy chọn...${NC}"
 
     # Lệnh configure với tất cả các tùy chọn
     ./configure --prefix="$HOME/.php/php-$php_version" \
@@ -138,15 +209,14 @@ build_php_from_source() {
       --with-readline || {
         print_boxed_message "Lỗi trong quá trình cấu hình PHP. Một số gói phụ thuộc có thể chưa được cài đặt." "error"
 
-        echo -e "${YELLOW}${ICON_WARNING} ${WHITE}Gợi ý: Bạn có thể cần cài đặt các gói phát triển sau:${NC}"
-        echo -e "${GRAY}libxml2-dev libssl-dev libcurl4-openssl-dev libpng-dev libjpeg-dev"
-        echo -e "libfreetype6-dev libwebp-dev libxpm-dev libldap2-dev libreadline-dev libzip-dev"
-        echo -e "libonig-dev libsqlite3-dev libicu-dev libbz2-dev${NC}"
+        echo -e "${YELLOW}${ICON_WARNING} ${WHITE}Gợi ý cho Arch Linux:${NC}"
+        echo -e "${GRAY}sudo pacman -S --needed base-devel libxml2 openssl curl libpng libjpeg-turbo"
+        echo -e "freetype2 libwebp libxpm openldap readline libzip oniguruma sqlite icu bzip2 zlib${NC}"
         return 1
     }
 
-    # 3. Biên dịch và cài đặt
-    print_boxed_message "3. Biên dịch và cài đặt PHP $php_version" "info"
+    # 4. Biên dịch và cài đặt
+    print_boxed_message "4. Biên dịch và cài đặt PHP $php_version" "info"
     echo -e "${WHITE}Đang biên dịch PHP (quá trình này có thể mất từ 5-15 phút)...${NC}"
 
     # Sử dụng tất cả các lõi CPU để tăng tốc
@@ -162,7 +232,7 @@ build_php_from_source() {
     }
 
     # 4. Tạo symlink
-    print_boxed_message "4. Tạo symlink" "info"
+    print_boxed_message "5. Tạo symlink" "info"
     cd "$HOME/.php" || return 1
 
     echo -e "${WHITE}Tạo symlink: $HOME/.php/current -> $HOME/.php/php-$php_version${NC}"
@@ -172,7 +242,7 @@ build_php_from_source() {
     }
 
     # 5. Cập nhật PATH cho Fish shell
-    print_boxed_message "5. Cập nhật PATH" "info"
+    print_boxed_message "6. Cập nhật PATH" "info"
 
     # Kiểm tra xem đã có cấu hình PATH chưa
     if ! grep -q "$HOME/.php/current/bin" "$HOME/.config/fish/config.fish" 2>/dev/null; then
@@ -190,7 +260,7 @@ build_php_from_source() {
     fi
 
     # 6. Xóa file tạm
-    print_boxed_message "6. Dọn dẹp" "info"
+    print_boxed_message "7. Dọn dẹp" "info"
     echo -e "${WHITE}Xóa file tạm $HOME/.php/php-$php_version.tar.gz${NC}"
     rm -f "$HOME/.php/php-$php_version.tar.gz" || {
         echo -e "${YELLOW}Cảnh báo: Không thể xóa file tạm${NC}"
