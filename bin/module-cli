@@ -1,0 +1,21 @@
+#!/bin/bash
+
+# Module CLI Executable Wrapper
+# Provides convenient access to the module management CLI
+
+# Determine the script directory
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+
+# Set up environment
+export ROOT_DIR
+export CORE_V2_DIR="$ROOT_DIR/src/core/v2"
+
+# Load and run the module CLI
+if [[ -f "$CORE_V2_DIR/module_cli.sh" ]]; then
+    source "$CORE_V2_DIR/module_cli.sh"
+    module_cli_main "$@"
+else
+    echo "Error: Module CLI not found at $CORE_V2_DIR/module_cli.sh" >&2
+    exit 1
+fi
