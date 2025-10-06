@@ -1,0 +1,68 @@
+# Dark Theme Configuration for Linux Manager
+# A sleek dark theme with high contrast and modern aesthetics
+
+# Theme Information
+THEME_NAME="Dark"
+THEME_VERSION="1.0"
+THEME_DESCRIPTION="Dark theme with high contrast and modern design"
+
+# Primary Colors - More muted for dark theme
+PRIMARY_COLOR="$LIGHT_BLUE"
+SECONDARY_COLOR="$CYAN"
+ACCENT_COLOR="$LIGHT_GREEN"
+ERROR_COLOR="$LIGHT_RED"
+WARNING_COLOR="$LIGHT_YELLOW"
+SUCCESS_COLOR="$LIGHT_GREEN"
+INFO_COLOR="$LIGHT_BLUE"
+
+# UI Element Colors - Adjusted for dark backgrounds
+HEADER_COLOR="$LIGHT_CYAN$BOLD"
+MENU_TITLE_COLOR="$LIGHT_BLUE$BOLD"
+MENU_OPTION_COLOR="$LIGHT_GREEN"
+MENU_DESCRIPTION_COLOR="$LIGHT_GRAY"
+SEPARATOR_COLOR="$GRAY"
+PROMPT_COLOR="$LIGHT_BLUE"
+INPUT_COLOR="$LIGHT_CYAN"
+
+# Background and Text - Dark theme optimized
+BG_COLOR=""  # Terminal default (should be dark)
+TEXT_COLOR="$LIGHT_GRAY"
+DIM_TEXT_COLOR="$GRAY"
+HIGHLIGHT_COLOR="$WHITE$BOLD"
+
+# Progress and Status - Higher contrast
+PROGRESS_FILL_COLOR="$LIGHT_CYAN"
+PROGRESS_EMPTY_COLOR="$GRAY"
+SPINNER_COLOR="$LIGHT_BLUE"
+STATUS_SUCCESS_COLOR="$LIGHT_GREEN"
+STATUS_ERROR_COLOR="$LIGHT_RED"
+STATUS_WARNING_COLOR="$LIGHT_YELLOW"
+STATUS_INFO_COLOR="$LIGHT_BLUE"
+
+# Form Colors - Dark theme friendly
+FORM_HEADER_COLOR="$LIGHT_BLUE"
+FORM_LABEL_COLOR="$LIGHT_CYAN$BOLD"
+FORM_REQUIRED_COLOR="$LIGHT_RED"
+FORM_PLACEHOLDER_COLOR="$GRAY"
+FORM_VALIDATION_ERROR_COLOR="$LIGHT_RED"
+
+# ASCII Art Color - More prominent in dark theme
+ASCII_COLOR="$LIGHT_BLUE"
+
+# Animation Settings
+ANIMATION_SPEED="0.08"  # Slightly faster for modern feel
+ENABLE_ANIMATIONS="true"
+
+# Typography
+ENABLE_BOLD="true"
+ENABLE_ITALIC="false"
+ENABLE_UNDERLINE="true"
+
+# Special Effects
+ENABLE_GRADIENTS="false"
+ENABLE_SHADOWS="true"  # Can work well in dark themes
+
+# Layout Settings
+DEFAULT_PADDING="2"
+MENU_SPACING="1"
+FORM_FIELD_SPACING="1"
