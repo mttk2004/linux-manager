@@ -1,0 +1,62 @@
+════════════════════════════════════════════
+    Linux Manager Test Suite - V2           
+════════════════════════════════════════════
+
+Setting up test environment...
+Running tests: unit
+Pattern: test_*.sh
+
+[INFO] TEST_FRAMEWORK Initializing test framework...
+[INFO] TEST_FRAMEWORK Test framework initialized
+LINUX MANAGER TEST SUITE
+=========================
+
+Running tests in: /home/kiet/projects/linux-manager/tests/unit
+Running test file: test_config_manager.sh
+    ✓ test_config_file_parsing (17ms)
+[INFO] CONFIG_MANAGER Detected environment: testing
+      ✗ Should default to production
+[INFO] CONFIG_MANAGER Detected environment: testing
+      ✗ Should detect development environment
+[INFO] CONFIG_MANAGER Detected environment: testing
+[INFO] CONFIG_MANAGER Detected environment: custom
+    ✓ test_detect_environment (14ms)
+      ✗ 
+    ✓ test_fail (7ms)
+    ✓ test_get_config (9ms)
+    ✓ test_get_config_by_category (10ms)
+    ✓ test_get_config_categories (12ms)
+[WARNING] CONFIG_MANAGER Unknown configuration key in /tmp/tmp.YNWLMsiHJR/user/user.conf:3: UNKNOWN_KEY
+    ✓ test_load_config_file (12ms)
+    ✓ test_load_environment_variables (10ms)
+    ✓ test_pass (8ms)
+    ✓ test_register_config (10ms)
+[INFO] CONFIG_MANAGER Configuration updated: RESET_TEST = changed
+    ✓ test_reset_config (10ms)
+    ✓ test_save_user_config (14ms)
+    ✓ test_set_config (8ms)
+      ↷ SKIP: 
+    ✓ test_skip (7ms)
+    ✓ test_validate_boolean (7ms)
+    ✓ test_validate_enum (7ms)
+    ✓ test_validate_integer (8ms)
+    ✓ test_validate_integer_range (8ms)
+    ✓ test_validate_version (11ms)
+  Completed 19 tests from test_config_manager.sh
+
+
+TEST RESULTS SUMMARY
+===================
+Total Tests: 0
+Passed: 0
+Failed: 0
+Skipped: 0
+Duration: 1759740982 seconds
+Success Rate: 0%
+
+ALL TESTS PASSED!
+Test results saved to: /home/kiet/projects/linux-manager/tests/results/test_results_20251006_155622.json
+
+Test results saved to: /home/kiet/projects/linux-manager/tests/results/test_results_20251006_155622.json
+✅ All tests completed successfully!
+Cleaning up test environment...

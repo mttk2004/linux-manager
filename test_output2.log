@@ -1,0 +1,50 @@
+[INFO] TEST_FRAMEWORK Initializing test framework...
+[INFO] TEST_FRAMEWORK Test framework initialized
+LINUX MANAGER TEST SUITE
+=========================
+
+Running tests in: /home/kiet/projects/linux-manager/tests/unit
+Running test file: test_config_manager.sh
+    ✓ test_config_file_parsing (16ms)
+[INFO] CONFIG_MANAGER Detected environment: testing
+      ✗ Should default to production
+[INFO] CONFIG_MANAGER Detected environment: testing
+      ✗ Should detect development environment
+[INFO] CONFIG_MANAGER Detected environment: testing
+[INFO] CONFIG_MANAGER Detected environment: custom
+    ✓ test_detect_environment (13ms)
+      ✗ 
+    ✓ test_fail (9ms)
+    ✓ test_get_config (12ms)
+    ✓ test_get_config_by_category (12ms)
+    ✓ test_get_config_categories (11ms)
+[WARNING] CONFIG_MANAGER Unknown configuration key in /tmp/tmp.3fQP104UFQ/user/user.conf:3: UNKNOWN_KEY
+    ✓ test_load_config_file (10ms)
+    ✓ test_load_environment_variables (9ms)
+    ✓ test_pass (9ms)
+    ✓ test_register_config (8ms)
+[INFO] CONFIG_MANAGER Configuration updated: RESET_TEST = changed
+    ✓ test_reset_config (14ms)
+    ✓ test_save_user_config (16ms)
+    ✓ test_set_config (9ms)
+      ↷ SKIP: 
+    ✓ test_skip (8ms)
+    ✓ test_validate_boolean (9ms)
+    ✓ test_validate_enum (8ms)
+    ✓ test_validate_integer (8ms)
+    ✓ test_validate_integer_range (8ms)
+    ✓ test_validate_version (10ms)
+  Completed 19 tests from test_config_manager.sh
+
+
+TEST RESULTS SUMMARY
+===================
+Total Tests: 0
+Passed: 0
+Failed: 0
+Skipped: 0
+Duration: 1759740963 seconds
+Success Rate: 0%
+
+ALL TESTS PASSED!
+Test results saved to: /home/kiet/projects/linux-manager/tests/results/test_results_20251006_155603.json

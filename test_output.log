@@ -1,0 +1,81 @@
+tests/framework/test_runner.sh: line 62: log_info: command not found
+tests/framework/test_runner.sh: line 80: log_info: command not found
+LINUX MANAGER TEST SUITE
+=========================
+
+Running tests in: /home/kiet/projects/linux-manager/tests/unit
+Running test file: test_config_manager.sh
+/home/kiet/projects/linux-manager/tests/unit/../../src/core/v2/config_manager.sh: line 173: log_debug: command not found
+/home/kiet/projects/linux-manager/tests/unit/../../src/core/v2/config_manager.sh: line 173: log_debug: command not found
+/home/kiet/projects/linux-manager/tests/unit/../../src/core/v2/config_manager.sh: line 173: log_debug: command not found
+/home/kiet/projects/linux-manager/tests/unit/../../src/core/v2/config_manager.sh: line 220: log_debug: command not found
+/home/kiet/projects/linux-manager/tests/unit/../../src/core/v2/config_manager.sh: line 244: log_debug: command not found
+/home/kiet/projects/linux-manager/tests/unit/../../src/core/v2/config_manager.sh: line 244: log_debug: command not found
+/home/kiet/projects/linux-manager/tests/unit/../../src/core/v2/config_manager.sh: line 244: log_debug: command not found
+    ✓ test_config_file_parsing (23ms)
+/home/kiet/projects/linux-manager/tests/unit/../../src/core/v2/config_manager.sh: line 75: log_info: command not found
+      ✗ Should default to production
+/home/kiet/projects/linux-manager/tests/unit/../../src/core/v2/config_manager.sh: line 75: log_info: command not found
+      ✗ Should detect development environment
+/home/kiet/projects/linux-manager/tests/unit/../../src/core/v2/config_manager.sh: line 75: log_info: command not found
+/home/kiet/projects/linux-manager/tests/unit/../../src/core/v2/config_manager.sh: line 75: log_info: command not found
+    ✓ test_detect_environment (17ms)
+      ✗ 
+    ✓ test_fail (7ms)
+/home/kiet/projects/linux-manager/tests/unit/../../src/core/v2/config_manager.sh: line 173: log_debug: command not found
+    ✓ test_get_config (11ms)
+/home/kiet/projects/linux-manager/tests/unit/../../src/core/v2/config_manager.sh: line 173: log_debug: command not found
+/home/kiet/projects/linux-manager/tests/unit/../../src/core/v2/config_manager.sh: line 173: log_debug: command not found
+/home/kiet/projects/linux-manager/tests/unit/../../src/core/v2/config_manager.sh: line 173: log_debug: command not found
+    ✓ test_get_config_by_category (12ms)
+/home/kiet/projects/linux-manager/tests/unit/../../src/core/v2/config_manager.sh: line 173: log_debug: command not found
+/home/kiet/projects/linux-manager/tests/unit/../../src/core/v2/config_manager.sh: line 173: log_debug: command not found
+/home/kiet/projects/linux-manager/tests/unit/../../src/core/v2/config_manager.sh: line 173: log_debug: command not found
+    ✓ test_get_config_categories (16ms)
+/home/kiet/projects/linux-manager/tests/unit/../../src/core/v2/config_manager.sh: line 173: log_debug: command not found
+/home/kiet/projects/linux-manager/tests/unit/../../src/core/v2/config_manager.sh: line 220: log_debug: command not found
+/home/kiet/projects/linux-manager/tests/unit/../../src/core/v2/config_manager.sh: line 244: log_debug: command not found
+/home/kiet/projects/linux-manager/tests/unit/../../src/core/v2/config_manager.sh: line 246: log_warning: command not found
+    ✓ test_load_config_file (14ms)
+/home/kiet/projects/linux-manager/tests/unit/../../src/core/v2/config_manager.sh: line 173: log_debug: command not found
+/home/kiet/projects/linux-manager/tests/unit/../../src/core/v2/config_manager.sh: line 256: log_debug: command not found
+/home/kiet/projects/linux-manager/tests/unit/../../src/core/v2/config_manager.sh: line 265: log_debug: command not found
+    ✓ test_load_environment_variables (14ms)
+    ✓ test_pass (9ms)
+/home/kiet/projects/linux-manager/tests/unit/../../src/core/v2/config_manager.sh: line 173: log_debug: command not found
+    ✓ test_register_config (10ms)
+/home/kiet/projects/linux-manager/tests/unit/../../src/core/v2/config_manager.sh: line 173: log_debug: command not found
+/home/kiet/projects/linux-manager/tests/unit/../../src/core/v2/config_manager.sh: line 318: log_info: command not found
+      ✗ Should be able to reset config
+    ✓ test_reset_config (17ms)
+/home/kiet/projects/linux-manager/tests/unit/../../src/core/v2/config_manager.sh: line 173: log_debug: command not found
+/home/kiet/projects/linux-manager/tests/unit/../../src/core/v2/config_manager.sh: line 419: log_debug: command not found
+    ✓ test_save_user_config (17ms)
+/home/kiet/projects/linux-manager/tests/unit/../../src/core/v2/config_manager.sh: line 173: log_debug: command not found
+    ✓ test_set_config (12ms)
+      ↷ SKIP: 
+    ✓ test_skip (8ms)
+/home/kiet/projects/linux-manager/tests/unit/../../src/core/v2/config_manager.sh: line 173: log_debug: command not found
+    ✓ test_validate_boolean (10ms)
+/home/kiet/projects/linux-manager/tests/unit/../../src/core/v2/config_manager.sh: line 173: log_debug: command not found
+    ✓ test_validate_enum (12ms)
+/home/kiet/projects/linux-manager/tests/unit/../../src/core/v2/config_manager.sh: line 173: log_debug: command not found
+    ✓ test_validate_integer (11ms)
+/home/kiet/projects/linux-manager/tests/unit/../../src/core/v2/config_manager.sh: line 173: log_debug: command not found
+    ✓ test_validate_integer_range (10ms)
+/home/kiet/projects/linux-manager/tests/unit/../../src/core/v2/config_manager.sh: line 173: log_debug: command not found
+    ✓ test_validate_version (14ms)
+  Completed 19 tests from test_config_manager.sh
+
+
+TEST RESULTS SUMMARY
+===================
+Total Tests: 0
+Passed: 0
+Failed: 0
+Skipped: 0
+Duration: 1759740881 seconds
+Success Rate: 0%
+
+ALL TESTS PASSED!
+Test results saved to: /home/kiet/projects/linux-manager/tests/results/test_results_20251006_155441.json

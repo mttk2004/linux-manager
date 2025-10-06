@@ -3,6 +3,14 @@
 # Configuration Management System - V2 Architecture
 # Provides flexible configuration with validation, user overrides, and environment-specific settings
 
+# Define stub logging functions for testing environment
+if [[ "${TESTING:-false}" == "true" ]]; then
+    log_debug() { [[ "${TEST_VERBOSE:-false}" == "true" ]] && echo "[DEBUG] $*" >&2 || true; }
+    log_info() { echo "[INFO] $*" >&2; }
+    log_warning() { echo "[WARNING] $*" >&2; }
+    log_error() { echo "[ERROR] $*" >&2; }
+fi
+
 # Configuration system status
 CONFIG_SYSTEM_INITIALIZED=false
 
