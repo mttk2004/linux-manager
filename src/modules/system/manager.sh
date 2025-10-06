@@ -4,7 +4,19 @@
 
 # Tải các module chức năng
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "${SCRIPT_DIR}/terminal/manager.sh"
+CORE_DIR="$(cd "${SCRIPT_DIR}/../../core" && pwd)"
+
+# Tải các module core trước
+source "${CORE_DIR}/config.sh"
+source "${CORE_DIR}/utils.sh"
+source "${CORE_DIR}/ui.sh"
+
+# Tải các module chức năng
+if [ -f "${SCRIPT_DIR}/terminal/manager.sh" ]; then
+    source "${SCRIPT_DIR}/terminal/manager.sh"
+fi
+
+# Module cleanup được tích hợp trực tiếp trong file này
 
 # Hiển thị menu cấu hình hệ thống
 display_system_menu() {
@@ -52,13 +64,17 @@ display_system_menu() {
     echo -e "      ${GRAY}${DIM}WezTerm, Ghostty, Alacritty${NC}"
     echo
 
-    echo -e "  ${ICON_EXIT} ${LIGHT_RED}${BOLD}[8]${NC}  ${WHITE}Quay lại menu chính${NC}"
+    echo -e "  🧹 ${GREEN}${BOLD}[8]${NC}  ${WHITE}Dọn dẹp hệ thống${NC}"
+    echo -e "      ${GRAY}${DIM}Gỡ gói mồ côi, cache, AUR${NC}"
+    echo
+
+    echo -e "  ${ICON_EXIT} ${LIGHT_RED}${BOLD}[9]${NC}  ${WHITE}Quay lại menu chính${NC}"
     echo -e "      ${GRAY}${DIM}Trở về menu chính${NC}"
     echo
 
-    echo -e "${DARK_GRAY}    ──────────────────────────────────────────────────────────────${NC}"
-    echo -e "    ${LIGHT_CYAN}${ICON_INFO} ${WHITE}Chọn một tùy chọn từ ${LIGHT_GREEN}${BOLD}1-8${NC}${WHITE} và nhấn Enter${NC}"
-    echo -e "${DARK_GRAY}    ──────────────────────────────────────────────────────────────${NC}"
+    echo -e "${DARK_GRAY}    ────────────────────────────────────────────────────────────────${NC}"
+    echo -e "    ${LIGHT_CYAN}${ICON_INFO} ${WHITE}Chọn một tùy chọn từ ${LIGHT_GREEN}${BOLD}1-9${NC}${WHITE} và nhấn Enter${NC}"
+    echo -e "${DARK_GRAY}    ────────────────────────────────────────────────────────────────${NC}"
     echo
 }
 
@@ -353,13 +369,141 @@ configure_qtile() {
     return 0
 }
 
+# Hàm dọn dẹp hệ thống (tạm thời tích hợp trực tiếp)
+manage_system_cleanup() {
+    clear
+    echo -e "${LIGHT_CYAN}"
+    echo "    ██████╗ ██╗      ███████╗ █████╗ ███╗   ██╗██╗   ██╗██████╗ "
+    echo "    ██╔════╝██║      ██╔════╝██╔══██╗████╗  ██║██║   ██║██╔══██╗"
+    echo "    ██║     ██║      █████╗  ███████║██╔██╗ ██║██║   ██║██████╔╝"
+    echo "    ██║     ██║      ██╔══╝  ██╔══██║██║╚██╗██║██║   ██║██╔═══╝ "
+    echo "    ╚██████╗███████╗ ███████╗██║  ██║██║ ╚████║╚██████╔╝██║     "
+    echo "     ╚═════╝╚══════╝ ╚══════╝╚═╝  ╚═╝╚═╝  ╚═══╝ ╚═════╝ ╚═╝     "
+    echo -e "${NC}"
+
+    echo -e "${DARK_GRAY}    ────────────────────────────────────────────────────────────────${NC}"
+    echo -e "${WHITE}                    🧹 ${BOLD}DỌN DẸP HỆ THỐNG${NC} 🧹"
+    echo -e "${DARK_GRAY}    ────────────────────────────────────────────────────────────────${NC}"
+    echo
+
+    echo -e "  🧩 ${GREEN}${BOLD}[1]${NC}  ${WHITE}Dọn gói mồ côi (Orphaned Packages)${NC}"
+    echo -e "      ${GRAY}${DIM}Gỡ các gói không còn được phụ thuộc${NC}"
+    echo
+
+    echo -e "  💾 ${GREEN}${BOLD}[2]${NC}  ${WHITE}Dọn cache Pacman${NC}"
+    echo -e "      ${GRAY}${DIM}Xóa các phiên bản cũ trong cache${NC}"
+    echo
+
+    echo -e "  📋 ${GREEN}${BOLD}[3]${NC}  ${WHITE}Xem gói cài thủ công${NC}"
+    echo -e "      ${GRAY}${DIM}Hiển thị các gói được cài bằng tay${NC}"
+    echo
+
+    echo -e "  ${ICON_PACKAGE} ${GREEN}${BOLD}[4]${NC}  ${WHITE}Dọn AUR và cache${NC}"
+    echo -e "      ${GRAY}${DIM}Dọn sạch gói AUR mồ côi và cache${NC}"
+    echo
+
+    echo -e "  🧧 ${GREEN}${BOLD}[5]${NC}  ${WHITE}Kiểm tra gói ngoại lai${NC}"
+    echo -e "      ${GRAY}${DIM}Gói không còn trong repository${NC}"
+    echo
+
+    echo -e "  🔥 ${GREEN}${BOLD}[6]${NC}  ${WHITE}Dọn dẹp tự động (Safe Mode)${NC}"
+    echo -e "      ${GRAY}${DIM}Chạy tất cả các thao tác dọn dẹp an toàn${NC}"
+    echo
+
+    echo -e "  ${ICON_EXIT} ${LIGHT_RED}${BOLD}[7]${NC}  ${WHITE}Quay lại menu hệ thống${NC}"
+    echo -e "      ${GRAY}${DIM}Trở về menu cấu hình hệ thống${NC}"
+    echo
+
+    echo -e "${DARK_GRAY}    ────────────────────────────────────────────────────────────────${NC}"
+    echo -e "    ${LIGHT_CYAN}${ICON_INFO} ${WHITE}Chọn một tùy chọn từ ${LIGHT_GREEN}${BOLD}1-7${NC}${WHITE} và nhấn Enter${NC}"
+    echo -e "${DARK_GRAY}    ────────────────────────────────────────────────────────────────${NC}"
+    echo
+
+    echo -e -n "${LIGHT_CYAN}${ICON_ARROW} ${WHITE}${BOLD}Nhập lựa chọn của bạn${NC} ${DARK_GRAY}[${LIGHT_GREEN}1-7${DARK_GRAY}]${NC}: "
+    local choice=$(read_single_key)
+    echo "$choice"
+    echo
+
+    case $choice in
+        1)
+            # Dọn gói mồ côi
+            print_boxed_message "Đang tìm kiếm các gói mồ côi..." "info"
+            local orphans=$(pacman -Qdtq)
+            if [ -z "$orphans" ]; then
+                print_boxed_message "Không tìm thấy gói mồ côi nào. Hệ thống đã sạch!" "success"
+            else
+                echo -e "${YELLOW}${BOLD}Các gói mồ côi được tìm thấy:${NC}"
+                pacman -Qdt
+                if confirm_yn "Bạn có muốn gỡ tất cả các gói mồ côi này không?" "n"; then
+                    sudo pacman -Rns $orphans && print_boxed_message "Đã gỡ thành công tất cả gói mồ côi!" "success"
+                fi
+            fi
+            ;;
+        2)
+            # Dọn cache Pacman
+            print_boxed_message "Đang dọn cache Pacman..." "info"
+            if command -v paccache >/dev/null 2>&1; then
+                sudo paccache -r && print_boxed_message "Đã dọn cache thành công!" "success"
+            else
+                print_boxed_message "paccache không được cài đặt. Cài đặt pacman-contrib trước." "warning"
+            fi
+            ;;
+        3)
+            # Xem gói cài thủ công
+            echo -e "${YELLOW}${BOLD}Các gói được cài thủ công:${NC}"
+            pacman -Qent
+            ;;
+        4)
+            # Dọn AUR
+            if command -v yay >/dev/null 2>&1; then
+                yay -Yc && print_boxed_message "Đã dọn AUR thành công!" "success"
+            elif command -v paru >/dev/null 2>&1; then
+                paru -c && print_boxed_message "Đã dọn AUR thành công!" "success"
+            else
+                print_boxed_message "Không tìm thấy AUR helper (yay hoặc paru)" "warning"
+            fi
+            ;;
+        5)
+            # Kiểm tra gói ngoại lai
+            echo -e "${YELLOW}${BOLD}Các gói ngoại lai:${NC}"
+            pacman -Qm
+            ;;
+        6)
+            # Dọn dẹp tự động
+            print_boxed_message "Bắt đầu dọn dẹp tự động..." "info"
+            # Gỡ gói mồ côi
+            local orphans=$(pacman -Qdtq)
+            if [ -n "$orphans" ]; then
+                sudo pacman -Rns $orphans && echo "✓ Đã gỡ gói mồ côi"
+            fi
+            # Dọn cache
+            if command -v paccache >/dev/null 2>&1; then
+                sudo paccache -rk2 && echo "✓ Đã dọn cache pacman"
+            fi
+            # Dọn AUR
+            if command -v yay >/dev/null 2>&1; then
+                yay -Yc --noconfirm && echo "✓ Đã dọn AUR"
+            fi
+            print_boxed_message "🎉 Hoàn tất dọn dẹp tự động!" "success"
+            ;;
+        7)
+            return 0
+            ;;
+        *)
+            print_boxed_message "Lựa chọn không hợp lệ. Vui lòng chọn số từ 1-7." "error"
+            ;;
+    esac
+
+    wait_for_user
+}
+
 # Hàm chính để quản lý cấu hình hệ thống
 manage_system_configurations() {
     local choice
 
     while true; do
         display_system_menu
-        echo -e -n "${LIGHT_CYAN}${ICON_ARROW} ${WHITE}${BOLD}Nhập lựa chọn của bạn${NC} ${DARK_GRAY}[${LIGHT_GREEN}1-8${DARK_GRAY}]${NC}: "
+        echo -e -n "${LIGHT_CYAN}${ICON_ARROW} ${WHITE}${BOLD}Nhập lựa chọn của bạn${NC} ${DARK_GRAY}[${LIGHT_GREEN}1-9${DARK_GRAY}]${NC}: "
         read -n 1 choice
         echo
 
@@ -383,14 +527,21 @@ manage_system_configurations() {
                 configure_window_manager
                 ;;
             7)
-                configure_terminal
+                if declare -f configure_terminal >/dev/null 2>&1; then
+                    configure_terminal
+                else
+                    print_boxed_message "Tính năng cấu hình terminal sẽ sớm được phát triển!" "info"
+                fi
                 ;;
             8)
+                manage_system_cleanup
+                ;;
+            9)
                 # Quay lại menu chính
                 return 0
                 ;;
             *)
-                print_boxed_message "Lựa chọn không hợp lệ. Vui lòng chọn số từ 1-8." "error"
+                print_boxed_message "Lựa chọn không hợp lệ. Vui lòng chọn số từ 1-9." "error"
                 ;;
         esac
 
