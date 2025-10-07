@@ -74,25 +74,29 @@ declare -g UI_PROGRESS_EMPTY="░"
 
 # Initialize the UI system
 init_ui_system() {
-    log_info "UI_SYSTEM" "Initializing enhanced UI system"
+    # Use basic echo if log_info is not available to prevent dependency issues
+    if declare -f log_info >/dev/null 2>&1; then
+        log_info "UI_SYSTEM" "Initializing enhanced UI system"
+    else
+        echo "[INFO] Initializing enhanced UI system" >&2
+    fi
     
-    # Detect terminal capabilities
+    # Detect terminal capabilities (safe operation)
     detect_terminal_capabilities
     
-    # Load UI configuration
-    load_ui_configuration
-    
-    # Initialize color support
+    # Initialize color support (safe operation)
     init_color_support
     
-    # Set up signal handlers for UI
-    setup_ui_signal_handlers
-    
+    # Skip loading UI configuration and signal handlers that might cause hangs
     # Skip integration loading during init to prevent hangs
-    # Integration layers will be loaded on-demand
     
     UI_SYSTEM_INITIALIZED=true
-    log_info "UI_SYSTEM" "Enhanced UI system initialized"
+    
+    if declare -f log_info >/dev/null 2>&1; then
+        log_info "UI_SYSTEM" "Enhanced UI system initialized (minimal mode)"
+    else
+        echo "[INFO] Enhanced UI system initialized (minimal mode)" >&2
+    fi
     
     return 0
 }
@@ -108,12 +112,16 @@ detect_terminal_capabilities() {
         UI_TERMINAL_HEIGHT=${LINES:-24}
     fi
     
-    # Check for color support
-    if [[ ! -t 1 ]] || [[ "${TERM:-}" == "dumb" ]]; then
-        # Disable colors for non-interactive or dumb terminals
+    # Check for color support - be more permissive
+    # Only disable colors if explicitly requested or in very limited environments
+    if [[ "${NO_COLOR:-}" == "1" ]] || [[ "${TERM:-}" == "dumb" ]]; then
+        # Disable colors only when explicitly disabled or in dumb terminal
         for key in "${!UI_COLORS[@]}"; do
             UI_COLORS["$key"]=""
         done
+        log_debug "UI_SYSTEM" "Colors disabled: NO_COLOR=${NO_COLOR:-}, TERM=${TERM:-}"
+    else
+        log_debug "UI_SYSTEM" "Colors enabled: TERM=${TERM:-}, stdout is tty: $([[ -t 1 ]] && echo yes || echo no)"
     fi
     
     # Check for Unicode support
@@ -180,16 +188,24 @@ apply_ui_theme() {
 
 # Initialize color support
 init_color_support() {
+    # Force color support unless explicitly disabled
+    if [[ "${NO_COLOR:-}" != "1" && "${FORCE_COLOR:-1}" == "1" ]]; then
+        # Force color support for better compatibility
+        log_debug "UI_SYSTEM" "Color support enabled (forced)"
+        return 0
+    fi
+    
     # Test color output capability
-    if [[ -t 1 ]]; then
+    if [[ -t 1 ]] && [[ "${TERM:-}" != "dumb" ]]; then
         # Terminal supports colors
-        log_debug "UI_SYSTEM" "Color support enabled"
+        log_debug "UI_SYSTEM" "Color support enabled (detected)"
+        return 0
     else
         # Disable all colors
         for key in "${!UI_COLORS[@]}"; do
             UI_COLORS["$key"]=""
         done
-        log_debug "UI_SYSTEM" "Color support disabled (non-terminal)"
+        log_debug "UI_SYSTEM" "Color support disabled (no terminal or dumb terminal)"
     fi
 }
 
@@ -200,6 +216,23 @@ setup_ui_signal_handlers() {
     
     # Handle cleanup on exit
     trap 'cleanup_ui' EXIT
+}
+
+# Safe color output function
+color_printf() {
+    local format="$1"
+    shift
+    
+    # Use printf with -e flag to ensure escape sequences are processed
+    printf "$format" "$@"
+}
+
+# Safe color echo function
+color_echo() {
+    local text="$1"
+    
+    # Use echo with -e to ensure escape sequences are processed
+    echo -e "$text"
 }
 
 # Clear screen with optional animation
@@ -244,8 +277,8 @@ ui_center_text() {
     local text_length=${#text}
     local padding=$(( (width - text_length) / 2 ))
     
-    # Print centered text
-    printf "%*s%s%s%s\n" "$padding" "" "$prefix" "$text" "$suffix"
+    # Print centered text with color support  
+    color_printf "%*s%s%s%s\n" "$padding" "" "$prefix" "$text" "$suffix"
 }
 
 # Print a horizontal line
@@ -254,9 +287,9 @@ ui_print_line() {
     local width="${2:-$UI_TERMINAL_WIDTH}"
     local color="${3:-${UI_COLORS[dim]}}"
     
-    printf "%s" "$color"
-    printf "%*s\n" "$width" | sed "s/ /$char/g"
-    printf "%s" "${UI_COLORS[reset]}"
+    local line_pattern
+    line_pattern=$(printf "%*s" "$width" | sed "s/ /$char/g")
+    color_echo "$color$line_pattern${UI_COLORS[reset]}"
 }
 
 # Print a box around text
@@ -330,17 +363,20 @@ ui_show_menu() {
 print_app_header_enhanced() {
     local header_width=$((UI_TERMINAL_WIDTH - 4))
     
-    printf "%s" "${UI_COLORS[primary]}"
+    # Create header components with proper escaping
+    local top_border="╔$(printf '%*s' "$header_width" | sed 's/ /═/g')╗"
+    local bottom_border="╚$(printf '%*s' "$header_width" | sed 's/ /═/g')╝"
+    local empty_line="║$(printf '%*s' "$header_width" "")║"
     
-    # Top border
-    printf "╔%*s╗\n" "$((header_width))" | sed 's/ /═/g'
+    # Use color_echo for safe color output
+    color_echo "${UI_COLORS[primary]}$top_border${UI_COLORS[reset]}"
     
     # Title line
     local title="🐧 Linux Manager V2"
     ui_center_text "║ $title ║" "$((header_width + 2))"
     
     # Empty line
-    printf "║%*s║\n" "$header_width" ""
+    color_echo "${UI_COLORS[primary]}$empty_line${UI_COLORS[reset]}"
     
     # Subtitle
     local subtitle="Công cụ quản lý hệ thống Arch Linux"
@@ -351,16 +387,14 @@ print_app_header_enhanced() {
     ui_center_text "║ $version_line ║" "$((header_width + 2))"
     
     # Empty line
-    printf "║%*s║\n" "$header_width" ""
+    color_echo "${UI_COLORS[primary]}$empty_line${UI_COLORS[reset]}"
     
     # Version
     local version_text="Version ${APP_VERSION:-2.0.0}"
     ui_center_text "║ $version_text ║" "$((header_width + 2))"
     
     # Bottom border
-    printf "╚%*s╝\n" "$header_width" | sed 's/ /═/g'
-    
-    printf "%s" "${UI_COLORS[reset]}"
+    color_echo "${UI_COLORS[primary]}$bottom_border${UI_COLORS[reset]}"
 }
 
 # Enhanced progress bar
@@ -422,7 +456,7 @@ ui_show_status() {
         *) color="${UI_COLORS[info]}" ;;
     esac
     
-    printf "%s%s %s%s" "$color" "$icon" "$message" "${UI_COLORS[reset]}"
+    color_printf "%s%s %s%s" "$color" "$icon" "$message" "${UI_COLORS[reset]}"
     
     if [[ "$newline" == "true" ]]; then
         echo
@@ -460,7 +494,8 @@ ui_confirm() {
         prompt="[y/N]"
     fi
     
-    printf "%s%s %s %s " "${UI_COLORS[warning]}" "${UI_ICONS[warning]}" "$message" "$prompt"
+    # Use color_printf for proper escape sequence handling
+    color_printf "%s%s %s %s " "${UI_COLORS[warning]}" "${UI_ICONS[warning]}" "$message" "$prompt"
     
     local response
     read -r response
@@ -676,18 +711,19 @@ show_main_menu() {
     print_app_header_enhanced
     
     echo
-    printf "${UI_COLORS[primary]}${UI_COLORS[bold]}═══ MENU CHÍNH ═══${UI_COLORS[reset]}\n\n"
+    color_echo "${UI_COLORS[primary]}${UI_COLORS[bold]}═══ MENU CHÍNH ═══${UI_COLORS[reset]}"
+    echo
     
-    printf "${UI_COLORS[accent]}1.${UI_COLORS[reset]} ${UI_ICONS[package]} Quản lý gói (Packages)\n"
-    printf "${UI_COLORS[accent]}2.${UI_COLORS[reset]} ${UI_ICONS[tools]} Môi trường phát triển (Development)\n" 
-    printf "${UI_COLORS[accent]}3.${UI_COLORS[reset]} ${UI_ICONS[gear]} Cấu hình hệ thống (System Config)\n"
-    printf "${UI_COLORS[accent]}4.${UI_COLORS[reset]} ${UI_ICONS[stats]} Thống kê hệ thống (System Stats)\n"
-    printf "${UI_COLORS[accent]}5.${UI_COLORS[reset]} ${UI_ICONS[gear]} Quản lý module (Module Management)\n"
-    printf "${UI_COLORS[accent]}6.${UI_COLORS[reset]} ${UI_ICONS[info]} Thông tin ứng dụng (About)\n"
-    printf "${UI_COLORS[accent]}0.${UI_COLORS[reset]} ${UI_ICONS[exit]} Thoát (Exit)\n"
+    color_echo "${UI_COLORS[accent]}1.${UI_COLORS[reset]} ${UI_ICONS[package]} Quản lý gói (Packages)"
+    color_echo "${UI_COLORS[accent]}2.${UI_COLORS[reset]} ${UI_ICONS[tools]} Môi trường phát triển (Development)" 
+    color_echo "${UI_COLORS[accent]}3.${UI_COLORS[reset]} ${UI_ICONS[gear]} Cấu hình hệ thống (System Config)"
+    color_echo "${UI_COLORS[accent]}4.${UI_COLORS[reset]} ${UI_ICONS[stats]} Thống kê hệ thống (System Stats)"
+    color_echo "${UI_COLORS[accent]}5.${UI_COLORS[reset]} ${UI_ICONS[gear]} Quản lý module (Module Management)"
+    color_echo "${UI_COLORS[accent]}6.${UI_COLORS[reset]} ${UI_ICONS[info]} Thông tin ứng dụng (About)"
+    color_echo "${UI_COLORS[accent]}0.${UI_COLORS[reset]} ${UI_ICONS[exit]} Thoát (Exit)"
     
     echo
-    printf "${UI_COLORS[bold]}${UI_COLORS[primary]}Lựa chọn của bạn: ${UI_COLORS[reset]}"
+    color_printf "${UI_COLORS[bold]}${UI_COLORS[primary]}Lựa chọn của bạn: ${UI_COLORS[reset]}"
 }
 
 # Basic input function for compatibility
@@ -1967,7 +2003,7 @@ handle_system_config_v2() {
 # Export UI functions
 export -f init_ui_system detect_terminal_capabilities load_ui_configuration
 export -f apply_ui_theme init_color_support setup_ui_signal_handlers
-export -f load_ui_integration_layers
+export -f load_ui_integration_layers color_printf color_echo
 export -f ui_clear_screen ui_print_title ui_center_text ui_print_line
 export -f ui_print_box ui_show_menu print_app_header_enhanced ui_show_progress
 export -f ui_show_status ui_show_loading ui_confirm ui_input ui_select

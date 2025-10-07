@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Debug output at script start
+echo "[DEBUG] Script started, bash version: $BASH_VERSION" >&2
+
 # Linux Manager V2 - Main Application Entry Point
 # Modern Arch Linux system management tool with enhanced architecture
 #
@@ -65,6 +68,13 @@ ${CYAN}${BOLD}╚═════════════════════
 EOF
 }
 
+# Safe color printf function for main script
+color_printf_main() {
+    local format="$1"
+    shift
+    printf "$format" "$@"
+}
+
 # Print startup status
 print_startup_status() {
     local message="$1"
@@ -72,19 +82,19 @@ print_startup_status() {
     
     case "$status" in
         "loading")
-            printf "${CYAN}[🔄] %s...${NC}\n" "$message"
+            color_printf_main "${CYAN}[🔄] %s...${NC}\n" "$message"
             ;;
         "success")
-            printf "${GREEN}[✅] %s${NC}\n" "$message"
+            color_printf_main "${GREEN}[✅] %s${NC}\n" "$message"
             ;;
         "error")
-            printf "${RED}[❌] %s${NC}\n" "$message"
+            color_printf_main "${RED}[❌] %s${NC}\n" "$message"
             ;;
         "warning")
-            printf "${YELLOW}[⚠️ ] %s${NC}\n" "$message"
+            color_printf_main "${YELLOW}[⚠️ ] %s${NC}\n" "$message"
             ;;
         *)
-            printf "${BLUE}[ℹ️ ] %s${NC}\n" "$message"
+            color_printf_main "${BLUE}[ℹ️ ] %s${NC}\n" "$message"
             ;;
     esac
 }
@@ -237,28 +247,36 @@ load_and_init_system() {
     local system_file="$CORE_V2_DIR/${system_name}.sh"
     local init_function="init_${system_name}"
     
+        color_printf_main "${BLUE}[DEBUG] Attempting to load system: %s${NC}\n" "$system_name" >&2
+    
     # Check if system file exists
     if [[ ! -f "$system_file" ]]; then
-        printf "${RED}[DEBUG] System file not found: %s${NC}\n" "$system_file" >&2
+        color_printf_main "${RED}[DEBUG] System file not found: %s${NC}\n" "$system_file" >&2
         return 1
     fi
+    
+    color_printf_main "${BLUE}[DEBUG] Sourcing system file: %s${NC}\n" "$system_file" >&2
     
     # Source the system file
     if ! source "$system_file" 2>&1; then
-        printf "${RED}[DEBUG] Failed to source system file: %s${NC}\n" "$system_file" >&2
+        color_printf_main "${RED}[DEBUG] Failed to source system file: %s${NC}\n" "$system_file" >&2
         return 1
     fi
     
+    color_printf_main "${BLUE}[DEBUG] System file sourced successfully: %s${NC}\n" "$system_name" >&2
+    
     # Check if init function exists and call it
     if declare -f "$init_function" >/dev/null 2>&1; then
+        color_printf_main "${BLUE}[DEBUG] Calling init function: %s${NC}\n" "$init_function" >&2
         if "$init_function" 2>&1; then
+            color_printf_main "${GREEN}[DEBUG] Init function completed: %s${NC}\n" "$init_function" >&2
             return 0
         else
-            printf "${RED}[DEBUG] Init function failed: %s${NC}\n" "$init_function" >&2
+            color_printf_main "${RED}[DEBUG] Init function failed: %s${NC}\n" "$init_function" >&2
             return 1
         fi
     else
-        printf "${YELLOW}[DEBUG] Init function not found: %s (but this may be normal)${NC}\n" "$init_function" >&2
+        color_printf_main "${YELLOW}[DEBUG] Init function not found: %s (but this may be normal)${NC}\n" "$init_function" >&2
     fi
     
     return 0
@@ -281,29 +299,40 @@ load_v2_ui() {
     print_startup_status "Loading V2 User Interface" "loading"
     
     local ui_file="$CORE_V2_DIR/ui_system.sh"
+    color_printf_main "${BLUE}[DEBUG] UI file path: %s${NC}\n" "$ui_file" >&2
+    
     if [[ -f "$ui_file" ]]; then
+        color_printf_main "${BLUE}[DEBUG] UI file exists, attempting to source...${NC}\n" >&2
         if source "$ui_file" 2>/dev/null; then
             print_startup_status "UI system sourced successfully" "success"
+            color_printf_main "${BLUE}[DEBUG] UI system sourced, checking for init function...${NC}\n" >&2
             if declare -f "init_ui_system" >/dev/null 2>&1; then
                 print_startup_status "Initializing UI system" "loading"
-                if init_ui_system 2>/dev/null; then
+                color_printf_main "${BLUE}[DEBUG] About to call init_ui_system...${NC}\n" >&2
+                if timeout 10 bash -c 'declare -f init_ui_system >/dev/null && init_ui_system' 2>/dev/null; then
                     print_startup_status "V2 User Interface loaded successfully" "success"
+                    color_printf_main "${GREEN}[DEBUG] UI system initialization completed successfully${NC}\n" >&2
                     return 0
                 else
-                    print_startup_status "UI system initialization failed" "error"
+                    print_startup_status "UI system initialization failed or timed out" "error"
+                    color_printf_main "${RED}[DEBUG] UI system initialization failed or timed out${NC}\n" >&2
                 fi
             else
                 print_startup_status "init_ui_system function not found" "error"
+                color_printf_main "${RED}[DEBUG] init_ui_system function not found${NC}\n" >&2
             fi
         else
             print_startup_status "Failed to source UI system file" "error"
+            color_printf_main "${RED}[DEBUG] Failed to source UI system file${NC}\n" >&2
         fi
     else
         print_startup_status "UI system file not found: $ui_file" "error"
+        color_printf_main "${RED}[DEBUG] UI system file not found: %s${NC}\n" "$ui_file" >&2
     fi
     
     # Fallback to basic UI
     print_startup_status "Using basic fallback UI" "warning"
+    color_printf_main "${YELLOW}[DEBUG] Loading fallback UI...${NC}\n" >&2
     load_fallback_ui
     return 0
 }
@@ -316,18 +345,18 @@ load_fallback_ui() {
         print_app_header
         
         echo
-        printf "${WHITE}${BOLD}═══ MENU CHÍNH ═══${NC}\n\n"
+        color_printf_main "${WHITE}${BOLD}═══ MENU CHÍNH ═══${NC}\n\n"
         
-        printf "${CYAN}1.${NC} 📦 Quản lý gói (Packages)\n"
-        printf "${CYAN}2.${NC} 🛠️  Môi trường phát triển (Development)\n" 
-        printf "${CYAN}3.${NC} ⚙️  Cấu hình hệ thống (System Config)\n"
-        printf "${CYAN}4.${NC} 📊 Thống kê hệ thống (System Stats)\n"
-        printf "${CYAN}5.${NC} 🔧 Quản lý module (Module Management)\n"
-        printf "${CYAN}6.${NC} ℹ️  Thông tin ứng dụng (About)\n"
-        printf "${CYAN}0.${NC} 🚪 Thoát (Exit)\n"
+        color_printf_main "${CYAN}1.${NC} 📦 Quản lý gói (Packages)\n"
+        color_printf_main "${CYAN}2.${NC} 🛠️  Môi trường phát triển (Development)\n" 
+        color_printf_main "${CYAN}3.${NC} ⚙️  Cấu hình hệ thống (System Config)\n"
+        color_printf_main "${CYAN}4.${NC} 📊 Thống kê hệ thống (System Stats)\n"
+        color_printf_main "${CYAN}5.${NC} 🔧 Quản lý module (Module Management)\n"
+        color_printf_main "${CYAN}6.${NC} ℹ️  Thông tin ứng dụng (About)\n"
+        color_printf_main "${CYAN}0.${NC} 🚪 Thoát (Exit)\n"
         
         echo
-        printf "${BOLD}Lựa chọn của bạn: ${NC}"
+        color_printf_main "${BOLD}Lựa chọn của bạn: ${NC}"
     }
     
     # Basic input function
@@ -343,46 +372,46 @@ show_system_info() {
     clear
     print_app_header
     
-    printf "${WHITE}${BOLD}═══ THÔNG TIN HỆ THỐNG ═══${NC}\n\n"
+    color_printf_main "${WHITE}${BOLD}═══ THÔNG TIN HỆ THỐNG ═══${NC}\n\n"
     
     # Application info
-    printf "${CYAN}${BOLD}Ứng dụng:${NC}\n"
-    printf "  Tên: %s\n" "$APP_NAME"
-    printf "  Phiên bản: %s\n" "$APP_VERSION"  
-    printf "  Kiến trúc: %s\n" "$APP_ARCHITECTURE"
-    printf "  Thời gian khởi động: %s ms\n" "$STARTUP_DURATION"
+    color_printf_main "${CYAN}${BOLD}Ứng dụng:${NC}\n"
+    color_printf_main "  Tên: %s\n" "$APP_NAME"
+    color_printf_main "  Phiên bản: %s\n" "$APP_VERSION"  
+    color_printf_main "  Kiến trúc: %s\n" "$APP_ARCHITECTURE"
+    color_printf_main "  Thời gian khởi động: %s ms\n" "$STARTUP_DURATION"
     
     echo
     
     # System info
-    printf "${CYAN}${BOLD}Hệ thống:${NC}\n"
-    printf "  OS: %s\n" "$(uname -s)"
-    printf "  Kernel: %s\n" "$(uname -r)"
-    printf "  Architecture: %s\n" "$(uname -m)"
+    color_printf_main "${CYAN}${BOLD}Hệ thống:${NC}\n"
+    color_printf_main "  OS: %s\n" "$(uname -s)"
+    color_printf_main "  Kernel: %s\n" "$(uname -r)"
+    color_printf_main "  Architecture: %s\n" "$(uname -m)"
     
     if [[ -f "/etc/os-release" ]]; then
         local os_name
         os_name=$(grep '^NAME=' /etc/os-release | cut -d= -f2 | tr -d '"')
-        printf "  Distribution: %s\n" "$os_name"
+        color_printf_main "  Distribution: %s\n" "$os_name"
     fi
     
     echo
     
     # Module statistics if available
     if declare -f "list_modules_enhanced" >/dev/null 2>&1; then
-        printf "${CYAN}${BOLD}Module Statistics:${NC}\n"
+        color_printf_main "${CYAN}${BOLD}Module Statistics:${NC}\n"
         local total_modules loaded_modules error_modules
         total_modules=$(list_modules_enhanced "all" | wc -l)
         loaded_modules=$(list_modules_enhanced "loaded" | wc -l) 
         error_modules=$(list_modules_enhanced "error" | wc -l)
         
-        printf "  Tổng số modules: %d\n" "$total_modules"
-        printf "  Modules đã tải: %d\n" "$loaded_modules"
-        printf "  Modules lỗi: %d\n" "$error_modules"
+        color_printf_main "  Tổng số modules: %d\n" "$total_modules"
+        color_printf_main "  Modules đã tải: %d\n" "$loaded_modules"
+        color_printf_main "  Modules lỗi: %d\n" "$error_modules"
     fi
     
     echo
-    printf "${YELLOW}Nhấn phím bất kỳ để tiếp tục...${NC}"
+    color_printf_main "${YELLOW}Nhấn phím bất kỳ để tiếp tục...${NC}"
     read -r
 }
 
@@ -391,15 +420,15 @@ run_module_cli() {
     clear
     print_app_header
     
-    printf "${WHITE}${BOLD}═══ QUẢN LÝ MODULE ═══${NC}\n\n"
+    color_printf_main "${WHITE}${BOLD}═══ QUẢN LÝ MODULE ═══${NC}\n\n"
     
     local module_cli_path="$ROOT_DIR/bin/module-cli"
     if [[ -f "$module_cli_path" ]]; then
-        printf "${CYAN}Khởi động Module CLI...${NC}\n\n"
+        color_printf_main "${CYAN}Khởi động Module CLI...${NC}\n\n"
         "$module_cli_path" interactive
     else
-        printf "${RED}Module CLI không tìm thấy tại: %s${NC}\n" "$module_cli_path"
-        printf "${YELLOW}Nhấn phím bất kỳ để tiếp tục...${NC}"
+        color_printf_main "${RED}Module CLI không tìm thấy tại: %s${NC}\n" "$module_cli_path"
+        color_printf_main "${YELLOW}Nhấn phím bất kỳ để tiếp tục...${NC}"
         read -r
     fi
 }
@@ -418,24 +447,24 @@ handle_packages_fallback() {
     clear  
     print_app_header
     
-    printf "${WHITE}${BOLD}═══ QUẢN LÝ GÓI ═══${NC}\n\n"
-    printf "${YELLOW}V2 modules không khả dụng - sử dụng chế độ cơ bản...${NC}\n\n"
+    color_printf_main "${WHITE}${BOLD}═══ QUẢN LÝ GÓI ═══${NC}\n\n"
+    color_printf_main "${YELLOW}V2 modules không khả dụng - sử dụng chế độ cơ bản...${NC}\n\n"
     
-    printf "${CYAN}1.${NC} Cài đặt gói cơ bản\n"
-    printf "${CYAN}2.${NC} Cài đặt gói phát triển\n" 
-    printf "${CYAN}3.${NC} Cài đặt gói multimedia\n"
-    printf "${CYAN}0.${NC} Quay lại\n"
+    color_printf_main "${CYAN}1.${NC} Cài đặt gói cơ bản\n"
+    color_printf_main "${CYAN}2.${NC} Cài đặt gói phát triển\n" 
+    color_printf_main "${CYAN}3.${NC} Cài đặt gói multimedia\n"
+    color_printf_main "${CYAN}0.${NC} Quay lại\n"
     
     echo
-    printf "${BOLD}Lựa chọn của bạn: ${NC}"
+    color_printf_main "${BOLD}Lựa chọn của bạn: ${NC}"
     
     local choice
     choice=$(read_user_choice)
     
     case "$choice" in
         "1"|"2"|"3")
-            printf "${YELLOW}Cần cài đặt V2 modules để sử dụng tính năng này...${NC}\n"
-            printf "${YELLOW}Nhấn phím bất kỳ để tiếp tục...${NC}"
+            color_printf_main "${YELLOW}Cần cài đặt V2 modules để sử dụng tính năng này...${NC}\n"
+            color_printf_main "${YELLOW}Nhấn phím bất kỳ để tiếp tục...${NC}"
             read -r
             ;;
         "0")
@@ -458,24 +487,24 @@ handle_development_fallback() {
     clear
     print_app_header
     
-    printf "${WHITE}${BOLD}═══ MÔI TRƯỜNG PHÁT TRIỂN ═══${NC}\n\n"
-    printf "${YELLOW}V2 modules không khả dụng - sử dụng chế độ cơ bản...${NC}\n\n"
+    color_printf_main "${WHITE}${BOLD}═══ MÔI TRƯỜNG PHÁT TRIỂN ═══${NC}\n\n"
+    color_printf_main "${YELLOW}V2 modules không khả dụng - sử dụng chế độ cơ bản...${NC}\n\n"
     
-    printf "${CYAN}1.${NC} Cài đặt PHP + Composer\n"
-    printf "${CYAN}2.${NC} Cài đặt Node.js + NPM\n"
-    printf "${CYAN}3.${NC} Cài đặt Python + Pip\n"
-    printf "${CYAN}0.${NC} Quay lại\n"
+    color_printf_main "${CYAN}1.${NC} Cài đặt PHP + Composer\n"
+    color_printf_main "${CYAN}2.${NC} Cài đặt Node.js + NPM\n"
+    color_printf_main "${CYAN}3.${NC} Cài đặt Python + Pip\n"
+    color_printf_main "${CYAN}0.${NC} Quay lại\n"
     
     echo
-    printf "${BOLD}Lựa chọn của bạn: ${NC}"
+    color_printf_main "${BOLD}Lựa chọn của bạn: ${NC}"
     
     local choice
     choice=$(read_user_choice)
     
     case "$choice" in
         "1"|"2"|"3")
-            printf "${YELLOW}Cần cài đặt V2 modules để sử dụng tính năng này...${NC}\n"
-            printf "${YELLOW}Nhấn phím bất kỳ để tiếp tục...${NC}"
+            color_printf_main "${YELLOW}Cần cài đặt V2 modules để sử dụng tính năng này...${NC}\n"
+            color_printf_main "${YELLOW}Nhấn phím bất kỳ để tiếp tục...${NC}"
             read -r
             ;;
         "0")
@@ -498,24 +527,24 @@ handle_system_config_fallback() {
     clear
     print_app_header
     
-    printf "${WHITE}${BOLD}═══ CẤU HÌNH HỆ THỐNG ═══${NC}\n\n"
-    printf "${YELLOW}V2 modules không khả dụng - sử dụng chế độ cơ bản...${NC}\n\n"
+    color_printf_main "${WHITE}${BOLD}═══ CẤU HÌNH HỆ THỐNG ═══${NC}\n\n"
+    color_printf_main "${YELLOW}V2 modules không khả dụng - sử dụng chế độ cơ bản...${NC}\n\n"
     
-    printf "${CYAN}1.${NC} Cấu hình Bash\n"
-    printf "${CYAN}2.${NC} Cấu hình Fish Shell\n"
-    printf "${CYAN}3.${NC} Cấu hình Vim\n"
-    printf "${CYAN}0.${NC} Quay lại\n"
+    color_printf_main "${CYAN}1.${NC} Cấu hình Bash\n"
+    color_printf_main "${CYAN}2.${NC} Cấu hình Fish Shell\n"
+    color_printf_main "${CYAN}3.${NC} Cấu hình Vim\n"
+    color_printf_main "${CYAN}0.${NC} Quay lại\n"
     
     echo
-    printf "${BOLD}Lựa chọn của bạn: ${NC}"
+    color_printf_main "${BOLD}Lựa chọn của bạn: ${NC}"
     
     local choice
     choice=$(read_user_choice)
     
     case "$choice" in
         "1"|"2"|"3")
-            printf "${YELLOW}Cần cài đặt V2 modules để sử dụng tính năng này...${NC}\n"
-            printf "${YELLOW}Nhấn phím bất kỳ để tiếp tục...${NC}"
+            color_printf_main "${YELLOW}Cần cài đặt V2 modules để sử dụng tính năng này...${NC}\n"
+            color_printf_main "${YELLOW}Nhấn phím bất kỳ để tiếp tục...${NC}"
             read -r
             ;;
         "0")
@@ -529,37 +558,37 @@ show_system_stats() {
     clear
     print_app_header
     
-    printf "${WHITE}${BOLD}═══ THỐNG KÊ HỆ THỐNG ═══${NC}\n\n"
+    color_printf_main "${WHITE}${BOLD}═══ THỐNG KÊ HỆ THỐNG ═══${NC}\n\n"
     
     # System uptime
     if command -v uptime >/dev/null 2>&1; then
-        printf "${CYAN}${BOLD}Uptime:${NC}\n"
+        color_printf_main "${CYAN}${BOLD}Uptime:${NC}\n"
         uptime
         echo
     fi
     
     # Memory usage
     if command -v free >/dev/null 2>&1; then
-        printf "${CYAN}${BOLD}Memory Usage:${NC}\n"
+        color_printf_main "${CYAN}${BOLD}Memory Usage:${NC}\n"
         free -h
         echo
     fi
     
     # Disk usage
     if command -v df >/dev/null 2>&1; then
-        printf "${CYAN}${BOLD}Disk Usage:${NC}\n"
+        color_printf_main "${CYAN}${BOLD}Disk Usage:${NC}\n"
         df -h / 2>/dev/null || df -h
         echo
     fi
     
     # Module statistics if available
     if command -v "$ROOT_DIR/bin/module-cli" >/dev/null 2>&1; then
-        printf "${CYAN}${BOLD}Module Statistics:${NC}\n"
+        color_printf_main "${CYAN}${BOLD}Module Statistics:${NC}\n"
         "$ROOT_DIR/bin/module-cli" stats 2>/dev/null || echo "Module statistics not available"
         echo
     fi
     
-    printf "${YELLOW}Nhấn phím bất kỳ để tiếp tục...${NC}"
+    color_printf_main "${YELLOW}Nhấn phím bất kỳ để tiếp tục...${NC}"
     read -r
 }
 
@@ -590,12 +619,12 @@ main_loop() {
                 show_system_info
                 ;;
             "0")
-                printf "\n${GREEN}Cảm ơn bạn đã sử dụng Linux Manager V2!${NC}\n"
-                printf "${CYAN}Hẹn gặp lại! 👋${NC}\n\n"
+                color_printf_main "\n${GREEN}Cảm ơn bạn đã sử dụng Linux Manager V2!${NC}\n"
+                color_printf_main "${CYAN}Hẹn gặp lại! 👋${NC}\n\n"
                 break
                 ;;
             *)
-                printf "\n${RED}Lựa chọn không hợp lệ. Vui lòng thử lại.${NC}\n"
+                color_printf_main "\n${RED}Lựa chọn không hợp lệ. Vui lòng thử lại.${NC}\n"
                 sleep 1
                 ;;
         esac
@@ -604,7 +633,7 @@ main_loop() {
 
 # Graceful shutdown
 graceful_shutdown() {
-    printf "\n\n${YELLOW}Đang thoát Linux Manager V2...${NC}\n"
+    color_printf_main "\n\n${YELLOW}Đang thoát Linux Manager V2...${NC}\n"
     
     # Save any pending data
     if declare -f "save_registry_data" >/dev/null 2>&1; then
@@ -616,7 +645,7 @@ graceful_shutdown() {
         shutdown_communication >/dev/null 2>&1
     fi
     
-    printf "${GREEN}Đã thoát thành công. Tạm biệt!${NC}\n"
+    color_printf_main "${GREEN}Đã thoát thành công. Tạm biệt!${NC}\n"
     exit 0
 }
 
@@ -625,16 +654,21 @@ trap graceful_shutdown INT TERM
 
 # Main execution
 main() {
+    # Very early debug output
+    echo "[DEBUG] Main function started" >&2
+    
     # Record startup time
     STARTUP_TIME=$(date)
+    echo "[DEBUG] Startup time recorded: $STARTUP_TIME" >&2
     
     # Print application header
+    echo "[DEBUG] About to print application header" >&2
     print_app_header
     
     # Check prerequisites
     if ! check_prerequisites; then
-        printf "\n${RED}Không thể khởi động do lỗi kiểm tra hệ thống.${NC}\n"
-        printf "${YELLOW}Vui lòng khắc phục các vấn đề trên và thử lại.${NC}\n"
+        color_printf_main "\n${RED}Không thể khởi động do lỗi kiểm tra hệ thống.${NC}\n"
+        color_printf_main "${YELLOW}Vui lòng khắc phục các vấn đề trên và thử lại.${NC}\n"
         exit 1
     fi
     
@@ -642,8 +676,8 @@ main() {
     
     # Initialize V2 systems
     if ! initialize_v2_systems; then
-        printf "\n${RED}Có lỗi trong quá trình khởi tạo hệ thống.${NC}\n"
-        printf "${YELLOW}Ứng dụng sẽ tiếp tục với chức năng hạn chế.${NC}\n"
+        color_printf_main "\n${RED}Có lỗi trong quá trình khởi tạo hệ thống.${NC}\n"
+        color_printf_main "${YELLOW}Ứng dụng sẽ tiếp tục với chức năng hạn chế.${NC}\n"
         sleep 2
     fi
     
