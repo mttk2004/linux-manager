@@ -857,15 +857,526 @@ get_timestamp_ms() {
     date +%s%3N
 }
 
-# Package management function stubs
-manage_package_installation() {
-    show_notification "Package installation management coming soon!" "info"
+# Package installation helper functions
+install_package_list() {
+    local list_type="$1"
+    local list_file="$ROOT_DIR/src/data/packages/${list_type}.list"
+    
+    if [[ ! -f "$list_file" ]]; then
+        show_notification "Package list not found: $list_file" "error"
+        wait_for_user
+        return 1
+    fi
+    
+    display_module_header "INSTALL ${list_type^^} PACKAGES" "📦"
+    
+    printf "${UI_COLORS[info]}Reading package list from: ${UI_COLORS[success]}$list_file${UI_COLORS[reset]}\n"
+    echo
+    
+    # Read and display packages
+    local packages=()
+    while IFS= read -r line; do
+        # Skip empty lines and comments
+        [[ -z "$line" || "$line" =~ ^[[:space:]]*# ]] && continue
+        packages+=("$line")
+    done < "$list_file"
+    
+    if [[ ${#packages[@]} -eq 0 ]]; then
+        show_notification "No packages found in list" "warning"
+        wait_for_user
+        return 1
+    fi
+    
+    printf "${UI_COLORS[info]}Found ${UI_COLORS[success]}${#packages[@]}${UI_COLORS[info]} packages to install:${UI_COLORS[reset]}\n"
+    echo
+    
+    # Display packages in a nice format
+    local count=0
+    for package in "${packages[@]}"; do
+        if [[ $count -eq 0 ]]; then
+            printf "  "
+        fi
+        printf "${UI_COLORS[accent]}$package${UI_COLORS[reset]} "
+        ((count++))
+        if [[ $count -eq 4 ]]; then
+            echo
+            count=0
+        fi
+    done
+    [[ $count -ne 0 ]] && echo
+    
+    echo
+    if ui_confirm "Do you want to install these packages?"; then
+        echo
+        show_progress "Preparing installation" 10
+        
+        # Use appropriate installer based on list type
+        case "$list_type" in
+            "pacman"|"dev"|"multimedia")
+                install_packages_with_pacman "${packages[@]}"
+                ;;
+            "aur")
+                install_packages_with_aur "${packages[@]}"
+                ;;
+            *)
+                show_notification "Unknown package list type: $list_type" "error"
+                ;;
+        esac
+    else
+        show_notification "Installation cancelled by user" "info"
+    fi
+    
+    echo
     wait_for_user
 }
 
-manage_package_search() {
-    show_notification "Package search management coming soon!" "info"
+install_packages_with_pacman() {
+    local packages=("$@")
+    
+    show_progress "Installing packages with pacman" 30
+    
+    # Check if packages are available
+    local available_packages=()
+    local unavailable_packages=()
+    
+    for package in "${packages[@]}"; do
+        if pacman -Si "$package" >/dev/null 2>&1; then
+            available_packages+=("$package")
+        else
+            unavailable_packages+=("$package")
+        fi
+    done
+    
+    if [[ ${#unavailable_packages[@]} -gt 0 ]]; then
+        printf "${UI_COLORS[warning]}Warning: These packages are not available:${UI_COLORS[reset]}\n"
+        for package in "${unavailable_packages[@]}"; do
+            printf "  ${UI_COLORS[error]}• $package${UI_COLORS[reset]}\n"
+        done
+        echo
+    fi
+    
+    if [[ ${#available_packages[@]} -eq 0 ]]; then
+        show_notification "No packages available to install" "error"
+        return 1
+    fi
+    
+    show_progress "Installing ${#available_packages[@]} packages" 50
+    
+    # Install packages
+    if sudo pacman -S --needed --noconfirm "${available_packages[@]}"; then
+        show_progress "Installation completed" 100
+        show_notification "Successfully installed ${#available_packages[@]} packages" "success"
+        
+        # Log installed packages
+        log_info "PACKAGES" "Installed pacman packages: ${available_packages[*]}"
+    else
+        show_notification "Some packages failed to install" "error"
+        return 1
+    fi
+}
+
+install_packages_with_aur() {
+    local packages=("$@")
+    
+    # Check if AUR helper is available
+    local aur_helper=""
+    if command -v yay >/dev/null 2>&1; then
+        aur_helper="yay"
+    elif command -v paru >/dev/null 2>&1; then
+        aur_helper="paru"
+    else
+        show_notification "No AUR helper found. Please install yay or paru first." "error"
+        return 1
+    fi
+    
+    show_progress "Installing packages with $aur_helper" 30
+    
+    # Install packages
+    if "$aur_helper" -S --needed --noconfirm "${packages[@]}"; then
+        show_progress "Installation completed" 100
+        show_notification "Successfully installed ${#packages[@]} AUR packages" "success"
+        
+        # Log installed packages
+        log_info "PACKAGES" "Installed AUR packages: ${packages[*]}"
+    else
+        show_notification "Some AUR packages failed to install" "error"
+        return 1
+    fi
+}
+
+install_custom_package() {
+    display_module_header "CUSTOM PACKAGE INSTALLATION" "⚙️"
+    
+    printf "${UI_COLORS[info]}Enter package name(s) to install (space-separated):${UI_COLORS[reset]}\n"
+    printf "${UI_COLORS[dim]}Examples: vim git firefox, google-chrome${UI_COLORS[reset]}\n"
+    echo
+    
+    printf "${UI_COLORS[primary]}Package name(s): ${UI_COLORS[reset]}"
+    local package_input
+    read -r package_input
+    
+    if [[ -z "$package_input" ]]; then
+        show_notification "No packages specified" "warning"
+        wait_for_user
+        return 1
+    fi
+    
+    # Convert input to array
+    local packages
+    IFS=' ' read -ra packages <<< "$package_input"
+    
+    echo
+    printf "${UI_COLORS[info]}Packages to install: ${UI_COLORS[success]}${packages[*]}${UI_COLORS[reset]}\n"
+    echo
+    
+    printf "${UI_COLORS[primary]}Choose installation method:${UI_COLORS[reset]}\n"
+    printf "  ${UI_COLORS[accent]}[1]${UI_COLORS[reset]} Pacman (official repositories)\n"
+    printf "  ${UI_COLORS[accent]}[2]${UI_COLORS[reset]} AUR (Arch User Repository)\n"
+    printf "  ${UI_COLORS[accent]}[0]${UI_COLORS[reset]} Cancel\n"
+    echo
+    
+    printf "${UI_COLORS[primary]}Choice: ${UI_COLORS[reset]}"
+    local method_choice
+    read -r method_choice
+    
+    echo
+    case "$method_choice" in
+        1)
+            install_packages_with_pacman "${packages[@]}"
+            ;;
+        2)
+            install_packages_with_aur "${packages[@]}"
+            ;;
+        0)
+            show_notification "Installation cancelled" "info"
+            ;;
+        *)
+            show_notification "Invalid choice" "error"
+            ;;
+    esac
+    
     wait_for_user
+}
+
+install_flatpak_apps_interactive() {
+    display_module_header "FLATPAK APPLICATIONS" "📱"
+    
+    if ! command -v flatpak >/dev/null 2>&1; then
+        printf "${UI_COLORS[warning]}Flatpak is not installed.${UI_COLORS[reset]}\n"
+        echo
+        if ui_confirm "Would you like to install Flatpak first?"; then
+            if sudo pacman -S --noconfirm flatpak; then
+                show_notification "Flatpak installed successfully" "success"
+                show_notification "Please restart your session to use Flatpak" "info"
+            else
+                show_notification "Failed to install Flatpak" "error"
+            fi
+        fi
+        wait_for_user
+        return 1
+    fi
+    
+    printf "${UI_COLORS[info]}Popular Flatpak applications:${UI_COLORS[reset]}\n"
+    echo
+    
+    # Common flatpak apps
+    local flatpak_apps=(
+        "org.mozilla.firefox:Firefox Web Browser"
+        "com.google.Chrome:Google Chrome"
+        "org.libreoffice.LibreOffice:LibreOffice Suite"
+        "com.spotify.Client:Spotify Music"
+        "org.videolan.VLC:VLC Media Player"
+        "com.discordapp.Discord:Discord"
+        "org.telegram.desktop:Telegram"
+        "org.gimp.GIMP:GIMP Image Editor"
+    )
+    
+    local i=1
+    for app_info in "${flatpak_apps[@]}"; do
+        IFS=':' read -r app_id app_name <<< "$app_info"
+        printf "  ${UI_COLORS[accent]}[%d]${UI_COLORS[reset]} %s ${UI_COLORS[dim]}(%s)${UI_COLORS[reset]}\n" "$i" "$app_name" "$app_id"
+        ((i++))
+    done
+    
+    printf "  ${UI_COLORS[accent]}[9]${UI_COLORS[reset]} Custom Flatpak app (enter App ID)\n"
+    printf "  ${UI_COLORS[accent]}[0]${UI_COLORS[reset]} Return\n"
+    
+    echo
+    printf "${UI_COLORS[primary]}Choice: ${UI_COLORS[reset]}"
+    local app_choice
+    read -r app_choice
+    
+    echo
+    case "$app_choice" in
+        [1-8])
+            local selected_app="${flatpak_apps[$((app_choice-1))]}"
+            IFS=':' read -r app_id app_name <<< "$selected_app"
+            
+            if flatpak install -y flathub "$app_id"; then
+                show_notification "Successfully installed $app_name" "success"
+            else
+                show_notification "Failed to install $app_name" "error"
+            fi
+            ;;
+        9)
+            printf "${UI_COLORS[primary]}Enter Flatpak App ID: ${UI_COLORS[reset]}"
+            local custom_app_id
+            read -r custom_app_id
+            
+            if [[ -n "$custom_app_id" ]]; then
+                if flatpak install -y flathub "$custom_app_id"; then
+                    show_notification "Successfully installed $custom_app_id" "success"
+                else
+                    show_notification "Failed to install $custom_app_id" "error"
+                fi
+            fi
+            ;;
+        0)
+            return 0
+            ;;
+        *)
+            show_notification "Invalid choice" "error"
+            ;;
+    esac
+    
+    wait_for_user
+}
+
+# Package search functions
+search_pacman_packages() {
+    display_module_header "SEARCH PACMAN PACKAGES" "📦"
+    
+    printf "${UI_COLORS[primary]}Enter search term: ${UI_COLORS[reset]}"
+    local search_term
+    read -r search_term
+    
+    if [[ -z "$search_term" ]]; then
+        show_notification "No search term provided" "warning"
+        wait_for_user
+        return 1
+    fi
+    
+    echo
+    printf "${UI_COLORS[info]}Searching for: ${UI_COLORS[success]}$search_term${UI_COLORS[reset]}\n"
+    echo
+    
+    pacman -Ss "$search_term" | head -20
+    
+    echo
+    wait_for_user
+}
+
+search_aur_packages() {
+    display_module_header "SEARCH AUR PACKAGES" "🏠"
+    
+    if ! command -v yay >/dev/null 2>&1 && ! command -v paru >/dev/null 2>&1; then
+        show_notification "No AUR helper found. Please install yay or paru first." "error"
+        wait_for_user
+        return 1
+    fi
+    
+    printf "${UI_COLORS[primary]}Enter search term: ${UI_COLORS[reset]}"
+    local search_term
+    read -r search_term
+    
+    if [[ -z "$search_term" ]]; then
+        show_notification "No search term provided" "warning"
+        wait_for_user
+        return 1
+    fi
+    
+    echo
+    printf "${UI_COLORS[info]}Searching AUR for: ${UI_COLORS[success]}$search_term${UI_COLORS[reset]}\n"
+    echo
+    
+    if command -v yay >/dev/null 2>&1; then
+        yay -Ss "$search_term" | head -20
+    elif command -v paru >/dev/null 2>&1; then
+        paru -Ss "$search_term" | head -20
+    fi
+    
+    echo
+    wait_for_user
+}
+
+search_flatpak_apps() {
+    display_module_header "SEARCH FLATPAK APPS" "📱"
+    
+    if ! command -v flatpak >/dev/null 2>&1; then
+        show_notification "Flatpak is not installed" "error"
+        wait_for_user
+        return 1
+    fi
+    
+    printf "${UI_COLORS[primary]}Enter search term: ${UI_COLORS[reset]}"
+    local search_term
+    read -r search_term
+    
+    if [[ -z "$search_term" ]]; then
+        show_notification "No search term provided" "warning"
+        wait_for_user
+        return 1
+    fi
+    
+    echo
+    printf "${UI_COLORS[info]}Searching Flatpak for: ${UI_COLORS[success]}$search_term${UI_COLORS[reset]}\n"
+    echo
+    
+    flatpak search "$search_term" | head -20
+    
+    echo
+    wait_for_user
+}
+
+show_installed_packages() {
+    display_module_header "INSTALLED PACKAGES" "📊"
+    
+    printf "${UI_COLORS[primary]}Choose package manager:${UI_COLORS[reset]}\n"
+    printf "  ${UI_COLORS[accent]}[1]${UI_COLORS[reset]} Pacman packages\n"
+    printf "  ${UI_COLORS[accent]}[2]${UI_COLORS[reset]} AUR packages\n"
+    printf "  ${UI_COLORS[accent]}[3]${UI_COLORS[reset]} Flatpak apps\n"
+    printf "  ${UI_COLORS[accent]}[4]${UI_COLORS[reset]} All packages (summary)\n"
+    printf "  ${UI_COLORS[accent]}[0]${UI_COLORS[reset]} Return\n"
+    echo
+    
+    printf "${UI_COLORS[primary]}Choice: ${UI_COLORS[reset]}"
+    local choice
+    read -r choice
+    
+    echo
+    case "$choice" in
+        1)
+            printf "${UI_COLORS[info]}Pacman packages (showing first 20):${UI_COLORS[reset]}\n"
+            echo
+            pacman -Q | head -20
+            printf "\n${UI_COLORS[dim]}Total: $(pacman -Q | wc -l) packages${UI_COLORS[reset]}\n"
+            ;;
+        2)
+            printf "${UI_COLORS[info]}Foreign packages (likely AUR):${UI_COLORS[reset]}\n"
+            echo
+            pacman -Qm | head -20
+            printf "\n${UI_COLORS[dim]}Total: $(pacman -Qm | wc -l) foreign packages${UI_COLORS[reset]}\n"
+            ;;
+        3)
+            if command -v flatpak >/dev/null 2>&1; then
+                printf "${UI_COLORS[info]}Flatpak applications:${UI_COLORS[reset]}\n"
+                echo
+                flatpak list --app
+            else
+                show_notification "Flatpak is not installed" "error"
+            fi
+            ;;
+        4)
+            printf "${UI_COLORS[primary]}${UI_COLORS[bold]}╔══ Package Summary ══╗${UI_COLORS[reset]}\n"
+            printf "${UI_COLORS[info]}Pacman packages: ${UI_COLORS[success]}$(pacman -Q | wc -l)${UI_COLORS[reset]}\n"
+            printf "${UI_COLORS[info]}Foreign packages: ${UI_COLORS[success]}$(pacman -Qm | wc -l)${UI_COLORS[reset]}\n"
+            if command -v flatpak >/dev/null 2>&1; then
+                printf "${UI_COLORS[info]}Flatpak apps: ${UI_COLORS[success]}$(flatpak list --app | wc -l)${UI_COLORS[reset]}\n"
+            fi
+            ;;
+        0)
+            return 0
+            ;;
+        *)
+            show_notification "Invalid choice" "error"
+            ;;
+    esac
+    
+    echo
+    wait_for_user
+}
+
+# Package management function stubs
+manage_package_installation() {
+    while true; do
+        display_module_header "PACKAGE INSTALLATION" "📦"
+        
+        printf "  📦 ${UI_COLORS[accent]}${UI_COLORS[bold]}[1]${UI_COLORS[reset]}  ${UI_COLORS[info]}Install Essential Packages${UI_COLORS[reset]}\n"
+        printf "      ${UI_COLORS[dim]}Basic system packages from Pacman${UI_COLORS[reset]}\n"
+        echo
+        
+        printf "  🛠️  ${UI_COLORS[accent]}${UI_COLORS[bold]}[2]${UI_COLORS[reset]}  ${UI_COLORS[info]}Install Development Packages${UI_COLORS[reset]}\n"
+        printf "      ${UI_COLORS[dim]}Programming tools and libraries${UI_COLORS[reset]}\n"
+        echo
+        
+        printf "  🎥 ${UI_COLORS[accent]}${UI_COLORS[bold]}[3]${UI_COLORS[reset]}  ${UI_COLORS[info]}Install Multimedia Packages${UI_COLORS[reset]}\n"
+        printf "      ${UI_COLORS[dim]}Audio, video and graphics tools${UI_COLORS[reset]}\n"
+        echo
+        
+        printf "  🏠 ${UI_COLORS[accent]}${UI_COLORS[bold]}[4]${UI_COLORS[reset]}  ${UI_COLORS[info]}Install AUR Packages${UI_COLORS[reset]}\n"
+        printf "      ${UI_COLORS[dim]}Packages from Arch User Repository${UI_COLORS[reset]}\n"
+        echo
+        
+        printf "  📱 ${UI_COLORS[accent]}${UI_COLORS[bold]}[5]${UI_COLORS[reset]}  ${UI_COLORS[info]}Install Flatpak Apps${UI_COLORS[reset]}\n"
+        printf "      ${UI_COLORS[dim]}Applications from Flathub${UI_COLORS[reset]}\n"
+        echo
+        
+        printf "  ⚙️  ${UI_COLORS[accent]}${UI_COLORS[bold]}[6]${UI_COLORS[reset]}  ${UI_COLORS[info]}Custom Package Installation${UI_COLORS[reset]}\n"
+        printf "      ${UI_COLORS[dim]}Install specific packages by name${UI_COLORS[reset]}\n"
+        echo
+        
+        printf "  ${UI_ICONS[exit]} ${UI_COLORS[error]}${UI_COLORS[bold]}[0]${UI_COLORS[reset]}  ${UI_COLORS[info]}Return to Package Menu${UI_COLORS[reset]}\n"
+        echo
+        
+        display_module_footer "Choose installation type [0-6]"
+        
+        local choice
+        choice=$(read_single_key)
+        echo "$choice"
+        echo
+        
+        case "$choice" in
+            1) install_package_list "pacman" ;;
+            2) install_package_list "dev" ;;
+            3) install_package_list "multimedia" ;;
+            4) install_package_list "aur" ;;
+            5) install_flatpak_apps_interactive ;;
+            6) install_custom_package ;;
+            0) return 0 ;;
+            *) show_notification "Invalid choice: $choice" "error"; sleep 1 ;;
+        esac
+    done
+}
+
+manage_package_search() {
+    while true; do
+        display_module_header "PACKAGE SEARCH" "🔍"
+        
+        printf "  📦 ${UI_COLORS[accent]}${UI_COLORS[bold]}[1]${UI_COLORS[reset]}  ${UI_COLORS[info]}Search Pacman Repositories${UI_COLORS[reset]}\n"
+        printf "      ${UI_COLORS[dim]}Search official Arch Linux repositories${UI_COLORS[reset]}\n"
+        echo
+        
+        printf "  🏠 ${UI_COLORS[accent]}${UI_COLORS[bold]}[2]${UI_COLORS[reset]}  ${UI_COLORS[info]}Search AUR Packages${UI_COLORS[reset]}\n"
+        printf "      ${UI_COLORS[dim]}Search Arch User Repository${UI_COLORS[reset]}\n"
+        echo
+        
+        printf "  📱 ${UI_COLORS[accent]}${UI_COLORS[bold]}[3]${UI_COLORS[reset]}  ${UI_COLORS[info]}Search Flatpak Apps${UI_COLORS[reset]}\n"
+        printf "      ${UI_COLORS[dim]}Search Flatpak applications${UI_COLORS[reset]}\n"
+        echo
+        
+        printf "  📊 ${UI_COLORS[accent]}${UI_COLORS[bold]}[4]${UI_COLORS[reset]}  ${UI_COLORS[info]}Show Installed Packages${UI_COLORS[reset]}\n"
+        printf "      ${UI_COLORS[dim]}List currently installed packages${UI_COLORS[reset]}\n"
+        echo
+        
+        printf "  ${UI_ICONS[exit]} ${UI_COLORS[error]}${UI_COLORS[bold]}[0]${UI_COLORS[reset]}  ${UI_COLORS[info]}Return to Package Menu${UI_COLORS[reset]}\n"
+        echo
+        
+        display_module_footer "Choose search type [0-4]"
+        
+        local choice
+        choice=$(read_single_key)
+        echo "$choice"
+        echo
+        
+        case "$choice" in
+            1) search_pacman_packages ;;
+            2) search_aur_packages ;;
+            3) search_flatpak_apps ;;
+            4) show_installed_packages ;;
+            0) return 0 ;;
+            *) show_notification "Invalid choice: $choice" "error"; sleep 1 ;;
+        esac
+    done
 }
 
 manage_package_removal() {
@@ -925,8 +1436,113 @@ manage_system_cleanup_v2() {
 }
 
 show_system_information() {
-    show_notification "System information display coming soon!" "info"
-    wait_for_user
+    display_module_header "SYSTEM INFORMATION" "📊"
+    
+    # System Information
+    printf "${UI_COLORS[primary]}${UI_COLORS[bold]}╔══ System Details ══╗${UI_COLORS[reset]}\n"
+    printf "${UI_COLORS[info]}Operating System: ${UI_COLORS[success]}$(uname -s)${UI_COLORS[reset]}\n"
+    printf "${UI_COLORS[info]}Kernel Version:   ${UI_COLORS[success]}$(uname -r)${UI_COLORS[reset]}\n"
+    printf "${UI_COLORS[info]}Architecture:     ${UI_COLORS[success]}$(uname -m)${UI_COLORS[reset]}\n"
+    
+    if [[ -f "/etc/os-release" ]]; then
+        local distro_name distro_version
+        distro_name=$(grep '^NAME=' /etc/os-release | cut -d= -f2 | tr -d '"')
+        distro_version=$(grep '^VERSION=' /etc/os-release | cut -d= -f2 | tr -d '"' 2>/dev/null || echo "N/A")
+        printf "${UI_COLORS[info]}Distribution:     ${UI_COLORS[success]}$distro_name${UI_COLORS[reset]}\n"
+        printf "${UI_COLORS[info]}Version:          ${UI_COLORS[success]}$distro_version${UI_COLORS[reset]}\n"
+    fi
+    
+    printf "${UI_COLORS[info]}Hostname:         ${UI_COLORS[success]}$(hostname)${UI_COLORS[reset]}\n"
+    printf "${UI_COLORS[info]}Uptime:           ${UI_COLORS[success]}$(uptime -p 2>/dev/null || uptime | cut -d, -f1)${UI_COLORS[reset]}\n"
+    echo
+    
+    # Hardware Information
+    printf "${UI_COLORS[primary]}${UI_COLORS[bold]}╔══ Hardware Information ══╗${UI_COLORS[reset]}\n"
+    
+    # CPU Info
+    if [[ -f "/proc/cpuinfo" ]]; then
+        local cpu_model cpu_cores
+        cpu_model=$(grep "model name" /proc/cpuinfo | head -n1 | cut -d: -f2 | sed 's/^ *//')
+        cpu_cores=$(grep "processor" /proc/cpuinfo | wc -l)
+        printf "${UI_COLORS[info]}CPU:              ${UI_COLORS[success]}$cpu_model${UI_COLORS[reset]}\n"
+        printf "${UI_COLORS[info]}CPU Cores:        ${UI_COLORS[success]}$cpu_cores${UI_COLORS[reset]}\n"
+    fi
+    
+    # Memory Info
+    if command -v free >/dev/null 2>&1; then
+        local mem_total mem_used mem_free
+        mem_total=$(free -h | awk '/^Mem:/ {print $2}')
+        mem_used=$(free -h | awk '/^Mem:/ {print $3}')
+        mem_free=$(free -h | awk '/^Mem:/ {print $4}')
+        printf "${UI_COLORS[info]}Memory Total:     ${UI_COLORS[success]}$mem_total${UI_COLORS[reset]}\n"
+        printf "${UI_COLORS[info]}Memory Used:      ${UI_COLORS[warning]}$mem_used${UI_COLORS[reset]}\n"
+        printf "${UI_COLORS[info]}Memory Free:      ${UI_COLORS[success]}$mem_free${UI_COLORS[reset]}\n"
+    fi
+    
+    echo
+    
+    # Storage Information
+    printf "${UI_COLORS[primary]}${UI_COLORS[bold]}╔══ Storage Information ══╗${UI_COLORS[reset]}\n"
+    if command -v df >/dev/null 2>&1; then
+        # Show main filesystem info
+        local disk_info
+        disk_info=$(df -h / 2>/dev/null | tail -n +2)
+        if [[ -n "$disk_info" ]]; then
+            local filesystem size used avail use_percent
+            read -r filesystem size used avail use_percent _ <<< "$disk_info"
+            printf "${UI_COLORS[info]}Root Filesystem:  ${UI_COLORS[success]}$filesystem${UI_COLORS[reset]}\n"
+            printf "${UI_COLORS[info]}Total Size:       ${UI_COLORS[success]}$size${UI_COLORS[reset]}\n"
+            printf "${UI_COLORS[info]}Used Space:       ${UI_COLORS[warning]}$used${UI_COLORS[reset]}\n"
+            printf "${UI_COLORS[info]}Available:        ${UI_COLORS[success]}$avail${UI_COLORS[reset]}\n"
+            printf "${UI_COLORS[info]}Usage:            ${UI_COLORS[warning]}$use_percent${UI_COLORS[reset]}\n"
+        fi
+    fi
+    
+    echo
+    
+    # Package Management
+    printf "${UI_COLORS[primary]}${UI_COLORS[bold]}╔══ Package Management ══╗${UI_COLORS[reset]}\n"
+    
+    # Pacman info
+    if command -v pacman >/dev/null 2>&1; then
+        local installed_packages
+        installed_packages=$(pacman -Q 2>/dev/null | wc -l)
+        printf "${UI_COLORS[info]}Pacman Packages:  ${UI_COLORS[success]}$installed_packages installed${UI_COLORS[reset]}\n"
+        
+        # Check for updates
+        local updates
+        updates=$(pacman -Qu 2>/dev/null | wc -l)
+        if [[ $updates -gt 0 ]]; then
+            printf "${UI_COLORS[info]}Available Updates:${UI_COLORS[warning]} $updates updates available${UI_COLORS[reset]}\n"
+        else
+            printf "${UI_COLORS[info]}System Status:    ${UI_COLORS[success]}Up to date${UI_COLORS[reset]}\n"
+        fi
+    fi
+    
+    # Flatpak info
+    if command -v flatpak >/dev/null 2>&1; then
+        local flatpak_apps
+        flatpak_apps=$(flatpak list 2>/dev/null | wc -l)
+        printf "${UI_COLORS[info]}Flatpak Apps:     ${UI_COLORS[success]}$flatpak_apps installed${UI_COLORS[reset]}\n"
+    fi
+    
+    echo
+    
+    # Application Information
+    printf "${UI_COLORS[primary]}${UI_COLORS[bold]}╔══ Linux Manager Info ══╗${UI_COLORS[reset]}\n"
+    printf "${UI_COLORS[info]}Application:      ${UI_COLORS[success]}${APP_NAME:-Linux Manager}${UI_COLORS[reset]}\n"
+    printf "${UI_COLORS[info]}Version:          ${UI_COLORS[success]}${APP_VERSION:-2.0.0}${UI_COLORS[reset]}\n"
+    printf "${UI_COLORS[info]}Architecture:     ${UI_COLORS[success]}${APP_ARCHITECTURE:-V2}${UI_COLORS[reset]}\n"
+    if [[ -n "${STARTUP_TIME:-}" ]]; then
+        printf "${UI_COLORS[info]}Started:          ${UI_COLORS[success]}$STARTUP_TIME${UI_COLORS[reset]}\n"
+    fi
+    if [[ -n "${STARTUP_DURATION:-}" && "$STARTUP_DURATION" != "0" ]]; then
+        printf "${UI_COLORS[info]}Startup Time:     ${UI_COLORS[success]}${STARTUP_DURATION}ms${UI_COLORS[reset]}\n"
+    fi
+    
+    echo
+    display_module_footer "Press any key to return"
+    read_single_key >/dev/null
 }
 
 # Development management function stubs
@@ -1097,6 +1713,10 @@ export -f manage_terminal_configuration_v2 manage_system_cleanup_v2
 export -f show_system_information manage_php_environment_v2
 export -f manage_nodejs_environment_v2 manage_python_environment_v2
 export -f manage_docker_environment_v2 manage_git_configuration_v2
+
+# Export package installation helpers
+export -f install_package_list install_packages_with_pacman install_packages_with_aur
+export -f install_custom_package install_flatpak_apps_interactive
 
 # Export main V2 handlers
 export -f handle_packages_v2 handle_development_v2 handle_system_config_v2
