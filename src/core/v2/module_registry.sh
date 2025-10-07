@@ -465,7 +465,7 @@ list_registered_modules() {
     esac
     
     local first=true
-    for module_name in "${!MODULE_REGISTRY_DB[@]}" | sort; do
+    for module_name in $(printf '%s\n' "${!MODULE_REGISTRY_DB[@]}" | sort); do
         local registry_data="${MODULE_REGISTRY_DB[$module_name]}"
         local status=""
         

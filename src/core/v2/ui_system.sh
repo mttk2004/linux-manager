@@ -667,6 +667,407 @@ ui_get_choice() {
     done
 }
 
+# Show main menu using V2 system
+show_main_menu() {
+    ui_clear_screen
+    print_app_header_enhanced
+    
+    echo
+    printf "${UI_COLORS[primary]}${UI_COLORS[bold]}═══ MENU CHÍNH ═══${UI_COLORS[reset]}\n\n"
+    
+    printf "${UI_COLORS[accent]}1.${UI_COLORS[reset]} ${UI_ICONS[package]} Quản lý gói (Packages)\n"
+    printf "${UI_COLORS[accent]}2.${UI_COLORS[reset]} ${UI_ICONS[tools]} Môi trường phát triển (Development)\n" 
+    printf "${UI_COLORS[accent]}3.${UI_COLORS[reset]} ${UI_ICONS[gear]} Cấu hình hệ thống (System Config)\n"
+    printf "${UI_COLORS[accent]}4.${UI_COLORS[reset]} ${UI_ICONS[stats]} Thống kê hệ thống (System Stats)\n"
+    printf "${UI_COLORS[accent]}5.${UI_COLORS[reset]} ${UI_ICONS[gear]} Quản lý module (Module Management)\n"
+    printf "${UI_COLORS[accent]}6.${UI_COLORS[reset]} ${UI_ICONS[info]} Thông tin ứng dụng (About)\n"
+    printf "${UI_COLORS[accent]}0.${UI_COLORS[reset]} ${UI_ICONS[exit]} Thoát (Exit)\n"
+    
+    echo
+    printf "${UI_COLORS[bold]}${UI_COLORS[primary]}Lựa chọn của bạn: ${UI_COLORS[reset]}"
+}
+
+# Basic input function for compatibility
+read_user_choice() {
+    local choice
+    read -r choice
+    echo "$choice"
+}
+
+# Module UI functions - compatibility layer for V2 modules
+display_module_header() {
+    local title="$1"
+    local icon="${2:-📦}"
+    
+    ui_clear_screen
+    print_app_header_enhanced
+    
+    echo
+    printf "${UI_COLORS[primary]}${UI_COLORS[bold]}═══ $icon $title ═══${UI_COLORS[reset]}\n\n"
+}
+
+display_module_footer() {
+    local prompt="$1"
+    
+    echo
+    ui_print_line "─" "$UI_TERMINAL_WIDTH" "${UI_COLORS[dim]}"
+    printf "${UI_COLORS[bold]}${UI_COLORS[primary]}$prompt: ${UI_COLORS[reset]}"
+}
+
+display_section_header() {
+    local title="$1"
+    local icon="${2:-⚙️}"
+    
+    echo
+    printf "${UI_COLORS[primary]}${UI_COLORS[bold]}$icon $title${UI_COLORS[reset]}\n"
+    ui_print_line "─" "$((${#title} + 3))" "${UI_COLORS[primary]}"
+    echo
+}
+
+show_notification() {
+    local message="$1"
+    local type="${2:-info}"
+    
+    ui_show_status "$type" "$message"
+}
+
+show_progress() {
+    local message="$1"
+    local percent="${2:-0}"
+    
+    ui_show_progress "$percent" "100" "$message"
+}
+
+read_single_key() {
+    local key
+    # Try to use the utils.sh version if available
+    if declare -f "read_single_key" >/dev/null 2>&1 && [[ "${BASH_SOURCE[0]}" != *"ui_system.sh" ]]; then
+        # Call the original function from utils.sh
+        command read_single_key
+    else
+        # Fallback implementation
+        if command -v stty >/dev/null 2>&1; then
+            local old_stty_cfg
+            old_stty_cfg=$(stty -g)
+            stty raw -echo
+            key=$(dd bs=1 count=1 2>/dev/null)
+            stty "$old_stty_cfg"
+        else
+            read -r -n1 key
+        fi
+        printf "%s" "$key"
+    fi
+}
+
+wait_for_user() {
+    ui_pause
+}
+
+# Event system stubs
+publish_event() {
+    local event="$1"
+    local data="${2:-}"
+    log_debug "EVENT" "Publishing event: $event with data: $data"
+}
+
+subscribe_to_event() {
+    local event="$1"
+    local handler="$2"
+    log_debug "EVENT" "Subscribed to event: $event with handler: $handler"
+}
+
+# Icon helper function
+get_icon() {
+    local icon_name="$1"
+    echo "${UI_ICONS[${icon_name,,}]:-●}"
+}
+
+# V1 compatibility functions
+print_boxed_message() {
+    local message="$1"
+    local type="${2:-info}"
+    show_notification "$message" "$type"
+}
+
+confirm_yn() {
+    local prompt="$1"
+    local default="${2:-y}"
+    ui_confirm "$prompt" "$default"
+}
+
+get_user_choice() {
+    local min="$1"
+    local max="$2"
+    local prompt="${3:-Nhập lựa chọn của bạn}"
+    ui_get_choice "$max" "$prompt"
+}
+
+show_spinner() {
+    local message="$1"
+    local duration="${2:-2}"
+    ui_show_loading "$message" "$duration"
+}
+
+center_text() {
+    local text="$1"
+    ui_center_text "$text"
+}
+
+wait_return_to_main() {
+    echo -e "${UI_COLORS[warning]}Nhấn phím bất kỳ để quay lại menu chính...${UI_COLORS[reset]}"
+    read_single_key >/dev/null
+}
+
+# Additional missing functions found in modules
+print_fancy_header() {
+    print_app_header_enhanced
+}
+
+display_menu() {
+    show_main_menu
+}
+
+show_exit_message() {
+    echo
+    ui_center_text "Cảm ơn bạn đã sử dụng Linux Manager!" "$UI_TERMINAL_WIDTH" "${UI_COLORS[primary]}${UI_COLORS[bold]}" "${UI_COLORS[reset]}"
+    ui_center_text "Hẹn gặp lại! 👋" "$UI_TERMINAL_WIDTH" "${UI_COLORS[success]}" "${UI_COLORS[reset]}"
+    echo
+}
+
+# Module management stubs
+source_v1_modules() {
+    log_debug "MODULE" "source_v1_modules called"
+    return 0
+}
+
+init_package_cache() {
+    log_debug "MODULE" "init_package_cache called"
+    return 0
+}
+
+# Additional stubs for missing functions
+log_performance() {
+    local component="$1"
+    local message="$2"
+    local duration="${3:-0}"
+    log_info "$component" "$message (${duration}ms)"
+}
+
+get_timestamp_ms() {
+    date +%s%3N
+}
+
+# Package management function stubs
+manage_package_installation() {
+    show_notification "Package installation management coming soon!" "info"
+    wait_for_user
+}
+
+manage_package_search() {
+    show_notification "Package search management coming soon!" "info"
+    wait_for_user
+}
+
+manage_package_removal() {
+    show_notification "Package removal management coming soon!" "info"
+    wait_for_user
+}
+
+show_package_statistics() {
+    show_notification "Package statistics coming soon!" "info"
+    wait_for_user
+}
+
+manage_package_settings() {
+    show_notification "Package settings management coming soon!" "info"
+    wait_for_user
+}
+
+# System management function stubs
+manage_shell_configuration_v2() {
+    show_notification "Shell configuration management coming soon!" "info"
+    wait_for_user
+}
+
+manage_editor_configuration_v2() {
+    show_notification "Editor configuration management coming soon!" "info"
+    wait_for_user
+}
+
+manage_network_configuration_v2() {
+    show_notification "Network configuration management coming soon!" "info"
+    wait_for_user
+}
+
+manage_system_services_v2() {
+    show_notification "System services management coming soon!" "info"
+    wait_for_user
+}
+
+manage_system_backup_v2() {
+    show_notification "System backup management coming soon!" "info"
+    wait_for_user
+}
+
+manage_window_manager_v2() {
+    show_notification "Window manager setup coming soon!" "info"
+    wait_for_user
+}
+
+manage_terminal_configuration_v2() {
+    show_notification "Terminal configuration management coming soon!" "info"
+    wait_for_user
+}
+
+manage_system_cleanup_v2() {
+    show_notification "System cleanup management coming soon!" "info"
+    wait_for_user
+}
+
+show_system_information() {
+    show_notification "System information display coming soon!" "info"
+    wait_for_user
+}
+
+# Development management function stubs
+manage_php_environment_v2() {
+    show_notification "PHP environment management coming soon!" "info"
+    wait_for_user
+}
+
+manage_nodejs_environment_v2() {
+    show_notification "Node.js environment management coming soon!" "info"
+    wait_for_user
+}
+
+manage_python_environment_v2() {
+    show_notification "Python environment management coming soon!" "info"
+    wait_for_user
+}
+
+manage_docker_environment_v2() {
+    show_notification "Docker environment management coming soon!" "info"
+    wait_for_user
+}
+
+manage_git_configuration_v2() {
+    show_notification "Git configuration management coming soon!" "info"
+    wait_for_user
+}
+
+# Main V2 handlers called by the main script
+handle_packages_v2() {
+    # Try to use the actual V2 packages module if available
+    if declare -f "manage_packages_v2" >/dev/null 2>&1; then
+        manage_packages_v2
+    else
+        # Fallback implementation
+        while true; do
+            display_module_header "PACKAGE MANAGEMENT" "📦"
+            
+            printf "  📦 ${UI_COLORS[accent]}${UI_COLORS[bold]}[1]${UI_COLORS[reset]}  ${UI_COLORS[info]}Install Packages${UI_COLORS[reset]}\n"
+            printf "  🔍 ${UI_COLORS[accent]}${UI_COLORS[bold]}[2]${UI_COLORS[reset]}  ${UI_COLORS[info]}Search Packages${UI_COLORS[reset]}\n"
+            printf "  ⬆️  ${UI_COLORS[accent]}${UI_COLORS[bold]}[3]${UI_COLORS[reset]}  ${UI_COLORS[info]}Update System${UI_COLORS[reset]}\n"
+            printf "  ❌ ${UI_COLORS[accent]}${UI_COLORS[bold]}[4]${UI_COLORS[reset]}  ${UI_COLORS[info]}Remove Packages${UI_COLORS[reset]}\n"
+            printf "  📊 ${UI_COLORS[accent]}${UI_COLORS[bold]}[5]${UI_COLORS[reset]}  ${UI_COLORS[info]}Package Statistics${UI_COLORS[reset]}\n"
+            printf "  ${UI_ICONS[exit]} ${UI_COLORS[error]}${UI_COLORS[bold]}[0]${UI_COLORS[reset]}  ${UI_COLORS[info]}Return to Main Menu${UI_COLORS[reset]}\n"
+            
+            display_module_footer "Choose option [0-5]"
+            
+            local choice
+            choice=$(read_single_key)
+            echo "$choice"
+            echo
+            
+            case "$choice" in
+                1) manage_package_installation ;;
+                2) manage_package_search ;;
+                3) show_notification "System update coming soon!" "info"; wait_for_user ;;
+                4) manage_package_removal ;;
+                5) show_package_statistics ;;
+                0) return 0 ;;
+                *) show_notification "Invalid choice: $choice" "error" ;;
+            esac
+        done
+    fi
+}
+
+handle_development_v2() {
+    # Try to use the actual V2 development module if available
+    if declare -f "manage_development_v2" >/dev/null 2>&1; then
+        manage_development_v2
+    else
+        # Fallback implementation
+        while true; do
+            display_module_header "DEVELOPMENT ENVIRONMENT" "💻"
+            
+            printf "  🐘 ${UI_COLORS[accent]}${UI_COLORS[bold]}[1]${UI_COLORS[reset]}  ${UI_COLORS[info]}PHP Environment${UI_COLORS[reset]}\n"
+            printf "  🟢 ${UI_COLORS[accent]}${UI_COLORS[bold]}[2]${UI_COLORS[reset]}  ${UI_COLORS[info]}Node.js Environment${UI_COLORS[reset]}\n"
+            printf "  🐍 ${UI_COLORS[accent]}${UI_COLORS[bold]}[3]${UI_COLORS[reset]}  ${UI_COLORS[info]}Python Environment${UI_COLORS[reset]}\n"
+            printf "  🐳 ${UI_COLORS[accent]}${UI_COLORS[bold]}[4]${UI_COLORS[reset]}  ${UI_COLORS[info]}Docker Environment${UI_COLORS[reset]}\n"
+            printf "  🌿 ${UI_COLORS[accent]}${UI_COLORS[bold]}[5]${UI_COLORS[reset]}  ${UI_COLORS[info]}Git Configuration${UI_COLORS[reset]}\n"
+            printf "  ${UI_ICONS[exit]} ${UI_COLORS[error]}${UI_COLORS[bold]}[0]${UI_COLORS[reset]}  ${UI_COLORS[info]}Return to Main Menu${UI_COLORS[reset]}\n"
+            
+            display_module_footer "Choose option [0-5]"
+            
+            local choice
+            choice=$(read_single_key)
+            echo "$choice"
+            echo
+            
+            case "$choice" in
+                1) manage_php_environment_v2 ;;
+                2) manage_nodejs_environment_v2 ;;
+                3) manage_python_environment_v2 ;;
+                4) manage_docker_environment_v2 ;;
+                5) manage_git_configuration_v2 ;;
+                0) return 0 ;;
+                *) show_notification "Invalid choice: $choice" "error" ;;
+            esac
+        done
+    fi
+}
+
+handle_system_config_v2() {
+    # Try to use the actual V2 system module if available
+    if declare -f "manage_system_v2" >/dev/null 2>&1; then
+        manage_system_v2
+    else
+        # Fallback implementation
+        while true; do
+            display_module_header "SYSTEM CONFIGURATION" "⚙️"
+            
+            printf "  🗺️  ${UI_COLORS[accent]}${UI_COLORS[bold]}[1]${UI_COLORS[reset]}  ${UI_COLORS[info]}Shell Configuration${UI_COLORS[reset]}\n"
+            printf "  📝 ${UI_COLORS[accent]}${UI_COLORS[bold]}[2]${UI_COLORS[reset]}  ${UI_COLORS[info]}Editor Configuration${UI_COLORS[reset]}\n"
+            printf "  🌐 ${UI_COLORS[accent]}${UI_COLORS[bold]}[3]${UI_COLORS[reset]}  ${UI_COLORS[info]}Network Configuration${UI_COLORS[reset]}\n"
+            printf "  🔧 ${UI_COLORS[accent]}${UI_COLORS[bold]}[4]${UI_COLORS[reset]}  ${UI_COLORS[info]}System Services${UI_COLORS[reset]}\n"
+            printf "  💾 ${UI_COLORS[accent]}${UI_COLORS[bold]}[5]${UI_COLORS[reset]}  ${UI_COLORS[info]}System Backup${UI_COLORS[reset]}\n"
+            printf "  🧹 ${UI_COLORS[accent]}${UI_COLORS[bold]}[6]${UI_COLORS[reset]}  ${UI_COLORS[info]}System Cleanup${UI_COLORS[reset]}\n"
+            printf "  📊 ${UI_COLORS[accent]}${UI_COLORS[bold]}[7]${UI_COLORS[reset]}  ${UI_COLORS[info]}System Information${UI_COLORS[reset]}\n"
+            printf "  ${UI_ICONS[exit]} ${UI_COLORS[error]}${UI_COLORS[bold]}[0]${UI_COLORS[reset]}  ${UI_COLORS[info]}Return to Main Menu${UI_COLORS[reset]}\n"
+            
+            display_module_footer "Choose option [0-7]"
+            
+            local choice
+            choice=$(read_single_key)
+            echo "$choice"
+            echo
+            
+            case "$choice" in
+                1) manage_shell_configuration_v2 ;;
+                2) manage_editor_configuration_v2 ;;
+                3) manage_network_configuration_v2 ;;
+                4) manage_system_services_v2 ;;
+                5) manage_system_backup_v2 ;;
+                6) manage_system_cleanup_v2 ;;
+                7) show_system_information ;;
+                0) return 0 ;;
+                *) show_notification "Invalid choice: $choice" "error" ;;
+            esac
+        done
+    fi
+}
+
 # Export UI functions
 export -f init_ui_system detect_terminal_capabilities load_ui_configuration
 export -f apply_ui_theme init_color_support setup_ui_signal_handlers
@@ -674,3 +1075,28 @@ export -f ui_clear_screen ui_print_title ui_center_text ui_print_line
 export -f ui_print_box ui_show_menu print_app_header_enhanced ui_show_progress
 export -f ui_show_status ui_show_loading ui_confirm ui_input ui_select
 export -f ui_show_table ui_show_notification ui_pause cleanup_ui ui_get_choice
+export -f show_main_menu read_user_choice
+
+# Export V2 module compatibility functions
+export -f display_module_header display_module_footer display_section_header
+export -f show_notification show_progress read_single_key wait_for_user
+export -f publish_event subscribe_to_event get_icon
+
+# Export V1 compatibility functions
+export -f print_boxed_message confirm_yn get_user_choice show_spinner center_text
+export -f wait_return_to_main print_fancy_header display_menu show_exit_message
+export -f source_v1_modules init_package_cache log_performance get_timestamp_ms
+
+# Export module management function stubs
+export -f manage_package_installation manage_package_search manage_package_removal
+export -f show_package_statistics manage_package_settings
+export -f manage_shell_configuration_v2 manage_editor_configuration_v2
+export -f manage_network_configuration_v2 manage_system_services_v2
+export -f manage_system_backup_v2 manage_window_manager_v2
+export -f manage_terminal_configuration_v2 manage_system_cleanup_v2
+export -f show_system_information manage_php_environment_v2
+export -f manage_nodejs_environment_v2 manage_python_environment_v2
+export -f manage_docker_environment_v2 manage_git_configuration_v2
+
+# Export main V2 handlers
+export -f handle_packages_v2 handle_development_v2 handle_system_config_v2

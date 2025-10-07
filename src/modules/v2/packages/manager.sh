@@ -56,11 +56,11 @@ source_v1_modules() {
 
 # Initialize package cache system
 init_package_cache() {
-    if get_config "packages.cache_enabled" "true" == "true"; then
+    if get_config "PACKAGE_CACHE_ENABLED" "true" == "true"; then
         local cache_dir="$ROOT_DIR/.cache/packages"
         mkdir -p "$cache_dir"
         export PACKAGES_CACHE_DIR="$cache_dir"
-        export PACKAGES_CACHE_TTL=$(get_config "packages.cache_ttl" "300")
+        export PACKAGES_CACHE_TTL=$(get_config "PACKAGE_CACHE_TTL" "300")
         log_debug "Package cache initialized: $cache_dir (TTL: ${PACKAGES_CACHE_TTL}s)"
     else
         log_debug "Package cache disabled by configuration"
@@ -95,7 +95,7 @@ init_package_managers() {
 
 # Detect AUR helper
 detect_aur_helper() {
-    local aur_preference=$(get_config "packages.aur_helper" "auto")
+    local aur_preference=$(get_config "PREFERRED_AUR_HELPER" "auto")
     
     case "$aur_preference" in
         "auto")
@@ -162,13 +162,14 @@ check_packages_health() {
     fi
     
     # Check AUR helper health
-    if [[ "$AUR_AVAILABLE" != "true" ]] && get_config "packages.aur_helper" "auto" != "disabled"; then
+    if [[ "$AUR_AVAILABLE" != "true" ]] && get_config "PREFERRED_AUR_HELPER" "auto" != "disabled"; then
         health_score=$((health_score - 20))
         issues+=("AUR helper not available")
     fi
     
     # Check Flatpak health
-    if [[ "$FLATPAK_AVAILABLE" != "true" ]] && get_config "packages.flatpak_enabled" "true" == "true"; then
+    # Note: No specific Flatpak enabled config registered, using default check
+    if [[ "$FLATPAK_AVAILABLE" != "true" ]]; then
         health_score=$((health_score - 10))
         issues+=("Flatpak not available but enabled")
     fi
@@ -275,7 +276,7 @@ search_packages_enhanced() {
     local cache_file="$PACKAGES_CACHE_DIR/search_${package_manager}_$(echo "$query" | md5sum | cut -d' ' -f1)"
     local use_cache=false
     
-    if [[ -f "$cache_file" ]] && get_config "packages.cache_enabled" "true" == "true"; then
+    if [[ -f "$cache_file" ]] && get_config "PACKAGE_CACHE_ENABLED" "true" == "true"; then
         local cache_age=$(($(date +%s) - $(stat -c %Y "$cache_file" 2>/dev/null || echo 0)))
         if [[ $cache_age -lt $PACKAGES_CACHE_TTL ]]; then
             use_cache=true
@@ -370,7 +371,7 @@ update_system_enhanced() {
     fi
     
     # Update Flatpak
-    if [[ "$FLATPAK_AVAILABLE" == "true" ]] && get_config "packages.flatpak_enabled" "true" == "true"; then
+    if [[ "$FLATPAK_AVAILABLE" == "true" ]]; then
         show_progress "Updating Flatpak applications" 90
         if update_flatpak_apps; then
             log_info "Updated Flatpak applications"

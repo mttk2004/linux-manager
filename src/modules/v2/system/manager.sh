@@ -215,7 +215,7 @@ check_system_health() {
     fi
     
     # Check backup configuration
-    if get_config "system.backup_enabled" "true" == "true" && [[ "$TIMESHIFT_AVAILABLE" != "true" ]]; then
+    if get_config "BACKUP_ENABLED" "true" == "true" && [[ "$TIMESHIFT_AVAILABLE" != "true" ]]; then
         health_score=$((health_score - 15))
         issues+=("Backup enabled but Timeshift not available")
     fi
@@ -518,7 +518,7 @@ manage_system_backup_v2() {
     else
         show_notification "Installing Timeshift for system backup..." "info"
         
-        if get_config "packages.pacman.available" "true" == "true"; then
+        if [[ "$PACMAN_AVAILABLE" == "true" ]]; then
             if sudo pacman -S --noconfirm timeshift; then
                 show_notification "Timeshift installed successfully" "success"
                 export TIMESHIFT_AVAILABLE=true

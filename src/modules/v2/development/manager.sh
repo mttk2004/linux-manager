@@ -73,7 +73,7 @@ source_v1_dev_modules() {
 
 # Initialize development cache
 init_dev_cache() {
-    if get_config "development.dev_cache_enabled" "true" == "true"; then
+    if get_config "DEVELOPMENT_MODE" "false" == "true"; then
         local cache_dir="$ROOT_DIR/.cache/development"
         mkdir -p "$cache_dir"
         export DEV_CACHE_DIR="$cache_dir"
@@ -238,12 +238,12 @@ check_development_health() {
     fi
     
     # Check language environments
-    if [[ "$PHP_AVAILABLE" != "true" ]] && get_config "development.preferred_php_version" "" != ""; then
+    if [[ "$PHP_AVAILABLE" != "true" ]] && get_config "PHP_DEFAULT_VERSION" "" != ""; then
         health_score=$((health_score - 15))
         issues+=("PHP not available but configured")
     fi
     
-    if [[ "$NODE_AVAILABLE" != "true" ]] && get_config "development.preferred_node_version" "" != ""; then
+    if [[ "$NODE_AVAILABLE" != "true" ]] && get_config "NODEJS_DEFAULT_VERSION" "" != ""; then
         health_score=$((health_score - 15))
         issues+=("Node.js not available but configured")
     fi
