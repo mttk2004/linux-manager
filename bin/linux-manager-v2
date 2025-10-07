@@ -22,6 +22,9 @@ readonly MODULES_DIR="$ROOT_DIR/src/modules"
 readonly DATA_DIR="$ROOT_DIR/src/data"
 readonly LOGS_DIR="$ROOT_DIR/logs"
 
+# Create essential directories early
+mkdir -p "$LOGS_DIR" "$DATA_DIR" 2>/dev/null
+
 # Export essential paths for the entire application
 export ROOT_DIR CORE_V2_DIR MODULES_DIR DATA_DIR LOGS_DIR
 export APP_NAME APP_VERSION APP_ARCHITECTURE
@@ -158,10 +161,10 @@ initialize_v2_systems() {
     fi
     
     # Load and initialize logging system
-    if load_and_init_system "logging" "Logging System"; then
+    if load_and_init_system "logger" "Logging System"; then
         print_startup_status "Logging system initialized" "success"
     else
-        failed_systems+=("logging")
+        failed_systems+=("logger")
         print_startup_status "Failed to initialize logging system" "error"
     fi
     
@@ -236,21 +239,26 @@ load_and_init_system() {
     
     # Check if system file exists
     if [[ ! -f "$system_file" ]]; then
+        printf "${RED}[DEBUG] System file not found: %s${NC}\n" "$system_file" >&2
         return 1
     fi
     
     # Source the system file
-    if ! source "$system_file" 2>/dev/null; then
+    if ! source "$system_file" 2>&1; then
+        printf "${RED}[DEBUG] Failed to source system file: %s${NC}\n" "$system_file" >&2
         return 1
     fi
     
     # Check if init function exists and call it
     if declare -f "$init_function" >/dev/null 2>&1; then
-        if "$init_function" >/dev/null 2>&1; then
+        if "$init_function" 2>&1; then
             return 0
         else
+            printf "${RED}[DEBUG] Init function failed: %s${NC}\n" "$init_function" >&2
             return 1
         fi
+    else
+        printf "${YELLOW}[DEBUG] Init function not found: %s (but this may be normal)${NC}\n" "$init_function" >&2
     fi
     
     return 0

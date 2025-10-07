@@ -1,0 +1,12 @@
+DEBUG: Starting test script
+DEBUG: SCRIPT_DIR = /home/kiet/projects/linux-manager
+DEBUG: ROOT_DIR = /home/kiet/projects
+DEBUG: CORE_V2_DIR = /home/kiet/projects/src/core/v2
+DEBUG: LOGS_DIR = /home/kiet/projects/logs
+DEBUG: Checking directories...
+DEBUG: CORE_V2_DIR missing
+DEBUG: LOGS_DIR missing
+DEBUG: Logger file: /home/kiet/projects/src/core/v2/logger.sh
+DEBUG: Logger file missing
+DEBUG: Logger file not found
+DEBUG: Test script completed

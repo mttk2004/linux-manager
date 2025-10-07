@@ -33,23 +33,27 @@ ERROR_LOG_FILE="${LOGS_DIR}/error_$(date +%Y%m%d).log"
 # Initialize logger
 init_logger() {
     # Create logs directory if it doesn't exist
-    mkdir -p "$LOGS_DIR"
+    if [[ -n "$LOGS_DIR" ]]; then
+        mkdir -p "$LOGS_DIR" 2>/dev/null || true
+    fi
     
     # Set current log level numeric value
-    CURRENT_LOG_LEVEL=${LOG_LEVELS[$LOG_LEVEL]}
+    CURRENT_LOG_LEVEL=${LOG_LEVELS[$LOG_LEVEL]:-2}
     
     # Initialize performance tracking
     PERFORMANCE_METRICS[operations_count]=0
     PERFORMANCE_METRICS[total_time]=0
     PERFORMANCE_METRICS[avg_time]=0
     
-    # Rotate logs if needed
-    if [[ "$LOG_ROTATION" == "true" ]]; then
-        rotate_logs_if_needed
+    # Skip log rotation during init for now
+    # Log rotation will be handled later
+    
+    # Simple log initialization without calling log_info to avoid circular dependency
+    if [[ -n "$LOG_FILE" && -d "$(dirname "$LOG_FILE")" ]]; then
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] [INFO] [LOGGER] Logger initialized with level: $LOG_LEVEL, format: $LOG_FORMAT" >> "$LOG_FILE" 2>/dev/null || true
     fi
     
-    # Log initialization
-    log_info "Logger initialized with level: $LOG_LEVEL, format: $LOG_FORMAT"
+    return 0
 }
 
 # Check if message should be logged based on level
@@ -228,7 +232,7 @@ measure_execution() {
 # Log rotation
 rotate_logs_if_needed() {
     for log_file in "$LOG_FILE" "$PERFORMANCE_LOG_FILE" "$ERROR_LOG_FILE"; do
-        if [[ -f "$log_file" ]] && [[ $(stat -f%z "$log_file" 2>/dev/null || stat -c%s "$log_file" 2>/dev/null || echo 0) -gt $LOG_MAX_SIZE ]]; then
+        if [[ -f "$log_file" ]] && [[ $(stat -c%s "$log_file" 2>/dev/null || echo 0) -gt $LOG_MAX_SIZE ]]; then
             rotate_log_file "$log_file"
         fi
     done

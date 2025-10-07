@@ -54,15 +54,33 @@ init_module_loader() {
     
     log_info "MODULE_LOADER" "Initializing enhanced module loading system..."
     
-    # Set global paths
+    # Set global paths (avoid conflicts with readonly variables from main script)
     export LINUX_MANAGER_ROOT="$base_dir"
-    export CORE_DIR="$base_dir/src/core"
-    export CORE_V2_DIR="$base_dir/src/core/v2"
-    export MODULES_DIR="$base_dir/src/modules"
-    export DATA_DIR="$base_dir/src/data"
+    
+    # Use existing readonly variables if already set, otherwise set them
+    if [[ -z "${CORE_DIR:-}" ]]; then
+        export CORE_DIR="$base_dir/src/core"
+    fi
+    
+    if [[ -z "${CORE_V2_DIR:-}" ]]; then
+        export CORE_V2_DIR="$base_dir/src/core/v2"
+    fi
+    
+    if [[ -z "${MODULES_DIR:-}" ]]; then
+        export MODULES_DIR="$base_dir/src/modules"
+    fi
+    
+    if [[ -z "${DATA_DIR:-}" ]]; then
+        export DATA_DIR="$base_dir/src/data"
+    fi
+    
+    if [[ -z "${LOGS_DIR:-}" ]]; then
+        export LOGS_DIR="$base_dir/logs"
+    fi
+    
+    # Set module-loader specific paths
     export TEMPLATES_DIR="$base_dir/src/templates"
     export CONFIG_DIR="$base_dir/src/config"
-    export LOGS_DIR="$base_dir/logs"
     export TESTS_DIR="$base_dir/tests"
     export MODULES_PLUGINS_DIR="$base_dir/plugins"
     export MODULES_USER_DIR="${HOME}/.local/share/linux-manager/modules"
