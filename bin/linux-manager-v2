@@ -1,0 +1,597 @@
+#!/bin/bash
+
+# Linux Manager V2 - Main Application Entry Point
+# Modern Arch Linux system management tool with enhanced architecture
+#
+# @VERSION: 2.0.0
+# @DESCRIPTION: Advanced system management with modular architecture
+# @AUTHOR: Linux Manager Team
+# @LICENSE: MIT
+
+# Application metadata
+readonly APP_NAME="Linux Manager"
+readonly APP_VERSION="2.0.0"
+readonly APP_ARCHITECTURE="V2"
+readonly APP_MIN_BASH_VERSION="4.0"
+
+# Determine application directories
+readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+readonly ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+readonly CORE_V2_DIR="$ROOT_DIR/src/core/v2"
+readonly MODULES_DIR="$ROOT_DIR/src/modules"
+readonly DATA_DIR="$ROOT_DIR/src/data"
+readonly LOGS_DIR="$ROOT_DIR/logs"
+
+# Export essential paths for the entire application
+export ROOT_DIR CORE_V2_DIR MODULES_DIR DATA_DIR LOGS_DIR
+export APP_NAME APP_VERSION APP_ARCHITECTURE
+
+# V2 System state tracking
+declare -g SYSTEM_INITIALIZED=false
+declare -g STARTUP_TIME=""
+declare -g STARTUP_DURATION=0
+
+# Color codes for output
+if [[ -t 1 ]]; then
+    readonly RED='\033[0;31m'
+    readonly GREEN='\033[0;32m'
+    readonly YELLOW='\033[1;33m'
+    readonly BLUE='\033[0;34m'
+    readonly CYAN='\033[0;36m'
+    readonly WHITE='\033[1;37m'
+    readonly BOLD='\033[1m'
+    readonly NC='\033[0m'
+else
+    readonly RED='' GREEN='' YELLOW='' BLUE='' CYAN='' WHITE='' BOLD='' NC=''
+fi
+
+# Print application header
+print_app_header() {
+    cat << EOF
+
+${CYAN}${BOLD}╔══════════════════════════════════════════════════════════════╗${NC}
+${CYAN}${BOLD}║                                                              ║${NC}
+${CYAN}${BOLD}║              🐧 ${WHITE}Linux Manager V2${CYAN}                       ║${NC}
+${CYAN}${BOLD}║                                                              ║${NC}
+${CYAN}${BOLD}║          ${WHITE}Công cụ quản lý hệ thống Arch Linux${CYAN}           ║${NC}
+${CYAN}${BOLD}║              ${WHITE}Modern • Modular • Powerful${CYAN}                ║${NC}
+${CYAN}${BOLD}║                                                              ║${NC}
+${CYAN}${BOLD}║                    ${YELLOW}Version ${APP_VERSION}${CYAN}                    ║${NC}
+${CYAN}${BOLD}╚══════════════════════════════════════════════════════════════╝${NC}
+
+EOF
+}
+
+# Print startup status
+print_startup_status() {
+    local message="$1"
+    local status="$2"  # loading, success, error, warning
+    
+    case "$status" in
+        "loading")
+            printf "${CYAN}[🔄] %s...${NC}\n" "$message"
+            ;;
+        "success")
+            printf "${GREEN}[✅] %s${NC}\n" "$message"
+            ;;
+        "error")
+            printf "${RED}[❌] %s${NC}\n" "$message"
+            ;;
+        "warning")
+            printf "${YELLOW}[⚠️ ] %s${NC}\n" "$message"
+            ;;
+        *)
+            printf "${BLUE}[ℹ️ ] %s${NC}\n" "$message"
+            ;;
+    esac
+}
+
+# Check system prerequisites
+check_prerequisites() {
+    print_startup_status "Checking system prerequisites" "loading"
+    
+    local issues=0
+    
+    # Check Bash version
+    if ! version_compare "$BASH_VERSION" "$APP_MIN_BASH_VERSION"; then
+        print_startup_status "Bash version $BASH_VERSION is too old (minimum: $APP_MIN_BASH_VERSION)" "error"
+        ((issues++))
+    fi
+    
+    # Check if running on supported system
+    if [[ ! -f "/etc/arch-release" ]] && [[ ! -f "/etc/manjaro-release" ]]; then
+        print_startup_status "System may not be fully supported (designed for Arch Linux)" "warning"
+    fi
+    
+    # Check required commands
+    local required_commands=("curl" "git" "make" "gcc" "sudo" "systemctl")
+    for cmd in "${required_commands[@]}"; do
+        if ! command -v "$cmd" >/dev/null 2>&1; then
+            print_startup_status "Required command not found: $cmd" "error"
+            ((issues++))
+        fi
+    done
+    
+    # Check write permissions for directories
+    local required_dirs=("$LOGS_DIR" "$DATA_DIR")
+    for dir in "${required_dirs[@]}"; do
+        if [[ ! -w "$dir" ]] && ! mkdir -p "$dir" 2>/dev/null; then
+            print_startup_status "Cannot write to directory: $dir" "error"
+            ((issues++))
+        fi
+    done
+    
+    if [[ $issues -eq 0 ]]; then
+        print_startup_status "System prerequisites check completed" "success"
+        return 0
+    else
+        print_startup_status "System prerequisites check failed ($issues issues)" "error"
+        return 1
+    fi
+}
+
+# Compare version numbers
+version_compare() {
+    local version1="$1"
+    local version2="$2"
+    
+    # Simple version comparison for bash versions
+    local v1_major="${version1%%.*}"
+    local v2_major="${version2%%.*}"
+    
+    [[ $v1_major -ge $v2_major ]]
+}
+
+# Initialize V2 Core Systems
+initialize_v2_systems() {
+    print_startup_status "Initializing V2 Core Systems" "loading"
+    
+    local initialization_start=$(date +%s%3N)
+    local failed_systems=()
+    
+    # Load and initialize error handler first
+    if load_and_init_system "error_handler" "Error Handler"; then
+        print_startup_status "Error handling system initialized" "success"
+    else
+        failed_systems+=("error_handler")
+        print_startup_status "Failed to initialize error handling system" "error"
+    fi
+    
+    # Load and initialize logging system
+    if load_and_init_system "logging" "Logging System"; then
+        print_startup_status "Logging system initialized" "success"
+    else
+        failed_systems+=("logging")
+        print_startup_status "Failed to initialize logging system" "error"
+    fi
+    
+    # Load and initialize performance monitoring
+    if load_and_init_system "performance" "Performance Monitor"; then
+        print_startup_status "Performance monitoring initialized" "success"
+    else
+        failed_systems+=("performance")
+        print_startup_status "Performance monitoring initialization failed" "warning"
+    fi
+    
+    # Load and initialize configuration system
+    if load_and_init_system "config_manager" "Configuration Manager"; then
+        print_startup_status "Configuration system initialized" "success"
+    else
+        failed_systems+=("config_manager")
+        print_startup_status "Failed to initialize configuration system" "error"
+    fi
+    
+    # Load and initialize module loader
+    if load_and_init_system "module_loader" "Module Loader"; then
+        print_startup_status "Module system initialized" "success"
+    else
+        failed_systems+=("module_loader")
+        print_startup_status "Failed to initialize module system" "error"
+    fi
+    
+    # Load and initialize module registry
+    if load_and_init_system "module_registry" "Module Registry"; then
+        print_startup_status "Module registry initialized" "success"
+    else
+        failed_systems+=("module_registry")
+        print_startup_status "Module registry initialization failed" "warning"
+    fi
+    
+    # Load and initialize inter-module communication
+    if load_and_init_system "module_communication" "Inter-Module Communication"; then
+        print_startup_status "Communication system initialized" "success"
+    else
+        failed_systems+=("module_communication")
+        print_startup_status "Communication system initialization failed" "warning"
+    fi
+    
+    local initialization_end=$(date +%s%3N)
+    STARTUP_DURATION=$((initialization_end - initialization_start))
+    
+    if [[ ${#failed_systems[@]} -eq 0 ]]; then
+        print_startup_status "All V2 core systems initialized successfully (${STARTUP_DURATION}ms)" "success"
+        SYSTEM_INITIALIZED=true
+        return 0
+    else
+        print_startup_status "Core system initialization completed with ${#failed_systems[@]} failures" "warning"
+        SYSTEM_INITIALIZED=true  # Allow partial initialization
+        return 0
+    fi
+}
+
+# Load and initialize a specific system
+load_and_init_system() {
+    local system_name="$1"
+    local display_name="$2"
+    
+    local system_file="$CORE_V2_DIR/${system_name}.sh"
+    local init_function="init_${system_name}"
+    
+    # Check if system file exists
+    if [[ ! -f "$system_file" ]]; then
+        return 1
+    fi
+    
+    # Source the system file
+    if ! source "$system_file" 2>/dev/null; then
+        return 1
+    fi
+    
+    # Check if init function exists and call it
+    if declare -f "$init_function" >/dev/null 2>&1; then
+        if "$init_function" >/dev/null 2>&1; then
+            return 0
+        else
+            return 1
+        fi
+    fi
+    
+    return 0
+}
+
+# Load V2 User Interface System
+load_v2_ui() {
+    print_startup_status "Loading V2 User Interface" "loading"
+    
+    local ui_file="$CORE_V2_DIR/ui_system.sh"
+    if [[ -f "$ui_file" ]]; then
+        source "$ui_file"
+        if declare -f "init_ui_system" >/dev/null 2>&1; then
+            if init_ui_system >/dev/null 2>&1; then
+                print_startup_status "V2 User Interface loaded successfully" "success"
+                return 0
+            fi
+        fi
+    fi
+    
+    # Fallback to basic UI
+    print_startup_status "Using basic fallback UI" "warning"
+    load_fallback_ui
+    return 0
+}
+
+# Load fallback UI for basic functionality
+load_fallback_ui() {
+    # Basic menu function
+    show_main_menu() {
+        clear
+        print_app_header
+        
+        echo
+        printf "${WHITE}${BOLD}═══ MENU CHÍNH ═══${NC}\n\n"
+        
+        printf "${CYAN}1.${NC} 📦 Quản lý gói (Packages)\n"
+        printf "${CYAN}2.${NC} 🛠️  Môi trường phát triển (Development)\n" 
+        printf "${CYAN}3.${NC} ⚙️  Cấu hình hệ thống (System Config)\n"
+        printf "${CYAN}4.${NC} 📊 Thống kê hệ thống (System Stats)\n"
+        printf "${CYAN}5.${NC} 🔧 Quản lý module (Module Management)\n"
+        printf "${CYAN}6.${NC} ℹ️  Thông tin ứng dụng (About)\n"
+        printf "${CYAN}0.${NC} 🚪 Thoát (Exit)\n"
+        
+        echo
+        printf "${BOLD}Lựa chọn của bạn: ${NC}"
+    }
+    
+    # Basic input function
+    read_user_choice() {
+        local choice
+        read -r choice
+        echo "$choice"
+    }
+}
+
+# Show system information
+show_system_info() {
+    clear
+    print_app_header
+    
+    printf "${WHITE}${BOLD}═══ THÔNG TIN HỆ THỐNG ═══${NC}\n\n"
+    
+    # Application info
+    printf "${CYAN}${BOLD}Ứng dụng:${NC}\n"
+    printf "  Tên: %s\n" "$APP_NAME"
+    printf "  Phiên bản: %s\n" "$APP_VERSION"  
+    printf "  Kiến trúc: %s\n" "$APP_ARCHITECTURE"
+    printf "  Thời gian khởi động: %s ms\n" "$STARTUP_DURATION"
+    
+    echo
+    
+    # System info
+    printf "${CYAN}${BOLD}Hệ thống:${NC}\n"
+    printf "  OS: %s\n" "$(uname -s)"
+    printf "  Kernel: %s\n" "$(uname -r)"
+    printf "  Architecture: %s\n" "$(uname -m)"
+    
+    if [[ -f "/etc/os-release" ]]; then
+        local os_name
+        os_name=$(grep '^NAME=' /etc/os-release | cut -d= -f2 | tr -d '"')
+        printf "  Distribution: %s\n" "$os_name"
+    fi
+    
+    echo
+    
+    # Module statistics if available
+    if declare -f "list_modules_enhanced" >/dev/null 2>&1; then
+        printf "${CYAN}${BOLD}Module Statistics:${NC}\n"
+        local total_modules loaded_modules error_modules
+        total_modules=$(list_modules_enhanced "all" | wc -l)
+        loaded_modules=$(list_modules_enhanced "loaded" | wc -l) 
+        error_modules=$(list_modules_enhanced "error" | wc -l)
+        
+        printf "  Tổng số modules: %d\n" "$total_modules"
+        printf "  Modules đã tải: %d\n" "$loaded_modules"
+        printf "  Modules lỗi: %d\n" "$error_modules"
+    fi
+    
+    echo
+    printf "${YELLOW}Nhấn phím bất kỳ để tiếp tục...${NC}"
+    read -r
+}
+
+# Run module CLI interface
+run_module_cli() {
+    clear
+    print_app_header
+    
+    printf "${WHITE}${BOLD}═══ QUẢN LÝ MODULE ═══${NC}\n\n"
+    
+    local module_cli_path="$ROOT_DIR/bin/module-cli"
+    if [[ -f "$module_cli_path" ]]; then
+        printf "${CYAN}Khởi động Module CLI...${NC}\n\n"
+        "$module_cli_path" interactive
+    else
+        printf "${RED}Module CLI không tìm thấy tại: %s${NC}\n" "$module_cli_path"
+        printf "${YELLOW}Nhấn phím bất kỳ để tiếp tục...${NC}"
+        read -r
+    fi
+}
+
+# Handle package management
+handle_packages() {
+    clear  
+    print_app_header
+    
+    printf "${WHITE}${BOLD}═══ QUẢN LÝ GÓI ═══${NC}\n\n"
+    printf "${YELLOW}Chức năng đang được phát triển cho V2...${NC}\n\n"
+    
+    printf "${CYAN}1.${NC} Cài đặt gói cơ bản\n"
+    printf "${CYAN}2.${NC} Cài đặt gói phát triển\n" 
+    printf "${CYAN}3.${NC} Cài đặt gói multimedia\n"
+    printf "${CYAN}0.${NC} Quay lại\n"
+    
+    echo
+    printf "${BOLD}Lựa chọn của bạn: ${NC}"
+    
+    local choice
+    choice=$(read_user_choice)
+    
+    case "$choice" in
+        "1"|"2"|"3")
+            printf "${YELLOW}Tính năng này sẽ được triển khai trong bản cập nhật tới...${NC}\n"
+            printf "${YELLOW}Nhấn phím bất kỳ để tiếp tục...${NC}"
+            read -r
+            ;;
+        "0")
+            return 0
+            ;;
+    esac
+}
+
+# Handle development environment
+handle_development() {
+    clear
+    print_app_header
+    
+    printf "${WHITE}${BOLD}═══ MÔI TRƯỜNG PHÁT TRIỂN ═══${NC}\n\n"
+    printf "${YELLOW}Chức năng đang được phát triển cho V2...${NC}\n\n"
+    
+    printf "${CYAN}1.${NC} Cài đặt PHP + Composer\n"
+    printf "${CYAN}2.${NC} Cài đặt Node.js + NPM\n"
+    printf "${CYAN}3.${NC} Cài đặt Python + Pip\n"
+    printf "${CYAN}0.${NC} Quay lại\n"
+    
+    echo
+    printf "${BOLD}Lựa chọn của bạn: ${NC}"
+    
+    local choice
+    choice=$(read_user_choice)
+    
+    case "$choice" in
+        "1"|"2"|"3")
+            printf "${YELLOW}Tính năng này sẽ được triển khai trong bản cập nhật tới...${NC}\n"
+            printf "${YELLOW}Nhấn phím bất kỳ để tiếp tục...${NC}"
+            read -r
+            ;;
+        "0")
+            return 0
+            ;;
+    esac
+}
+
+# Handle system configuration
+handle_system_config() {
+    clear
+    print_app_header
+    
+    printf "${WHITE}${BOLD}═══ CẤU HÌNH HỆ THỐNG ═══${NC}\n\n"
+    printf "${YELLOW}Chức năng đang được phát triển cho V2...${NC}\n\n"
+    
+    printf "${CYAN}1.${NC} Cấu hình Bash\n"
+    printf "${CYAN}2.${NC} Cấu hình Fish Shell\n"
+    printf "${CYAN}3.${NC} Cấu hình Vim\n"
+    printf "${CYAN}0.${NC} Quay lại\n"
+    
+    echo
+    printf "${BOLD}Lựa chọn của bạn: ${NC}"
+    
+    local choice
+    choice=$(read_user_choice)
+    
+    case "$choice" in
+        "1"|"2"|"3")
+            printf "${YELLOW}Tính năng này sẽ được triển khai trong bản cập nhật tới...${NC}\n"
+            printf "${YELLOW}Nhấn phím bất kỳ để tiếp tục...${NC}"
+            read -r
+            ;;
+        "0")
+            return 0
+            ;;
+    esac
+}
+
+# Show system statistics
+show_system_stats() {
+    clear
+    print_app_header
+    
+    printf "${WHITE}${BOLD}═══ THỐNG KÊ HỆ THỐNG ═══${NC}\n\n"
+    
+    # System uptime
+    if command -v uptime >/dev/null 2>&1; then
+        printf "${CYAN}${BOLD}Uptime:${NC}\n"
+        uptime
+        echo
+    fi
+    
+    # Memory usage
+    if command -v free >/dev/null 2>&1; then
+        printf "${CYAN}${BOLD}Memory Usage:${NC}\n"
+        free -h
+        echo
+    fi
+    
+    # Disk usage
+    if command -v df >/dev/null 2>&1; then
+        printf "${CYAN}${BOLD}Disk Usage:${NC}\n"
+        df -h / 2>/dev/null || df -h
+        echo
+    fi
+    
+    # Module statistics if available
+    if command -v "$ROOT_DIR/bin/module-cli" >/dev/null 2>&1; then
+        printf "${CYAN}${BOLD}Module Statistics:${NC}\n"
+        "$ROOT_DIR/bin/module-cli" stats 2>/dev/null || echo "Module statistics not available"
+        echo
+    fi
+    
+    printf "${YELLOW}Nhấn phím bất kỳ để tiếp tục...${NC}"
+    read -r
+}
+
+# Main application loop
+main_loop() {
+    while true; do
+        show_main_menu
+        local choice
+        choice=$(read_user_choice)
+        
+        case "$choice" in
+            "1")
+                handle_packages
+                ;;
+            "2") 
+                handle_development
+                ;;
+            "3")
+                handle_system_config
+                ;;
+            "4")
+                show_system_stats
+                ;;
+            "5")
+                run_module_cli
+                ;;
+            "6")
+                show_system_info
+                ;;
+            "0")
+                printf "\n${GREEN}Cảm ơn bạn đã sử dụng Linux Manager V2!${NC}\n"
+                printf "${CYAN}Hẹn gặp lại! 👋${NC}\n\n"
+                break
+                ;;
+            *)
+                printf "\n${RED}Lựa chọn không hợp lệ. Vui lòng thử lại.${NC}\n"
+                sleep 1
+                ;;
+        esac
+    done
+}
+
+# Graceful shutdown
+graceful_shutdown() {
+    printf "\n\n${YELLOW}Đang thoát Linux Manager V2...${NC}\n"
+    
+    # Save any pending data
+    if declare -f "save_registry_data" >/dev/null 2>&1; then
+        save_registry_data >/dev/null 2>&1
+    fi
+    
+    # Shutdown communication system
+    if declare -f "shutdown_communication" >/dev/null 2>&1; then
+        shutdown_communication >/dev/null 2>&1
+    fi
+    
+    printf "${GREEN}Đã thoát thành công. Tạm biệt!${NC}\n"
+    exit 0
+}
+
+# Set up signal handlers
+trap graceful_shutdown INT TERM
+
+# Main execution
+main() {
+    # Record startup time
+    STARTUP_TIME=$(date)
+    
+    # Print application header
+    print_app_header
+    
+    # Check prerequisites
+    if ! check_prerequisites; then
+        printf "\n${RED}Không thể khởi động do lỗi kiểm tra hệ thống.${NC}\n"
+        printf "${YELLOW}Vui lòng khắc phục các vấn đề trên và thử lại.${NC}\n"
+        exit 1
+    fi
+    
+    echo
+    
+    # Initialize V2 systems
+    if ! initialize_v2_systems; then
+        printf "\n${RED}Có lỗi trong quá trình khởi tạo hệ thống.${NC}\n"
+        printf "${YELLOW}Ứng dụng sẽ tiếp tục với chức năng hạn chế.${NC}\n"
+        sleep 2
+    fi
+    
+    echo
+    print_startup_status "Linux Manager V2 đã sẵn sàng!" "success"
+    sleep 1
+    
+    # Load UI and start main loop
+    load_v2_ui
+    main_loop
+}
+
+# Run main function if executed directly
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    main "$@"
+fi
