@@ -12,9 +12,11 @@
 V1_INTEGRATION_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 V1_BASE_DIR="$(cd "$V1_INTEGRATION_DIR/../../.." && pwd)"
 
-# Source V2 UI system for consistency
-if [[ ! "${UI_SYSTEM_INITIALIZED:-false}" == "true" ]]; then
+# Source V2 UI system for consistency (only if not currently loading)
+if [[ ! "${UI_SYSTEM_INITIALIZED:-false}" == "true" && "${UI_INTEGRATION_LOADED:-false}" != "true" ]]; then
     if [[ -f "$V1_INTEGRATION_DIR/ui_system.sh" ]]; then
+        # Prevent circular loading
+        UI_INTEGRATION_LOADED=true
         source "$V1_INTEGRATION_DIR/ui_system.sh"
         init_ui_system
     fi

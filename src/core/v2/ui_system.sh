@@ -88,6 +88,9 @@ init_ui_system() {
     # Set up signal handlers for UI
     setup_ui_signal_handlers
     
+    # Load integration layers after basic UI is initialized
+    load_ui_integration_layers
+    
     UI_SYSTEM_INITIALIZED=true
     log_info "UI_SYSTEM" "Enhanced UI system initialized"
     
@@ -1787,28 +1790,52 @@ reset_configuration_interactive() {
     wait_for_user
 }
 
-# Get current script directory reliably
-UI_SYSTEM_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-
-# Load V1 integration layer
-if [[ -f "$UI_SYSTEM_DIR/v1_integration.sh" ]]; then
-    source "$UI_SYSTEM_DIR/v1_integration.sh"
-    V1_INTEGRATION_AVAILABLE=true
-    log_debug "UI_SYSTEM" "V1 integration loaded from: $UI_SYSTEM_DIR/v1_integration.sh"
-else
-    V1_INTEGRATION_AVAILABLE=false
-    log_debug "UI_SYSTEM" "V1 integration not found at: $UI_SYSTEM_DIR/v1_integration.sh"
-fi
-
-# Load configuration manager
-if [[ -f "$UI_SYSTEM_DIR/config_manager.sh" ]]; then
-    source "$UI_SYSTEM_DIR/config_manager.sh"
-    CONFIG_MANAGER_AVAILABLE=true
-    log_debug "UI_SYSTEM" "Config manager loaded from: $UI_SYSTEM_DIR/config_manager.sh"
-else
-    CONFIG_MANAGER_AVAILABLE=false
-    log_debug "UI_SYSTEM" "Config manager not found at: $UI_SYSTEM_DIR/config_manager.sh"
-fi
+# Load UI integration layers (called from init_ui_system)
+load_ui_integration_layers() {
+    # Get current script directory reliably
+    local ui_system_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    
+    # Only load if not already initialized to prevent circular dependencies
+    if [[ "${UI_INTEGRATION_LOADED:-false}" == "true" ]]; then
+        log_debug "UI_SYSTEM" "Integration layers already loaded, skipping"
+        return 0
+    fi
+    
+    # Mark as loading to prevent recursion
+    UI_INTEGRATION_LOADED=true
+    
+    # Load V1 integration layer
+    if [[ -f "$ui_system_dir/v1_integration.sh" ]]; then
+        log_debug "UI_SYSTEM" "Loading V1 integration from: $ui_system_dir/v1_integration.sh"
+        if source "$ui_system_dir/v1_integration.sh" 2>/dev/null; then
+            V1_INTEGRATION_AVAILABLE=true
+            log_debug "UI_SYSTEM" "V1 integration loaded successfully"
+        else
+            V1_INTEGRATION_AVAILABLE=false
+            log_debug "UI_SYSTEM" "V1 integration failed to load"
+        fi
+    else
+        V1_INTEGRATION_AVAILABLE=false
+        log_debug "UI_SYSTEM" "V1 integration not found at: $ui_system_dir/v1_integration.sh"
+    fi
+    
+    # Load configuration manager
+    if [[ -f "$ui_system_dir/config_manager.sh" ]]; then
+        log_debug "UI_SYSTEM" "Loading config manager from: $ui_system_dir/config_manager.sh"
+        if source "$ui_system_dir/config_manager.sh" 2>/dev/null; then
+            CONFIG_MANAGER_AVAILABLE=true
+            log_debug "UI_SYSTEM" "Config manager loaded successfully"
+        else
+            CONFIG_MANAGER_AVAILABLE=false
+            log_debug "UI_SYSTEM" "Config manager failed to load"
+        fi
+    else
+        CONFIG_MANAGER_AVAILABLE=false
+        log_debug "UI_SYSTEM" "Config manager not found at: $ui_system_dir/config_manager.sh"
+    fi
+    
+    return 0
+}
 
 # Main V2 handlers called by the main script
 handle_packages_v2() {
@@ -1931,6 +1958,7 @@ handle_system_config_v2() {
 # Export UI functions
 export -f init_ui_system detect_terminal_capabilities load_ui_configuration
 export -f apply_ui_theme init_color_support setup_ui_signal_handlers
+export -f load_ui_integration_layers
 export -f ui_clear_screen ui_print_title ui_center_text ui_print_line
 export -f ui_print_box ui_show_menu print_app_header_enhanced ui_show_progress
 export -f ui_show_status ui_show_loading ui_confirm ui_input ui_select

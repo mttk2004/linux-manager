@@ -282,13 +282,24 @@ load_v2_ui() {
     
     local ui_file="$CORE_V2_DIR/ui_system.sh"
     if [[ -f "$ui_file" ]]; then
-        source "$ui_file"
-        if declare -f "init_ui_system" >/dev/null 2>&1; then
-            if init_ui_system >/dev/null 2>&1; then
-                print_startup_status "V2 User Interface loaded successfully" "success"
-                return 0
+        if source "$ui_file" 2>/dev/null; then
+            print_startup_status "UI system sourced successfully" "success"
+            if declare -f "init_ui_system" >/dev/null 2>&1; then
+                print_startup_status "Initializing UI system" "loading"
+                if init_ui_system 2>/dev/null; then
+                    print_startup_status "V2 User Interface loaded successfully" "success"
+                    return 0
+                else
+                    print_startup_status "UI system initialization failed" "error"
+                fi
+            else
+                print_startup_status "init_ui_system function not found" "error"
             fi
+        else
+            print_startup_status "Failed to source UI system file" "error"
         fi
+    else
+        print_startup_status "UI system file not found: $ui_file" "error"
     fi
     
     # Fallback to basic UI
