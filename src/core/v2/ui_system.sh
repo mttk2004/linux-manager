@@ -1571,10 +1571,245 @@ manage_git_configuration_v2() {
     wait_for_user
 }
 
+# Configuration management using the config manager
+manage_system_configuration() {
+    if [[ "$CONFIG_MANAGER_AVAILABLE" == "true" ]]; then
+        # Initialize config manager if not already done
+        if ! declare -f "init_config_manager" >/dev/null 2>&1 || [[ "${CONFIG_SYSTEM_INITIALIZED:-false}" != "true" ]]; then
+            if init_config_manager; then
+                log_info "CONFIG" "Configuration manager initialized successfully"
+            else
+                show_notification "Failed to initialize configuration manager" "error"
+                wait_for_user
+                return 1
+            fi
+        fi
+        
+        # Use the configuration manager interface
+        manage_configuration_interactive
+    else
+        show_notification "Configuration manager not available" "error"
+        wait_for_user
+    fi
+}
+
+# Interactive configuration management
+manage_configuration_interactive() {
+    while true; do
+        display_module_header "CONFIGURATION MANAGEMENT" "⚙️"
+        
+        printf "  📋 ${UI_COLORS[accent]}${UI_COLORS[bold]}[1]${UI_COLORS[reset]}  ${UI_COLORS[info]}View Current Configuration${UI_COLORS[reset]}\n"
+        printf "      ${UI_COLORS[dim]}Display all configuration values${UI_COLORS[reset]}\n"
+        echo
+        
+        printf "  ✏️  ${UI_COLORS[accent]}${UI_COLORS[bold]}[2]${UI_COLORS[reset]}  ${UI_COLORS[info]}Edit Configuration${UI_COLORS[reset]}\n"
+        printf "      ${UI_COLORS[dim]}Modify configuration settings${UI_COLORS[reset]}\n"
+        echo
+        
+        printf "  💾 ${UI_COLORS[accent]}${UI_COLORS[bold]}[3]${UI_COLORS[reset]}  ${UI_COLORS[info]}Save Configuration${UI_COLORS[reset]}\n"
+        printf "      ${UI_COLORS[dim]}Export current settings to file${UI_COLORS[reset]}\n"
+        echo
+        
+        printf "  🔄 ${UI_COLORS[accent]}${UI_COLORS[bold]}[4]${UI_COLORS[reset]}  ${UI_COLORS[info]}Reset to Defaults${UI_COLORS[reset]}\n"
+        printf "      ${UI_COLORS[dim]}Restore default configuration${UI_COLORS[reset]}\n"
+        echo
+        
+        printf "  ${UI_ICONS[exit]} ${UI_COLORS[error]}${UI_COLORS[bold]}[0]${UI_COLORS[reset]}  ${UI_COLORS[info]}Return to System Menu${UI_COLORS[reset]}\n"
+        echo
+        
+        display_module_footer "Choose option [0-4]"
+        
+        local choice
+        choice=$(read_single_key)
+        echo "$choice"
+        echo
+        
+        case "$choice" in
+            1) view_current_configuration ;;
+            2) edit_configuration_interactive ;;
+            3) save_configuration_interactive ;;
+            4) reset_configuration_interactive ;;
+            0) return 0 ;;
+            *) show_notification "Invalid choice: $choice" "error"; sleep 1 ;;
+        esac
+    done
+}
+
+# View current configuration
+view_current_configuration() {
+    display_module_header "CURRENT CONFIGURATION" "📋"
+    
+    if declare -f "get_config" >/dev/null 2>&1; then
+        # Display configuration by category
+        local categories=("core" "ui" "performance" "packages" "development" "security")
+        
+        for category in "${categories[@]}"; do
+            printf "${UI_COLORS[primary]}${UI_COLORS[bold]}${category^} Configuration:${UI_COLORS[reset]}\n"
+            
+            # Find all config keys for this category
+            local found_any=false
+            for key in "${!CONFIG_CATEGORIES[@]}"; do
+                if [[ "${CONFIG_CATEGORIES[$key]}" == "$category" ]]; then
+                    local value="${CONFIG_VALUES[$key]:-}"
+                    local default="${CONFIG_DEFAULTS[$key]:-}"
+                    local description="${CONFIG_DESCRIPTIONS[$key]:-}"
+                    
+                    if [[ "$value" == "$default" ]]; then
+                        printf "  ${UI_COLORS[dim]}$key: ${UI_COLORS[info]}$value${UI_COLORS[reset]}\n"
+                    else
+                        printf "  ${UI_COLORS[accent]}$key: ${UI_COLORS[success]}$value${UI_COLORS[reset]} ${UI_COLORS[dim]}(default: $default)${UI_COLORS[reset]}\n"
+                    fi
+                    
+                    if [[ -n "$description" ]]; then
+                        printf "    ${UI_COLORS[dim]}$description${UI_COLORS[reset]}\n"
+                    fi
+                    echo
+                    found_any=true
+                fi
+            done
+            
+            if [[ "$found_any" == "false" ]]; then
+                printf "  ${UI_COLORS[dim]}No settings in this category${UI_COLORS[reset]}\n"
+            fi
+            echo
+        done
+    else
+        show_notification "Configuration system not properly initialized" "error"
+    fi
+    
+    wait_for_user
+}
+
+# Edit configuration interactively
+edit_configuration_interactive() {
+    show_notification "Interactive configuration editing coming soon!" "info"
+    printf "${UI_COLORS[info]}Configuration can be manually edited in:${UI_COLORS[reset]}\n"
+    printf "  ${UI_COLORS[accent]}User config: ${CONFIG_USER_DIR}/user.conf${UI_COLORS[reset]}\n"
+    printf "  ${UI_COLORS[accent]}Override config: ${CONFIG_USER_DIR}/override.conf${UI_COLORS[reset]}\n"
+    echo
+    wait_for_user
+}
+
+# Save configuration interactively  
+save_configuration_interactive() {
+    display_module_header "SAVE CONFIGURATION" "💾"
+    
+    local config_file="${CONFIG_USER_DIR}/exported_config.conf"
+    
+    printf "${UI_COLORS[info]}This will export current configuration to:${UI_COLORS[reset]}\n"
+    printf "${UI_COLORS[success]}$config_file${UI_COLORS[reset]}\n"
+    echo
+    
+    if ui_confirm "Export configuration to this file?"; then
+        # Create directory if needed
+        mkdir -p "$(dirname "$config_file")"
+        
+        # Export configuration
+        {
+            echo "# Linux Manager V2 Configuration Export"
+            echo "# Generated on $(date)"
+            echo 
+            
+            for category in "core" "ui" "performance" "packages" "development" "security"; do
+                echo "# ${category^} Configuration"
+                
+                for key in "${!CONFIG_CATEGORIES[@]}"; do
+                    if [[ "${CONFIG_CATEGORIES[$key]}" == "$category" ]]; then
+                        local value="${CONFIG_VALUES[$key]:-}"
+                        local description="${CONFIG_DESCRIPTIONS[$key]:-}"
+                        
+                        if [[ -n "$description" ]]; then
+                            echo "# $description"
+                        fi
+                        echo "$key=$value"
+                        echo
+                    fi
+                done
+            done
+        } > "$config_file"
+        
+        if [[ $? -eq 0 ]]; then
+            show_notification "Configuration exported successfully" "success"
+        else
+            show_notification "Failed to export configuration" "error"
+        fi
+    else
+        show_notification "Export cancelled" "info"
+    fi
+    
+    wait_for_user
+}
+
+# Reset configuration interactively
+reset_configuration_interactive() {
+    display_module_header "RESET CONFIGURATION" "🔄"
+    
+    printf "${UI_COLORS[warning]}This will reset all configuration to default values.${UI_COLORS[reset]}\n"
+    printf "${UI_COLORS[warning]}Custom settings will be lost.${UI_COLORS[reset]}\n"
+    echo
+    
+    if ui_confirm "Are you sure you want to reset to defaults?" "n"; then
+        # Reset to defaults
+        for key in "${!CONFIG_DEFAULTS[@]}"; do
+            CONFIG_VALUES["$key"]="${CONFIG_DEFAULTS[$key]}"
+        done
+        
+        show_notification "Configuration reset to defaults" "success"
+        
+        if ui_confirm "Save default configuration to user file?"; then
+            local user_config="${CONFIG_USER_DIR}/user.conf"
+            mkdir -p "$(dirname "$user_config")"
+            
+            {
+                echo "# Linux Manager V2 User Configuration"
+                echo "# Reset to defaults on $(date)"
+                echo
+                echo "# Uncomment and modify values as needed"
+                
+                for key in "${!CONFIG_DEFAULTS[@]}"; do
+                    local value="${CONFIG_DEFAULTS[$key]}"
+                    local description="${CONFIG_DESCRIPTIONS[$key]:-}"
+                    
+                    if [[ -n "$description" ]]; then
+                        echo "# $description"
+                    fi
+                    echo "# $key=$value"
+                    echo
+                done
+            } > "$user_config"
+            
+            show_notification "Default configuration saved to user file" "success"
+        fi
+    else
+        show_notification "Reset cancelled" "info"
+    fi
+    
+    wait_for_user
+}
+
+# Load V1 integration layer
+if [[ -f "$(dirname "${BASH_SOURCE[0]}")/v1_integration.sh" ]]; then
+    source "$(dirname "${BASH_SOURCE[0]}")/v1_integration.sh"
+    V1_INTEGRATION_AVAILABLE=true
+else
+    V1_INTEGRATION_AVAILABLE=false
+fi
+
+# Load configuration manager
+if [[ -f "$(dirname "${BASH_SOURCE[0]}")/config_manager.sh" ]]; then
+    source "$(dirname "${BASH_SOURCE[0]}")/config_manager.sh"
+    CONFIG_MANAGER_AVAILABLE=true
+else
+    CONFIG_MANAGER_AVAILABLE=false
+fi
+
 # Main V2 handlers called by the main script
 handle_packages_v2() {
+    # Try V1 integration first if available
+    if [[ "$V1_INTEGRATION_AVAILABLE" == "true" ]] && declare -f "manage_packages_v1_integrated" >/dev/null 2>&1; then
+        manage_packages_v1_integrated
     # Try to use the actual V2 packages module if available
-    if declare -f "manage_packages_v2" >/dev/null 2>&1; then
+    elif declare -f "manage_packages_v2" >/dev/null 2>&1; then
         manage_packages_v2
     else
         # Fallback implementation
@@ -1660,9 +1895,10 @@ handle_system_config_v2() {
             printf "  💾 ${UI_COLORS[accent]}${UI_COLORS[bold]}[5]${UI_COLORS[reset]}  ${UI_COLORS[info]}System Backup${UI_COLORS[reset]}\n"
             printf "  🧹 ${UI_COLORS[accent]}${UI_COLORS[bold]}[6]${UI_COLORS[reset]}  ${UI_COLORS[info]}System Cleanup${UI_COLORS[reset]}\n"
             printf "  📊 ${UI_COLORS[accent]}${UI_COLORS[bold]}[7]${UI_COLORS[reset]}  ${UI_COLORS[info]}System Information${UI_COLORS[reset]}\n"
+            printf "  ⚙️  ${UI_COLORS[accent]}${UI_COLORS[bold]}[8]${UI_COLORS[reset]}  ${UI_COLORS[info]}Configuration Management${UI_COLORS[reset]}\n"
             printf "  ${UI_ICONS[exit]} ${UI_COLORS[error]}${UI_COLORS[bold]}[0]${UI_COLORS[reset]}  ${UI_COLORS[info]}Return to Main Menu${UI_COLORS[reset]}\n"
             
-            display_module_footer "Choose option [0-7]"
+            display_module_footer "Choose option [0-8]"
             
             local choice
             choice=$(read_single_key)
@@ -1677,6 +1913,7 @@ handle_system_config_v2() {
                 5) manage_system_backup_v2 ;;
                 6) manage_system_cleanup_v2 ;;
                 7) show_system_information ;;
+                8) manage_system_configuration ;;
                 0) return 0 ;;
                 *) show_notification "Invalid choice: $choice" "error" ;;
             esac
