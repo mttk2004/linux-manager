@@ -1,0 +1,23 @@
+{
+    "name": "packages",
+    "version": "2.0.0",
+    "description": "Advanced package management for Pacman, AUR, and Flatpak",
+    "author": "Linux Manager Team",
+    "dependencies": ["core", "ui", "event", "perf"],
+    "provides": ["package_manager", "pacman", "aur", "flatpak"],
+    "api_version": "2.0",
+    "health_check": "check_packages_health",
+    "events": {
+        "subscribes": ["system.ready", "perf.cache_clear", "ui.theme_changed"],
+        "publishes": ["packages.installed", "packages.updated", "packages.removed"]
+    },
+    "permissions": ["sudo"],
+    "config": {
+        "cache_enabled": true,
+        "cache_ttl": 300,
+        "auto_update": false,
+        "parallel_installs": true,
+        "flatpak_enabled": true,
+        "aur_helper": "auto"
+    }
+}

@@ -205,6 +205,13 @@ initialize_v2_systems() {
         print_startup_status "Communication system initialization failed" "warning"
     fi
     
+    # Load V2 modules integration helper
+    if load_v2_modules_helper; then
+        print_startup_status "V2 modules helper loaded" "success"
+    else
+        print_startup_status "V2 modules helper not available" "warning"
+    fi
+    
     local initialization_end=$(date +%s%3N)
     STARTUP_DURATION=$((initialization_end - initialization_start))
     
@@ -247,6 +254,18 @@ load_and_init_system() {
     fi
     
     return 0
+}
+
+# Load V2 modules integration helper
+load_v2_modules_helper() {
+    local v2_modules_helper="$CORE_V2_DIR/v2_modules.sh"
+    if [[ -f "$v2_modules_helper" ]]; then
+        source "$v2_modules_helper"
+        return 0
+    else
+        print_startup_status "V2 modules helper not found" "warning"
+        return 1
+    fi
 }
 
 # Load V2 User Interface System
@@ -368,11 +387,20 @@ run_module_cli() {
 
 # Handle package management
 handle_packages() {
+    if declare -f "handle_packages_v2" >/dev/null 2>&1; then
+        handle_packages_v2
+    else
+        handle_packages_fallback
+    fi
+}
+
+# Fallback package handler
+handle_packages_fallback() {
     clear  
     print_app_header
     
     printf "${WHITE}${BOLD}═══ QUẢN LÝ GÓI ═══${NC}\n\n"
-    printf "${YELLOW}Chức năng đang được phát triển cho V2...${NC}\n\n"
+    printf "${YELLOW}V2 modules không khả dụng - sử dụng chế độ cơ bản...${NC}\n\n"
     
     printf "${CYAN}1.${NC} Cài đặt gói cơ bản\n"
     printf "${CYAN}2.${NC} Cài đặt gói phát triển\n" 
@@ -387,7 +415,7 @@ handle_packages() {
     
     case "$choice" in
         "1"|"2"|"3")
-            printf "${YELLOW}Tính năng này sẽ được triển khai trong bản cập nhật tới...${NC}\n"
+            printf "${YELLOW}Cần cài đặt V2 modules để sử dụng tính năng này...${NC}\n"
             printf "${YELLOW}Nhấn phím bất kỳ để tiếp tục...${NC}"
             read -r
             ;;
@@ -399,11 +427,20 @@ handle_packages() {
 
 # Handle development environment
 handle_development() {
+    if declare -f "handle_development_v2" >/dev/null 2>&1; then
+        handle_development_v2
+    else
+        handle_development_fallback
+    fi
+}
+
+# Fallback development handler
+handle_development_fallback() {
     clear
     print_app_header
     
     printf "${WHITE}${BOLD}═══ MÔI TRƯỜNG PHÁT TRIỂN ═══${NC}\n\n"
-    printf "${YELLOW}Chức năng đang được phát triển cho V2...${NC}\n\n"
+    printf "${YELLOW}V2 modules không khả dụng - sử dụng chế độ cơ bản...${NC}\n\n"
     
     printf "${CYAN}1.${NC} Cài đặt PHP + Composer\n"
     printf "${CYAN}2.${NC} Cài đặt Node.js + NPM\n"
@@ -418,7 +455,7 @@ handle_development() {
     
     case "$choice" in
         "1"|"2"|"3")
-            printf "${YELLOW}Tính năng này sẽ được triển khai trong bản cập nhật tới...${NC}\n"
+            printf "${YELLOW}Cần cài đặt V2 modules để sử dụng tính năng này...${NC}\n"
             printf "${YELLOW}Nhấn phím bất kỳ để tiếp tục...${NC}"
             read -r
             ;;
@@ -430,11 +467,20 @@ handle_development() {
 
 # Handle system configuration
 handle_system_config() {
+    if declare -f "handle_system_config_v2" >/dev/null 2>&1; then
+        handle_system_config_v2
+    else
+        handle_system_config_fallback
+    fi
+}
+
+# Fallback system config handler
+handle_system_config_fallback() {
     clear
     print_app_header
     
     printf "${WHITE}${BOLD}═══ CẤU HÌNH HỆ THỐNG ═══${NC}\n\n"
-    printf "${YELLOW}Chức năng đang được phát triển cho V2...${NC}\n\n"
+    printf "${YELLOW}V2 modules không khả dụng - sử dụng chế độ cơ bản...${NC}\n\n"
     
     printf "${CYAN}1.${NC} Cấu hình Bash\n"
     printf "${CYAN}2.${NC} Cấu hình Fish Shell\n"
@@ -449,7 +495,7 @@ handle_system_config() {
     
     case "$choice" in
         "1"|"2"|"3")
-            printf "${YELLOW}Tính năng này sẽ được triển khai trong bản cập nhật tới...${NC}\n"
+            printf "${YELLOW}Cần cài đặt V2 modules để sử dụng tính năng này...${NC}\n"
             printf "${YELLOW}Nhấn phím bất kỳ để tiếp tục...${NC}"
             read -r
             ;;

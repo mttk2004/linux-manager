@@ -1,0 +1,22 @@
+{
+    "name": "system",
+    "version": "2.0.0",
+    "description": "System configuration and management tools",
+    "author": "Linux Manager Team",
+    "dependencies": ["core", "ui", "packages", "event"],
+    "provides": ["system_config", "cleanup_tools", "shell_config", "terminal_config"],
+    "api_version": "2.0",
+    "health_check": "check_system_health",
+    "events": {
+        "subscribes": ["system.ready", "packages.installed", "ui.theme_changed"],
+        "publishes": ["system.configured", "system.cleaned", "system.backup_created"]
+    },
+    "permissions": ["sudo"],
+    "config": {
+        "auto_cleanup": false,
+        "backup_enabled": true,
+        "shell_preference": "auto",
+        "terminal_preference": "auto",
+        "cleanup_schedule": "weekly"
+    }
+}
