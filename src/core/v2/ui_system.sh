@@ -88,8 +88,8 @@ init_ui_system() {
     # Set up signal handlers for UI
     setup_ui_signal_handlers
     
-    # Load integration layers after basic UI is initialized
-    load_ui_integration_layers
+    # Skip integration loading during init to prevent hangs
+    # Integration layers will be loaded on-demand
     
     UI_SYSTEM_INITIALIZED=true
     log_info "UI_SYSTEM" "Enhanced UI system initialized"
@@ -1839,6 +1839,9 @@ load_ui_integration_layers() {
 
 # Main V2 handlers called by the main script
 handle_packages_v2() {
+    # Load integration layers on-demand
+    load_ui_integration_layers >/dev/null 2>&1
+    
     # Try V1 integration first if available
     if [[ "$V1_INTEGRATION_AVAILABLE" == "true" ]] && declare -f "manage_packages_v1_integrated" >/dev/null 2>&1; then
         manage_packages_v1_integrated
@@ -1878,6 +1881,9 @@ handle_packages_v2() {
 }
 
 handle_development_v2() {
+    # Load integration layers on-demand
+    load_ui_integration_layers >/dev/null 2>&1
+    
     # Try to use the actual V2 development module if available
     if declare -f "manage_development_v2" >/dev/null 2>&1; then
         manage_development_v2
@@ -1914,6 +1920,9 @@ handle_development_v2() {
 }
 
 handle_system_config_v2() {
+    # Load integration layers on-demand
+    load_ui_integration_layers >/dev/null 2>&1
+    
     # Try to use the actual V2 system module if available
     if declare -f "manage_system_v2" >/dev/null 2>&1; then
         manage_system_v2
