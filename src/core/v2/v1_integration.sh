@@ -174,7 +174,7 @@ install_v1_packages_with_ui() {
     
     display_module_header "INSTALL ${list_type^^} PACKAGES" "📦"
     
-    printf "${UI_COLORS[info]}Found ${UI_COLORS[success]}${#packages[@]}${UI_COLORS[info]} packages to install:${UI_COLORS[reset]}\\n"
+    printf "${UI_COLORS[info]}Found ${UI_COLORS[success]}${#packages[@]}${UI_COLORS[info]} packages to install:${UI_COLORS[reset]}\n"
     echo
     
     # Display packages in a nice format
@@ -249,7 +249,7 @@ install_v1_pacman_with_v2_ui() {
         fi
         
         if [[ "$already_installed" == "true" ]]; then
-            printf "${UI_COLORS[info]}  • ${UI_COLORS[dim]}$package (already installed)${UI_COLORS[reset]}\\n"
+            printf "${UI_COLORS[info]}  • ${UI_COLORS[dim]}$package (already installed)${UI_COLORS[reset]}\n"
             ((already_count++))
             continue
         fi
@@ -284,10 +284,10 @@ install_v1_pacman_with_v2_ui() {
         fi
         
         if [[ "$install_success" == "true" ]]; then
-            printf "${UI_COLORS[success]}  ✓ ${UI_COLORS[info]}$package installed${UI_COLORS[reset]}\\n"
+        printf "${UI_COLORS[success]}  ✓ ${UI_COLORS[info]}$package installed${UI_COLORS[reset]}\n"
             ((installed_count++))
         else
-            printf "${UI_COLORS[error]}  ✗ ${UI_COLORS[info]}$package failed${UI_COLORS[reset]}\\n"
+            printf "${UI_COLORS[error]}  ✗ ${UI_COLORS[info]}$package failed${UI_COLORS[reset]}\n"
         fi
     done
     
@@ -295,13 +295,13 @@ install_v1_pacman_with_v2_ui() {
     echo
     
     # Summary
-    printf "${UI_COLORS[primary]}${UI_COLORS[bold]}Installation Summary:${UI_COLORS[reset]}\\n"
-    printf "${UI_COLORS[success]}  ✓ Installed: $installed_count${UI_COLORS[reset]}\\n"
+    printf "${UI_COLORS[primary]}${UI_COLORS[bold]}Installation Summary:${UI_COLORS[reset]}\n"
+    printf "${UI_COLORS[success]}  ✓ Installed: $installed_count${UI_COLORS[reset]}\n"
     if [[ $already_count -gt 0 ]]; then
-        printf "${UI_COLORS[info]}  ℹ Already installed: $already_count${UI_COLORS[reset]}\\n"
+        printf "${UI_COLORS[info]}  ℹ Already installed: $already_count${UI_COLORS[reset]}\n"
     fi
     if [[ $skipped_count -gt 0 ]]; then
-        printf "${UI_COLORS[warning]}  ⚠ Skipped: $skipped_count${UI_COLORS[reset]}\\n"
+        printf "${UI_COLORS[warning]}  ⚠ Skipped: $skipped_count${UI_COLORS[reset]}\n"
     fi
     
     if [[ $installed_count -gt 0 ]]; then
@@ -364,31 +364,31 @@ manage_packages_v1_integrated() {
     while true; do
         display_module_header "PACKAGE MANAGEMENT (V1 Enhanced)" "📦"
         
-        printf "  📦 ${UI_COLORS[accent]}${UI_COLORS[bold]}[1]${UI_COLORS[reset]}  ${UI_COLORS[info]}Install Essential Packages${UI_COLORS[reset]}\\n"
-        printf "      ${UI_COLORS[dim]}Basic system packages (${#V1_PACMAN_PACKAGES[@]} available)${UI_COLORS[reset]}\\n"
+        printf "  📦 ${UI_COLORS[accent]}${UI_COLORS[bold]}[1]${UI_COLORS[reset]}  ${UI_COLORS[info]}Install Essential Packages${UI_COLORS[reset]}\n"
+        printf "      ${UI_COLORS[dim]}Basic system packages (${#V1_PACMAN_PACKAGES[@]} available)${UI_COLORS[reset]}\n"
         echo
         
-        printf "  🛠️  ${UI_COLORS[accent]}${UI_COLORS[bold]}[2]${UI_COLORS[reset]}  ${UI_COLORS[info]}Install Development Packages${UI_COLORS[reset]}\\n" 
-        printf "      ${UI_COLORS[dim]}Programming tools and libraries (${#V1_DEV_PACKAGES[@]} available)${UI_COLORS[reset]}\\n"
+        printf "  🛠️  ${UI_COLORS[accent]}${UI_COLORS[bold]}[2]${UI_COLORS[reset]}  ${UI_COLORS[info]}Install Development Packages${UI_COLORS[reset]}\n" 
+        printf "      ${UI_COLORS[dim]}Programming tools and libraries (${#V1_DEV_PACKAGES[@]} available)${UI_COLORS[reset]}\n"
         echo
         
-        printf "  🎥 ${UI_COLORS[accent]}${UI_COLORS[bold]}[3]${UI_COLORS[reset]}  ${UI_COLORS[info]}Install Multimedia Packages${UI_COLORS[reset]}\\n"
-        printf "      ${UI_COLORS[dim]}Audio, video and graphics tools${UI_COLORS[reset]}\\n"
+        printf "  🎥 ${UI_COLORS[accent]}${UI_COLORS[bold]}[3]${UI_COLORS[reset]}  ${UI_COLORS[info]}Install Multimedia Packages${UI_COLORS[reset]}\n"
+        printf "      ${UI_COLORS[dim]}Audio, video and graphics tools${UI_COLORS[reset]}\n"
         echo
         
-        printf "  🏠 ${UI_COLORS[accent]}${UI_COLORS[bold]}[4]${UI_COLORS[reset]}  ${UI_COLORS[info]}Install AUR Packages${UI_COLORS[reset]}\\n"
-        printf "      ${UI_COLORS[dim]}Packages from Arch User Repository${UI_COLORS[reset]}\\n"
+        printf "  🏠 ${UI_COLORS[accent]}${UI_COLORS[bold]}[4]${UI_COLORS[reset]}  ${UI_COLORS[info]}Install AUR Packages${UI_COLORS[reset]}\n"
+        printf "      ${UI_COLORS[dim]}Packages from Arch User Repository${UI_COLORS[reset]}\n"
         echo
         
-        printf "  🔍 ${UI_COLORS[accent]}${UI_COLORS[bold]}[5]${UI_COLORS[reset]}  ${UI_COLORS[info]}Search Packages${UI_COLORS[reset]}\\n"
-        printf "      ${UI_COLORS[dim]}Search across all repositories${UI_COLORS[reset]}\\n"
+        printf "  🔍 ${UI_COLORS[accent]}${UI_COLORS[bold]}[5]${UI_COLORS[reset]}  ${UI_COLORS[info]}Search Packages${UI_COLORS[reset]}\n"
+        printf "      ${UI_COLORS[dim]}Search across all repositories${UI_COLORS[reset]}\n"
         echo
         
-        printf "  ⬆️  ${UI_COLORS[accent]}${UI_COLORS[bold]}[6]${UI_COLORS[reset]}  ${UI_COLORS[info]}System Update${UI_COLORS[reset]}\\n"
-        printf "      ${UI_COLORS[dim]}Update all packages using V1 modules${UI_COLORS[reset]}\\n"
+        printf "  ⬆️  ${UI_COLORS[accent]}${UI_COLORS[bold]}[6]${UI_COLORS[reset]}  ${UI_COLORS[info]}System Update${UI_COLORS[reset]}\n"
+        printf "      ${UI_COLORS[dim]}Update all packages using V1 modules${UI_COLORS[reset]}\n"
         echo
         
-        printf "  ${UI_ICONS[exit]} ${UI_COLORS[error]}${UI_COLORS[bold]}[0]${UI_COLORS[reset]}  ${UI_COLORS[info]}Return to Main Menu${UI_COLORS[reset]}\\n"
+        printf "  ${UI_ICONS[exit]} ${UI_COLORS[error]}${UI_COLORS[bold]}[0]${UI_COLORS[reset]}  ${UI_COLORS[info]}Return to Main Menu${UI_COLORS[reset]}\n"
         echo
         
         display_module_footer "Choose option [0-6]"
@@ -415,7 +415,7 @@ manage_packages_v1_integrated() {
 update_system_v1_integrated() {
     display_module_header "SYSTEM UPDATE (V1 Enhanced)" "⬆️"
     
-    printf "${UI_COLORS[info]}This will update all packages using V1 module logic.${UI_COLORS[reset]}\\n"
+    printf "${UI_COLORS[info]}This will update all packages using V1 module logic.${UI_COLORS[reset]}\n"
     echo
     
     if ui_confirm "Do you want to proceed with system update?"; then
