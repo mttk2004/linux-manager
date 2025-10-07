@@ -1787,20 +1787,27 @@ reset_configuration_interactive() {
     wait_for_user
 }
 
+# Get current script directory reliably
+UI_SYSTEM_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 # Load V1 integration layer
-if [[ -f "$(dirname "${BASH_SOURCE[0]}")/v1_integration.sh" ]]; then
-    source "$(dirname "${BASH_SOURCE[0]}")/v1_integration.sh"
+if [[ -f "$UI_SYSTEM_DIR/v1_integration.sh" ]]; then
+    source "$UI_SYSTEM_DIR/v1_integration.sh"
     V1_INTEGRATION_AVAILABLE=true
+    log_debug "UI_SYSTEM" "V1 integration loaded from: $UI_SYSTEM_DIR/v1_integration.sh"
 else
     V1_INTEGRATION_AVAILABLE=false
+    log_debug "UI_SYSTEM" "V1 integration not found at: $UI_SYSTEM_DIR/v1_integration.sh"
 fi
 
 # Load configuration manager
-if [[ -f "$(dirname "${BASH_SOURCE[0]}")/config_manager.sh" ]]; then
-    source "$(dirname "${BASH_SOURCE[0]}")/config_manager.sh"
+if [[ -f "$UI_SYSTEM_DIR/config_manager.sh" ]]; then
+    source "$UI_SYSTEM_DIR/config_manager.sh"
     CONFIG_MANAGER_AVAILABLE=true
+    log_debug "UI_SYSTEM" "Config manager loaded from: $UI_SYSTEM_DIR/config_manager.sh"
 else
     CONFIG_MANAGER_AVAILABLE=false
+    log_debug "UI_SYSTEM" "Config manager not found at: $UI_SYSTEM_DIR/config_manager.sh"
 fi
 
 # Main V2 handlers called by the main script
@@ -1954,6 +1961,15 @@ export -f manage_docker_environment_v2 manage_git_configuration_v2
 # Export package installation helpers
 export -f install_package_list install_packages_with_pacman install_packages_with_aur
 export -f install_custom_package install_flatpak_apps_interactive
+
+# Export package search functions
+export -f search_pacman_packages search_aur_packages search_flatpak_apps
+export -f show_installed_packages
+
+# Export configuration management functions
+export -f manage_system_configuration manage_configuration_interactive
+export -f view_current_configuration edit_configuration_interactive
+export -f save_configuration_interactive reset_configuration_interactive
 
 # Export main V2 handlers
 export -f handle_packages_v2 handle_development_v2 handle_system_config_v2

@@ -8,16 +8,22 @@
 # @AUTHOR: Linux Manager Team
 # @LICENSE: MIT
 
+# Get base directory reliably
+V1_INTEGRATION_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+V1_BASE_DIR="$(cd "$V1_INTEGRATION_DIR/../../.." && pwd)"
+
 # Source V2 UI system for consistency
 if [[ ! "${UI_SYSTEM_INITIALIZED:-false}" == "true" ]]; then
-    source "$(dirname "${BASH_SOURCE[0]}")/ui_system.sh"
-    init_ui_system
+    if [[ -f "$V1_INTEGRATION_DIR/ui_system.sh" ]]; then
+        source "$V1_INTEGRATION_DIR/ui_system.sh"
+        init_ui_system
+    fi
 fi
 
 # V1 Module paths
-declare -g V1_MODULES_DIR="${ROOT_DIR:-$(dirname "${BASH_SOURCE[0]}")/../../../src}/modules"
-declare -g V1_DATA_DIR="${ROOT_DIR:-$(dirname "${BASH_SOURCE[0]}")/../../../src}/data"
-declare -g V1_CORE_DIR="${ROOT_DIR:-$(dirname "${BASH_SOURCE[0]}")/../../../src}/core"
+declare -g V1_MODULES_DIR="${ROOT_DIR:-$V1_BASE_DIR}/src/modules"
+declare -g V1_DATA_DIR="${ROOT_DIR:-$V1_BASE_DIR}/src/data"
+declare -g V1_CORE_DIR="${ROOT_DIR:-$V1_BASE_DIR}/src/core"
 
 # V1 Integration status
 declare -g V1_INTEGRATION_INITIALIZED=false
@@ -30,6 +36,9 @@ init_v1_integration() {
     fi
     
     log_info "V1_INTEGRATION" "Initializing V1 module integration"
+    log_debug "V1_INTEGRATION" "V1 modules dir: $V1_MODULES_DIR"
+    log_debug "V1_INTEGRATION" "V1 data dir: $V1_DATA_DIR"
+    log_debug "V1_INTEGRATION" "V1 core dir: $V1_CORE_DIR"
     
     # Check if V1 directories exist
     if [[ ! -d "$V1_MODULES_DIR" ]]; then
